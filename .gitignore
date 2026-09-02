@@ -6,6 +6,7 @@
 .env.production
 .env.local
 .env.*.local
+/.htaccess
 
 # Logs & Framework Storage
 *.log
