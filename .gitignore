@@ -30,7 +30,7 @@
 # Public build assets (Vite / Mix compiled files)
 /public/hot
 /public/storage
-/public/build/
+# /public/build/
 
 # PHP / Testing artifacts
 .phpunit.result.cache
