@@ -1,24 +1,61 @@
-*.log
-.DS_Store
+# ==============================================================================
+# Laravel & Environment Specific Ignores
+# ==============================================================================
 .env
 .env.backup
 .env.production
-.phpactor.json
-.phpunit.result.cache
-/.fleet
-/.idea
-/.nova
-/.phpunit.cache
-/.vscode
-/.zed
-/auth.json
-/node_modules
-/public/build
+.env.local
+.env.*.local
+
+# Logs & Framework Storage
+*.log
+/storage/logs/*.log
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/framework/testing/*
+/storage/app/public/*
+/storage/pail
+/storage/*.key
+!/storage/**/.gitignore
+
+# Dependencies
+/vendor/
+/node_modules/
+/npm-debug.log*
+/yarn-error.log*
+/pnpm-debug.log*
+
+# Public build assets (Vite / Mix compiled files)
 /public/hot
 /public/storage
-/storage/*.key
-/storage/pail
-/vendor
+/public/build/
+
+# PHP / Testing artifacts
+.phpunit.result.cache
+.phpunit.cache/
+.phpactor.json
+/auth.json
 Homestead.json
 Homestead.yaml
+
+# IDEs & Editor configs
+.vscode/
+.idea/
+.fleet/
+.nova/
+.zed/
+*.sublime-project
+*.sublime-workspace
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+
+# Antigravity Brain / IDE artifacts
+.system_generated/
