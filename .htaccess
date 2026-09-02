@@ -1,24 +1,4 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-
-    # 1. Block access to hidden dotfiles & sensitive config/source files
-    RewriteRule ^(\.env|\.git|\.agents|\.github|composer\.(json|lock)|package(-lock)?\.json|artisan|phpunit\.xml|vite\.config\.js|tailwind\.config\.js) - [F,L,NC]
-
-    # 2. Block access to backend directories (app, bootstrap, config, database, storage, tests)
-    RewriteRule ^(app|bootstrap|config|database|routes|storage|tests|vendor)/ - [F,L,NC]
-
-    # 3. Rewrite all remaining traffic to the public/ folder
-    RewriteCond %{REQUEST_URI} !^/public/
     RewriteRule ^(.*)$ public/$1 [L]
-</IfModule>
-
-# Prevent directory listings
-Options -Indexes
-
-# Security headers for live servers
-<IfModule mod_headers.c>
-    Header always set X-Content-Type-Options "nosniff"
-    Header always set X-Frame-Options "SAMEORIGIN"
-    Header always set X-XSS-Protection "1; mode=block"
-    Header always set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
