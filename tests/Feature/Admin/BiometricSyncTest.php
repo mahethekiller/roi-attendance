@@ -23,8 +23,19 @@ class BiometricSyncTest extends TestCase
         $this->adminUser = User::where('email', 'admin@example.com')->first();
     }
 
-    public function test_artisan_command_syncs_biometric_data(): void
+    public function test_artisan_command_syncs_biometric_data_for_registered_employee(): void
     {
+        // Seed registered employee
+        Employee::create([
+            'user_id' => $this->adminUser->id,
+            'employee_id' => '1001',
+            'card_no' => '7701',
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'john.doe@example.com',
+            'company' => 'Acme Corp',
+        ]);
+
         $mockData = [
             'status' => 1,
             'message' => 'Success',
@@ -38,6 +49,15 @@ class BiometricSyncTest extends TestCase
                     'maxtime' => '17:05:00',
                     'maxchecktime' => '2026-09-02 17:05:00',
                 ],
+                [
+                    'card_no' => '9999', // Unregistered employee
+                    'badgenumber' => '9999',
+                    'punch_date' => '2026-09-02',
+                    'mintime' => '09:00:00',
+                    'minchecktime' => '2026-09-02 09:00:00',
+                    'maxtime' => '17:00:00',
+                    'maxchecktime' => '2026-09-02 17:00:00',
+                ],
             ],
         ];
 
@@ -48,16 +68,33 @@ class BiometricSyncTest extends TestCase
         $this->artisan('attendance:sync-biometric')
             ->assertSuccessful();
 
+        // 7701 is registered -> must be in attendances
         $this->assertDatabaseHas('attendances', [
             'card_no' => '7701',
             'check_in_time' => '08:55:00',
             'check_out_time' => '17:05:00',
             'show_status' => 'present',
         ]);
+
+        // 9999 is unregistered -> must NOT be in attendances
+        $this->assertDatabaseMissing('attendances', [
+            'card_no' => '9999',
+        ]);
     }
 
     public function test_admin_can_trigger_sync_from_ui(): void
     {
+        // Seed registered employee
+        Employee::create([
+            'user_id' => $this->adminUser->id,
+            'employee_id' => '1002',
+            'card_no' => '8802',
+            'first_name' => 'Sarah',
+            'last_name' => 'Connor',
+            'email' => 'sarah.connor@example.com',
+            'company' => 'Acme Corp',
+        ]);
+
         $mockData = [
             'status' => 1,
             'message' => 'Success',

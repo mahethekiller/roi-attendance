@@ -81,6 +81,20 @@ class BiometricSyncService
             $punchRecords = $result['data'] ?? [];
             $importedCount = 0;
             $updatedCount = 0;
+            $skippedUnregisteredCount = 0;
+
+            // Pre-fetch all registered card numbers and employee IDs for fast O(1) hash lookup
+            $registeredCards = \App\Models\Employee::whereNotNull('card_no')
+                ->where('card_no', '!=', '')
+                ->pluck('card_no')
+                ->map(fn($v) => trim((string)$v))
+                ->flip();
+
+            $registeredBadgeNumbers = \App\Models\Employee::whereNotNull('employee_id')
+                ->where('employee_id', '!=', '')
+                ->pluck('employee_id')
+                ->map(fn($v) => trim((string)$v))
+                ->flip();
 
             foreach ($punchRecords as $obj) {
                 $cardNo = is_array($obj) ? ($obj['card_no'] ?? null) : ($obj->card_no ?? null);
@@ -92,6 +106,17 @@ class BiometricSyncService
                 $maxTime = is_array($obj) ? ($obj['maxtime'] ?? null) : ($obj->maxtime ?? null);
 
                 if (empty($cardNo) || empty($punchDateRaw)) {
+                    continue;
+                }
+
+                $cleanCard = trim((string)$cardNo);
+                $cleanBadge = !empty($badgeNumber) ? trim((string)$badgeNumber) : '';
+
+                // Verify employee exists in local database by card_no or employee_id / badgenumber
+                $isRegistered = $registeredCards->has($cleanCard) || (!empty($cleanBadge) && $registeredBadgeNumbers->has($cleanBadge));
+
+                if (!$isRegistered) {
+                    $skippedUnregisteredCount++;
                     continue;
                 }
 
@@ -129,7 +154,7 @@ class BiometricSyncService
                 }
             }
 
-            $successMsg = "Sync complete: {$importedCount} new entries inserted, {$updatedCount} entries updated.";
+            $successMsg = "Sync complete: {$importedCount} new entries inserted, {$updatedCount} updated, {$skippedUnregisteredCount} skipped (unregistered employees).";
 
             // Save to sync_logs DB table
             \App\Models\SyncLog::create([
@@ -140,16 +165,20 @@ class BiometricSyncService
                 'imported_count' => $importedCount,
                 'updated_count'  => $updatedCount,
                 'message'        => $successMsg,
-                'payload_summary' => ['total_records_received' => count($punchRecords)],
+                'payload_summary' => [
+                    'total_records_received' => count($punchRecords),
+                    'skipped_unregistered'   => $skippedUnregisteredCount,
+                ],
             ]);
 
-            Log::info("Biometric Sync Completed: {$importedCount} inserted, {$updatedCount} updated for range {$startDate} to {$endDate}.");
+            Log::info("Biometric Sync Completed: {$importedCount} inserted, {$updatedCount} updated, {$skippedUnregisteredCount} skipped for range {$startDate} to {$endDate}.");
 
             return [
-                'success'  => true,
-                'message'  => $successMsg,
-                'imported' => $importedCount,
-                'updated'  => $updatedCount,
+                'success'              => true,
+                'message'              => $successMsg,
+                'imported'             => $importedCount,
+                'updated'              => $updatedCount,
+                'skipped_unregistered' => $skippedUnregisteredCount,
             ];
 
         } catch (\Exception $e) {
