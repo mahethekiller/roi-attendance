@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\GetAttendanceApiRequest;
+use App\Http\Requests\Api\HRsaleAttendanceRequest;
 use App\Http\Resources\AttendanceResource;
+use App\Http\Resources\HRsaleAttendanceResource;
 use App\Models\Attendance;
 use App\Models\User;
 use Carbon\Carbon;
@@ -136,4 +138,62 @@ class AttendanceApiController extends Controller
             ]
         ]);
     }
+
+    /**
+     * HRsale Compatible Attendance Retrieval Endpoint
+     * POST /api/attendance or POST /api/v1/attendance
+     */
+    public function hrsaleAttendance(HRsaleAttendanceRequest $request): JsonResponse
+    {
+        $validated = $request->validated();
+
+        $query = Attendance::with('employee');
+
+        // Date filtering logic
+        if (!empty($validated['punch_date'])) {
+            $query->whereDate('punch_date', $validated['punch_date']);
+        } elseif (!empty($validated['start_date']) || !empty($validated['end_date'])) {
+            if (!empty($validated['start_date'])) {
+                $query->whereDate('punch_date', '>=', $validated['start_date']);
+            }
+            if (!empty($validated['end_date'])) {
+                $query->whereDate('punch_date', '<=', $validated['end_date']);
+            }
+        } else {
+            // Default to today's server date if no date filters are supplied
+            $query->whereDate('punch_date', Carbon::today('Asia/Kolkata')->format('Y-m-d'));
+        }
+
+        // Card number filter
+        if (!empty($validated['card_no'])) {
+            $query->where('card_no', $validated['card_no']);
+        }
+
+        // Employee filter (ID, badgenumber, or employee_id string)
+        if (!empty($validated['employee_id'])) {
+            $empId = $validated['employee_id'];
+            $query->where(function ($q) use ($empId) {
+                $q->where('badgenumber', $empId)
+                  ->orWhere('card_no', $empId)
+                  ->orWhereHas('employee', function ($eq) use ($empId) {
+                      $eq->where('employee_id', $empId)
+                         ->orWhere('id', $empId);
+                  });
+            });
+        }
+
+        // Company filter
+        if (!empty($validated['company_id'])) {
+            $companyId = $validated['company_id'];
+            $query->whereHas('employee', function ($q) use ($companyId) {
+                $q->where('company', 'like', "%{$companyId}%")
+                  ->orWhere('id', $companyId);
+            });
+        }
+
+        $attendances = $query->orderBy('punch_date', 'asc')->orderBy('check_in_time', 'asc')->get();
+
+        return response()->json(HRsaleAttendanceResource::collection($attendances)->resolve(), 200);
+    }
 }
+

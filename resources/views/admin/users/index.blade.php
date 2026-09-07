@@ -57,11 +57,11 @@
                         <span class="input-group-text bg-body-tertiary border-end-0 text-body-secondary">
                             <i data-lucide="search" style="width: 18px; height: 18px;"></i>
                         </span>
-                        <input type="search" name="search" class="form-control bg-body-tertiary border-start-0 text-body" placeholder="Search by name or email..." value="{{ $search }}">
+                        <input type="search" name="search" class="form-control bg-body-tertiary border-start-0 text-body" placeholder="Search by name or email..." aria-label="Search users by name or email" value="{{ $search }}">
                     </div>
                 </div>
                 <div class="col-12 col-md-4">
-                    <select name="role" class="form-select bg-body-tertiary text-body">
+                    <select name="role" class="form-select bg-body-tertiary text-body" aria-label="Filter by role">
                         <option value="">All Roles</option>
                         @foreach($roles as $role)
                             <option value="{{ $role->name }}" {{ $roleFilter === $role->name ? 'selected' : '' }}>
@@ -75,7 +75,7 @@
                         <i data-lucide="filter" style="width: 16px; height: 16px;"></i> Filter
                     </button>
                     @if($search || $roleFilter)
-                        <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary d-flex align-items-center justify-content-center">
+                        <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary d-flex align-items-center justify-content-center" title="Reset Filters" aria-label="Reset filters">
                             <i data-lucide="rotate-ccw" style="width: 16px; height: 16px;"></i>
                         </a>
                     @endif
@@ -136,17 +136,18 @@
                             <td class="text-body-secondary">{{ $user->created_at->format('M d, Y') }}</td>
                             <td class="text-end">
                                 <div class="d-inline-flex gap-1">
-                                    <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-outline-secondary" title="Edit User">
-                                        <i data-lucide="edit-3" style="width: 15px; height: 15px;"></i>
+                                    <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-outline-secondary p-2 d-inline-flex align-items-center justify-content-center" title="Edit User" aria-label="Edit user {{ $user->name }}">
+                                        <i data-lucide="edit-3" style="width: 16px; height: 16px;"></i>
                                     </a>
                                     @if(Auth::id() !== $user->id)
-                                        <button type="button" class="btn btn-sm btn-outline-danger" title="Delete User"
+                                        <button type="button" class="btn btn-sm btn-outline-danger p-2 d-inline-flex align-items-center justify-content-center" title="Delete User"
+                                                aria-label="Delete user {{ $user->name }}"
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#deleteUserModal"
                                                 data-user-id="{{ $user->id }}"
                                                 data-user-name="{{ $user->name }}"
                                                 data-user-action="{{ route('admin.users.destroy', $user) }}">
-                                            <i data-lucide="trash-2" style="width: 15px; height: 15px;"></i>
+                                            <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
                                         </button>
                                     @endif
                                 </div>

@@ -73,7 +73,7 @@
             <form method="GET" action="{{ route('admin.attendances.index') }}" class="row g-2 align-items-center">
                 <!-- Date Picker -->
                 <div class="col-12 col-md-3">
-                    <input type="date" name="date" class="form-control bg-body-tertiary text-body" value="{{ $date }}">
+                    <input type="date" name="date" class="form-control bg-body-tertiary text-body" aria-label="Select attendance date" value="{{ $date }}">
                 </div>
 
                 <!-- Search Input -->
@@ -82,13 +82,13 @@
                         <span class="input-group-text bg-body-tertiary border-end-0 text-body-secondary">
                             <i data-lucide="search" style="width: 18px; height: 18px;"></i>
                         </span>
-                        <input type="search" name="search" class="form-control bg-body-tertiary border-start-0 text-body" placeholder="Search Card, Badge No, or Name..." value="{{ $search }}">
+                        <input type="search" name="search" class="form-control bg-body-tertiary border-start-0 text-body" placeholder="Search Card, Badge No, or Name..." aria-label="Search by Card, Badge No, or Name" value="{{ $search }}">
                     </div>
                 </div>
 
                 <!-- Status Filter -->
                 <div class="col-12 col-md-3">
-                    <select name="status" class="form-select bg-body-tertiary text-body">
+                    <select name="status" class="form-select bg-body-tertiary text-body" aria-label="Filter by attendance status">
                         <option value="">All Statuses</option>
                         <option value="present" {{ $status === 'present' ? 'selected' : '' }}>Present</option>
                         <option value="late" {{ $status === 'late' ? 'selected' : '' }}>Late</option>
@@ -103,7 +103,7 @@
                         <i data-lucide="filter" style="width: 16px; height: 16px;"></i> Filter
                     </button>
                     @if($search || $status || $date !== date('Y-m-d'))
-                        <a href="{{ route('admin.attendances.index') }}" class="btn btn-outline-secondary d-flex align-items-center justify-content-center">
+                        <a href="{{ route('admin.attendances.index') }}" class="btn btn-outline-secondary d-flex align-items-center justify-content-center" title="Reset Filters" aria-label="Reset attendance filters">
                             <i data-lucide="rotate-ccw" style="width: 16px; height: 16px;"></i>
                         </a>
                     @endif

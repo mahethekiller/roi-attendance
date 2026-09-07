@@ -102,7 +102,7 @@
                                 <form method="POST" action="{{ route('admin.api-tokens.destroy', $token->id) }}" class="d-inline" onsubmit="return confirm('Revoke token \'{{ $token->name }}\'? External clients using it will immediately lose access.');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 p-2" aria-label="Revoke API token {{ $token->name }}" title="Revoke Token">
                                         <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
                                         <span>Revoke</span>
                                     </button>

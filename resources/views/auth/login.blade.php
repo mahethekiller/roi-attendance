@@ -7,23 +7,37 @@
 
     <title>{{ config('app.name', 'Laravel') }} - Admin Login</title>
 
-    <!-- Fonts -->
+    <!-- Pre-hydration theme script to prevent FOUC -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('roi_theme') || 'dark';
+            document.documentElement.setAttribute('data-bs-theme', savedTheme);
+        })();
+    </script>
+
+    <!-- Distinct Typography: Outfit (Sans) + JetBrains Mono (Code/Numbers) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Bootstrap 5.3 CDN -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     @vite(['resources/js/app.js'])
 
     <style>
+        :root {
+            --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: var(--font-sans);
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            letter-spacing: -0.01em;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            letter-spacing: -0.025em;
+        }
+        .font-monospace, code, pre, .font-mono, .badge.fw-mono {
+            font-family: var(--font-mono) !important;
         }
         .login-wrapper {
             min-height: 100vh;
@@ -56,11 +70,17 @@
         .lucide {
             vertical-align: middle;
         }
+        @media (prefers-reduced-motion: reduce) {
+            .btn,
+            .form-control {
+                transition: none !important;
+            }
+        }
     </style>
 </head>
 <body class="bg-body">
     <!-- Dark/Light Theme Toggle -->
-    <button class="btn btn-outline-secondary rounded-circle theme-toggle-btn p-2 d-flex align-items-center justify-content-center" id="themeToggleBtn" type="button" title="Toggle Theme" style="width: 40px; height: 40px;">
+    <button class="btn btn-outline-secondary rounded-circle theme-toggle-btn p-2 d-flex align-items-center justify-content-center" id="themeToggleBtn" type="button" aria-label="Toggle Theme Mode" title="Toggle Theme" style="width: 40px; height: 40px;">
         <i data-lucide="sun" id="themeIcon" style="width: 20px; height: 20px;"></i>
     </button>
 
@@ -79,7 +99,7 @@
                 </div>
 
                 <div class="z-1 my-auto py-5">
-                    <span class="badge bg-indigo bg-opacity-25 text-indigo border border-indigo border-opacity-25 mb-3 px-3 py-2 rounded-pill d-inline-flex align-items-center gap-1">
+                    <span class="badge bg-primary bg-opacity-25 text-white border border-primary border-opacity-50 mb-3 px-3 py-2 rounded-pill d-inline-flex align-items-center gap-1">
                         <i data-lucide="sparkles" style="width: 16px; height: 16px;"></i> Admin Management System
                     </span>
                     <h1 class="display-5 fw-bold mb-4">Streamline Attendance & HR Operations Effortlessly</h1>
@@ -87,14 +107,14 @@
 
                     <div class="row g-3 mt-4">
                         <div class="col-sm-6">
-                            <div class="p-3 rounded-3 bg-white bg-opacity-10 border border-white border-opacity-10 backdrop-blur">
+                            <div class="p-3 rounded-3 bg-white bg-opacity-10 border border-white border-opacity-10">
                                 <i data-lucide="lock" class="text-info mb-2 d-block" style="width: 24px; height: 24px;"></i>
                                 <h6 class="fw-semibold text-white mb-1">Spatie RBAC</h6>
                                 <small class="text-white-50">Strict permissions & roles</small>
                             </div>
                         </div>
                         <div class="col-sm-6">
-                            <div class="p-3 rounded-3 bg-white bg-opacity-10 border border-white border-opacity-10 backdrop-blur">
+                            <div class="p-3 rounded-3 bg-white bg-opacity-10 border border-white border-opacity-10">
                                 <i data-lucide="gauge" class="text-warning mb-2 d-block" style="width: 24px; height: 24px;"></i>
                                 <h6 class="fw-semibold text-white mb-1">Live Analytics</h6>
                                 <small class="text-white-50">Real-time stats dashboard</small>
@@ -134,7 +154,7 @@
 
                         <!-- Email Input -->
                         <div class="form-floating mb-3">
-                            <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" id="emailInput" placeholder="name@example.com" value="{{ old('email') }}" required autofocus autocomplete="username">
+                            <input type="email" name="email" class="form-control bg-body text-body @error('email') is-invalid @enderror" id="emailInput" placeholder="name@example.com" value="{{ old('email') }}" required autofocus autocomplete="username">
                             <label for="emailInput">Email Address</label>
                             @error('email')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -143,7 +163,7 @@
 
                         <!-- Password Input -->
                         <div class="form-floating mb-3">
-                            <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" id="passwordInput" placeholder="Password" required autocomplete="current-password">
+                            <input type="password" name="password" class="form-control bg-body text-body @error('password') is-invalid @enderror" id="passwordInput" placeholder="Password" required autocomplete="current-password">
                             <label for="passwordInput">Password</label>
                             @error('password')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -179,42 +199,5 @@
             </div>
         </div>
     </div>
-
-    <script>
-        (function() {
-            const savedTheme = localStorage.getItem('roi_theme') || 'dark';
-            document.documentElement.setAttribute('data-bs-theme', savedTheme);
-        })();
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const themeToggleBtn = document.getElementById('themeToggleBtn');
-            const htmlElement = document.documentElement;
-            const currentTheme = htmlElement.getAttribute('data-bs-theme') || 'dark';
-
-            // Set initial icon
-            const iconName = currentTheme === 'dark' ? 'sun' : 'moon';
-            if (themeToggleBtn) {
-                themeToggleBtn.innerHTML = `<i data-lucide="${iconName}" style="width: 20px; height: 20px;"></i>`;
-            }
-
-            if (window.lucide) {
-                lucide.createIcons();
-            }
-
-            if (themeToggleBtn) {
-                themeToggleBtn.addEventListener('click', () => {
-                    const theme = htmlElement.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
-                    htmlElement.setAttribute('data-bs-theme', theme);
-                    localStorage.setItem('roi_theme', theme);
-                    
-                    const newIcon = theme === 'dark' ? 'sun' : 'moon';
-                    themeToggleBtn.innerHTML = `<i data-lucide="${newIcon}" style="width: 20px; height: 20px;"></i>`;
-                    if (window.lucide) {
-                        lucide.createIcons();
-                    }
-                });
-            }
-        });
-    </script>
 </body>
 </html>

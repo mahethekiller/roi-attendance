@@ -60,3 +60,6 @@ Thumbs.db
 
 # Antigravity Brain / IDE artifacts
 .system_generated/
+.agents/
+.impeccable/
+

@@ -65,7 +65,7 @@
                         <span class="input-group-text bg-body-tertiary border-end-0 text-body-secondary">
                             <i data-lucide="search" style="width: 18px; height: 18px;"></i>
                         </span>
-                        <input type="search" name="search" class="form-control bg-body-tertiary border-start-0 text-body" placeholder="Search by Employee ID, Card No, Name, or Email..." value="{{ $search }}">
+                        <input type="search" name="search" class="form-control bg-body-tertiary border-start-0 text-body" placeholder="Search by Employee ID, Card No, Name, or Email..." aria-label="Search employees by ID, Card No, Name, or Email" value="{{ $search }}">
                     </div>
                 </div>
                 <div class="col-12 col-md-3 d-flex gap-2">
@@ -73,7 +73,7 @@
                         <i data-lucide="filter" style="width: 16px; height: 16px;"></i> Search
                     </button>
                     @if($search)
-                        <a href="{{ route('admin.employees.index') }}" class="btn btn-outline-secondary d-flex align-items-center justify-content-center">
+                        <a href="{{ route('admin.employees.index') }}" class="btn btn-outline-secondary d-flex align-items-center justify-content-center" title="Reset Search" aria-label="Reset search filter">
                             <i data-lucide="rotate-ccw" style="width: 16px; height: 16px;"></i>
                         </a>
                     @endif
@@ -143,15 +143,16 @@
                             <td class="text-body-secondary">{{ $employee->created_at->format('M d, Y') }}</td>
                             <td class="text-end">
                                 <div class="d-inline-flex gap-1">
-                                    <a href="{{ route('admin.employees.edit', $employee) }}" class="btn btn-sm btn-outline-secondary" title="Edit Employee">
-                                        <i data-lucide="edit-3" style="width: 15px; height: 15px;"></i>
+                                    <a href="{{ route('admin.employees.edit', $employee) }}" class="btn btn-sm btn-outline-secondary p-2 d-inline-flex align-items-center justify-content-center" title="Edit Employee" aria-label="Edit employee {{ $employee->full_name }}">
+                                        <i data-lucide="edit-3" style="width: 16px; height: 16px;"></i>
                                     </a>
-                                    <button type="button" class="btn btn-sm btn-outline-danger" title="Delete Employee"
+                                    <button type="button" class="btn btn-sm btn-outline-danger p-2 d-inline-flex align-items-center justify-content-center" title="Delete Employee"
+                                            aria-label="Delete employee {{ $employee->full_name }}"
                                             data-bs-toggle="modal"
                                             data-bs-target="#deleteEmployeeModal"
                                             data-emp-name="{{ $employee->full_name }}"
                                             data-emp-action="{{ route('admin.employees.destroy', $employee) }}">
-                                        <i data-lucide="trash-2" style="width: 15px; height: 15px;"></i>
+                                        <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
                                     </button>
                                 </div>
                             </td>

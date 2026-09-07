@@ -62,18 +62,18 @@
                         <span class="input-group-text bg-body-tertiary text-body-secondary border-end-0">
                             <i data-lucide="search" style="width: 16px; height: 16px;"></i>
                         </span>
-                        <input type="text" name="search" class="form-control bg-body-tertiary text-body border-start-0" placeholder="Search URL, IP, or Token..." value="{{ $search }}">
+                        <input type="text" name="search" class="form-control bg-body-tertiary text-body border-start-0" placeholder="Search URL, IP, or Token..." aria-label="Search API logs by URL, IP, or Token" value="{{ $search }}">
                     </div>
                 </div>
                 <div class="col-12 col-md-3">
-                    <select name="method" class="form-select bg-body-tertiary text-body">
+                    <select name="method" class="form-select bg-body-tertiary text-body" aria-label="Filter by HTTP method">
                         <option value="">All Methods (GET, POST, etc.)</option>
                         <option value="GET" {{ $method === 'GET' ? 'selected' : '' }}>GET</option>
                         <option value="POST" {{ $method === 'POST' ? 'selected' : '' }}>POST</option>
                     </select>
                 </div>
                 <div class="col-12 col-md-3">
-                    <select name="status" class="form-select bg-body-tertiary text-body">
+                    <select name="status" class="form-select bg-body-tertiary text-body" aria-label="Filter by HTTP status code">
                         <option value="">All Statuses</option>
                         <option value="2xx" {{ $status === '2xx' ? 'selected' : '' }}>2xx Success (200 OK)</option>
                         <option value="4xx" {{ $status === '4xx' ? 'selected' : '' }}>4xx Client Error (401 / 422 / 429)</option>
@@ -85,7 +85,7 @@
                         <i data-lucide="filter" style="width: 16px; height: 16px;"></i> Filter
                     </button>
                     @if($status || $method || $search)
-                        <a href="{{ route('admin.api-logs.index') }}" class="btn btn-outline-secondary d-flex align-items-center justify-content-center">
+                        <a href="{{ route('admin.api-logs.index') }}" class="btn btn-outline-secondary d-flex align-items-center justify-content-center" title="Reset Filters" aria-label="Reset API log filters">
                             <i data-lucide="rotate-ccw" style="width: 16px; height: 16px;"></i>
                         </a>
                     @endif
@@ -157,7 +157,9 @@
                                 @endif
                             </td>
                             <td class="text-end">
-                                <button type="button" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1"
+                                <button type="button" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1 p-2"
+                                        title="Inspect Request"
+                                        aria-label="Inspect API request for {{ $log->url }}"
                                         data-bs-toggle="modal"
                                         data-bs-target="#apiLogDetailModal"
                                         data-url="{{ $log->url }}"

@@ -57,7 +57,7 @@
         <div class="card-body p-3">
             <form method="GET" action="{{ route('admin.sync-logs.index') }}" class="row g-2 align-items-center">
                 <div class="col-12 col-md-5">
-                    <select name="trigger" class="form-select bg-body-tertiary text-body">
+                    <select name="trigger" class="form-select bg-body-tertiary text-body" aria-label="Filter by trigger type">
                         <option value="">All Trigger Types (Cron, Manual, Webhook, CLI)</option>
                         <option value="cron" {{ $trigger === 'cron' ? 'selected' : '' }}>Cron</option>
                         <option value="manual_ui" {{ $trigger === 'manual_ui' ? 'selected' : '' }}>Manual Dashboard Click</option>
@@ -66,7 +66,7 @@
                     </select>
                 </div>
                 <div class="col-12 col-md-4">
-                    <select name="status" class="form-select bg-body-tertiary text-body">
+                    <select name="status" class="form-select bg-body-tertiary text-body" aria-label="Filter by execution status">
                         <option value="">All Statuses (Success & Failed)</option>
                         <option value="success" {{ $status === 'success' ? 'selected' : '' }}>Success Only</option>
                         <option value="failed" {{ $status === 'failed' ? 'selected' : '' }}>Failed Only</option>
@@ -77,7 +77,7 @@
                         <i data-lucide="filter" style="width: 16px; height: 16px;"></i> Filter
                     </button>
                     @if($status || $trigger)
-                        <a href="{{ route('admin.sync-logs.index') }}" class="btn btn-outline-secondary d-flex align-items-center justify-content-center">
+                        <a href="{{ route('admin.sync-logs.index') }}" class="btn btn-outline-secondary d-flex align-items-center justify-content-center" title="Reset Filters" aria-label="Reset sync log filters">
                             <i data-lucide="rotate-ccw" style="width: 16px; height: 16px;"></i>
                         </a>
                     @endif
@@ -156,7 +156,9 @@
                                 </div>
                             </td>
                             <td class="text-end">
-                                <button type="button" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1"
+                                <button type="button" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1 p-2"
+                                        title="View Log Details"
+                                        aria-label="View sync log details from {{ $log->created_at->format('M d, Y h:i:s A') }}"
                                         data-bs-toggle="modal"
                                         data-bs-target="#logDetailModal"
                                         data-log-time="{{ $log->created_at->format('M d, Y h:i:s A') }}"

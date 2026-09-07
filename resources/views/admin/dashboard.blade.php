@@ -5,14 +5,14 @@
             <p class="text-body-secondary mb-0">Welcome back, {{ Auth::user()->name }}! Here's what's happening today.</p>
         </div>
         <div class="d-flex gap-2">
-            <button class="btn btn-outline-secondary btn-sm px-3 shadow-sm d-flex align-items-center gap-1">
-                <i data-lucide="download" style="width: 16px; height: 16px;"></i>
-                <span>Export Report</span>
-            </button>
-            <button class="btn btn-primary btn-sm px-3 shadow-sm d-flex align-items-center gap-1">
+            <a href="{{ route('admin.attendances.index') }}" class="btn btn-outline-secondary btn-sm px-3 shadow-sm d-flex align-items-center gap-1">
+                <i data-lucide="calendar-check" style="width: 16px; height: 16px;"></i>
+                <span>View Attendance Logs</span>
+            </a>
+            <a href="{{ route('admin.employees.create') }}" class="btn btn-primary btn-sm px-3 shadow-sm d-flex align-items-center gap-1">
                 <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
                 <span>Add Employee</span>
-            </button>
+            </a>
         </div>
     </div>
 
@@ -123,7 +123,7 @@
                         <td class="text-body-emphasis">08:58 AM</td>
                         <td class="text-body-secondary">-- : --</td>
                         <td><span class="badge bg-success-subtle text-success border border-success-subtle">On Time</span></td>
-                        <td><button class="btn btn-sm btn-outline-secondary">View Log</button></td>
+                        <td><a href="{{ route('admin.attendances.index') }}" class="btn btn-sm btn-outline-secondary" aria-label="View log for Sarah Connor">View Log</a></td>
                     </tr>
                     <tr>
                         <td>
@@ -138,7 +138,7 @@
                         <td class="text-body-emphasis">09:22 AM</td>
                         <td class="text-body-secondary">-- : --</td>
                         <td><span class="badge bg-warning-subtle text-warning border border-warning-subtle">Late (+22m)</span></td>
-                        <td><button class="btn btn-sm btn-outline-secondary">View Log</button></td>
+                        <td><a href="{{ route('admin.attendances.index') }}" class="btn btn-sm btn-outline-secondary" aria-label="View log for Mark Taylor">View Log</a></td>
                     </tr>
                     <tr>
                         <td>
@@ -153,7 +153,7 @@
                         <td class="text-body-emphasis">08:45 AM</td>
                         <td class="text-body-emphasis">05:00 PM</td>
                         <td><span class="badge bg-primary-subtle text-primary border border-primary-subtle">Completed</span></td>
-                        <td><button class="btn btn-sm btn-outline-secondary">View Log</button></td>
+                        <td><a href="{{ route('admin.attendances.index') }}" class="btn btn-sm btn-outline-secondary" aria-label="View log for John Wick">View Log</a></td>
                     </tr>
                 </tbody>
             </table>
