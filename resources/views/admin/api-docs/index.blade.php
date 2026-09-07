@@ -15,10 +15,71 @@
                 <i data-lucide="key" style="width: 16px; height: 16px;"></i>
                 <span>API Tokens</span>
             </a>
-            <a href="{{ route('admin.api-docs.export-txt') }}" class="btn btn-primary btn-sm px-3 shadow-sm d-flex align-items-center gap-2">
-                <i data-lucide="download" style="width: 16px; height: 16px;"></i>
-                <span>Download Spec (.txt)</span>
-            </a>
+            <!-- Split Button with Full Spec and Individual Endpoint Downloads -->
+            <div class="btn-group shadow-sm">
+                <a href="{{ route('admin.api-docs.export-txt') }}" class="btn btn-primary btn-sm px-3 d-flex align-items-center gap-2">
+                    <i data-lucide="file-text" style="width: 16px; height: 16px;"></i>
+                    <span>Download Full Spec (.txt)</span>
+                </a>
+                <button type="button" class="btn btn-primary btn-sm dropdown-toggle dropdown-toggle-split px-2" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="visually-hidden">Toggle Individual Endpoint Downloads</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-2" style="min-width: 270px;">
+                    <li class="dropdown-header text-uppercase small fw-semibold text-muted tracking-wider px-3" style="font-size: 0.75rem;">Individual Endpoint Specs</li>
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center justify-content-between py-2 px-3 small" href="{{ route('admin.api-docs.export-endpoint', 'hrsale-attendance') }}">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-success text-white font-monospace px-1 py-0" style="font-size: 0.68rem;">POST</span>
+                                <span class="font-monospace text-truncate" style="max-width: 160px;">/api/attendance</span>
+                            </div>
+                            <i data-lucide="download" style="width: 13px; height: 13px;" class="text-muted"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center justify-content-between py-2 px-3 small" href="{{ route('admin.api-docs.export-endpoint', 'auth-token') }}">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-success text-white font-monospace px-1 py-0" style="font-size: 0.68rem;">POST</span>
+                                <span class="font-monospace text-truncate" style="max-width: 160px;">/v1/auth/token</span>
+                            </div>
+                            <i data-lucide="download" style="width: 13px; height: 13px;" class="text-muted"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center justify-content-between py-2 px-3 small" href="{{ route('admin.api-docs.export-endpoint', 'attendances-list') }}">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-primary text-white font-monospace px-1 py-0" style="font-size: 0.68rem;">GET</span>
+                                <span class="font-monospace text-truncate" style="max-width: 160px;">/v1/attendances</span>
+                            </div>
+                            <i data-lucide="download" style="width: 13px; height: 13px;" class="text-muted"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center justify-content-between py-2 px-3 small" href="{{ route('admin.api-docs.export-endpoint', 'daily-summary') }}">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-primary text-white font-monospace px-1 py-0" style="font-size: 0.68rem;">GET</span>
+                                <span class="font-monospace text-truncate" style="max-width: 160px;">/daily-summary</span>
+                            </div>
+                            <i data-lucide="download" style="width: 13px; height: 13px;" class="text-muted"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center justify-content-between py-2 px-3 small" href="{{ route('admin.api-docs.export-endpoint', 'attendance-single') }}">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-primary text-white font-monospace px-1 py-0" style="font-size: 0.68rem;">GET</span>
+                                <span class="font-monospace text-truncate" style="max-width: 160px;">/v1/attendances/{id}</span>
+                            </div>
+                            <i data-lucide="download" style="width: 13px; height: 13px;" class="text-muted"></i>
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider my-2"></li>
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3 text-primary small fw-semibold" href="{{ route('admin.api-docs.export-txt') }}">
+                            <i data-lucide="file-text" style="width: 14px; height: 14px;"></i>
+                            <span>Complete Specification (.txt)</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 
@@ -80,6 +141,12 @@
                             <div class="d-flex align-items-center gap-2">
                                 <span class="badge bg-primary text-white fw-bold px-1 py-0 font-monospace" style="font-size: 0.7rem;">GET</span>
                                 <span class="text-truncate font-monospace" style="max-width: 140px;">/daily-summary</span>
+                            </div>
+                        </a>
+                        <a href="#endpoint-attendance-single" class="list-group-item list-group-item-action bg-transparent text-body d-flex align-items-center justify-content-between py-2 px-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-primary text-white fw-bold px-1 py-0 font-monospace" style="font-size: 0.7rem;">GET</span>
+                                <span class="text-truncate font-monospace" style="max-width: 140px;">/v1/attendances/{id}</span>
                             </div>
                         </a>
                     </div>
@@ -157,6 +224,10 @@
                             <span class="badge bg-body-tertiary text-body-secondary border font-monospace small">or /v1/attendance</span>
                         </div>
                         <div class="d-flex align-items-center gap-2">
+                            <a href="{{ route('admin.api-docs.export-endpoint', 'hrsale-attendance') }}" class="btn btn-outline-primary btn-sm px-2 py-1 shadow-sm d-flex align-items-center gap-1 font-monospace" style="font-size: 0.75rem;" title="Download individual .txt spec">
+                                <i data-lucide="download" style="width: 13px; height: 13px;"></i>
+                                <span>Download Doc</span>
+                            </a>
                             <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 fw-semibold">HRsale Compatible</span>
                             <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1">Bearer Auth</span>
                         </div>
@@ -350,7 +421,13 @@ print(response.json())</code></pre>
                             <span class="badge bg-success text-white fw-bold px-2 py-1 font-monospace fs-6">POST</span>
                             <span class="fw-bold text-body-emphasis font-monospace fs-5">/v1/auth/token</span>
                         </div>
-                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1">Public (10 req/min)</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <a href="{{ route('admin.api-docs.export-endpoint', 'auth-token') }}" class="btn btn-outline-primary btn-sm px-2 py-1 shadow-sm d-flex align-items-center gap-1 font-monospace" style="font-size: 0.75rem;" title="Download individual .txt spec">
+                                <i data-lucide="download" style="width: 13px; height: 13px;"></i>
+                                <span>Download Doc</span>
+                            </a>
+                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1">Public (10 req/min)</span>
+                        </div>
                     </div>
                     <p class="text-body-secondary mt-2 mb-0 small">Exchange admin credentials for a personal Bearer access token.</p>
                 </div>
@@ -400,7 +477,13 @@ print(response.json())</code></pre>
                             <span class="badge bg-primary text-white fw-bold px-2 py-1 font-monospace fs-6">GET</span>
                             <span class="fw-bold text-body-emphasis font-monospace fs-5">/v1/attendances</span>
                         </div>
-                        <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1">Bearer Auth (60 req/min)</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <a href="{{ route('admin.api-docs.export-endpoint', 'attendances-list') }}" class="btn btn-outline-primary btn-sm px-2 py-1 shadow-sm d-flex align-items-center gap-1 font-monospace" style="font-size: 0.75rem;" title="Download individual .txt spec">
+                                <i data-lucide="download" style="width: 13px; height: 13px;"></i>
+                                <span>Download Doc</span>
+                            </a>
+                            <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1">Bearer Auth (60 req/min)</span>
+                        </div>
                     </div>
                     <p class="text-body-secondary mt-2 mb-0 small">Query paginated attendance punch records with comprehensive search and metadata filters.</p>
                 </div>
@@ -508,7 +591,13 @@ print(response.json())</code></pre>
                             <span class="badge bg-primary text-white fw-bold px-2 py-1 font-monospace fs-6">GET</span>
                             <span class="fw-bold text-body-emphasis font-monospace fs-5">/v1/attendances/daily-summary</span>
                         </div>
-                        <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1">Bearer Auth</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <a href="{{ route('admin.api-docs.export-endpoint', 'daily-summary') }}" class="btn btn-outline-primary btn-sm px-2 py-1 shadow-sm d-flex align-items-center gap-1 font-monospace" style="font-size: 0.75rem;" title="Download individual .txt spec">
+                                <i data-lucide="download" style="width: 13px; height: 13px;"></i>
+                                <span>Download Doc</span>
+                            </a>
+                            <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1">Bearer Auth</span>
+                        </div>
                     </div>
                     <p class="text-body-secondary mt-2 mb-0 small">Retrieve high-level daily attendance metrics (total punches, present count, late count).</p>
                 </div>
@@ -548,6 +637,69 @@ print(response.json())</code></pre>
                 </div>
             </div>
 
+
+            <!-- Section 6: Endpoint - Single Attendance Record -->
+            <div class="card border-0 shadow-sm bg-body text-body mb-4" id="endpoint-attendance-single">
+                <div class="card-header bg-body border-bottom p-3 p-md-4">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-primary text-white fw-bold px-2 py-1 font-monospace fs-6">GET</span>
+                            <span class="fw-bold text-body-emphasis font-monospace fs-5">/v1/attendances/{id}</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <a href="{{ route('admin.api-docs.export-endpoint', 'attendance-single') }}" class="btn btn-outline-primary btn-sm px-2 py-1 shadow-sm d-flex align-items-center gap-1 font-monospace" style="font-size: 0.75rem;" title="Download individual .txt spec">
+                                <i data-lucide="download" style="width: 13px; height: 13px;"></i>
+                                <span>Download Doc</span>
+                            </a>
+                            <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1">Bearer Auth</span>
+                        </div>
+                    </div>
+                    <p class="text-body-secondary mt-2 mb-0 small">Retrieve complete record details for a specific attendance entry by its ID.</p>
+                </div>
+                <div class="card-body p-3 p-md-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-body-emphasis small text-uppercase mb-2">URI Parameters</h6>
+                            <p class="small text-body-secondary"><code>id</code> &mdash; (Required, Integer, ID of the attendance record).</p>
+                            
+                            <div class="d-flex align-items-center justify-content-between mb-2 mt-3">
+                                <h6 class="fw-bold text-body-emphasis small text-uppercase mb-0">cURL Request</h6>
+                                <button class="btn btn-outline-secondary btn-sm px-2 py-0 copy-btn font-monospace" type="button" style="font-size: 0.75rem;" data-copy-target="#singleAttendanceCurl">
+                                    <i data-lucide="copy" style="width: 12px; height: 12px;"></i> Copy
+                                </button>
+                            </div>
+                            <pre class="bg-body-secondary p-3 rounded-3 border font-monospace small text-body mb-0" id="singleAttendanceCurl"><code>curl -X GET "{{ $baseUrl }}/attendances/1" \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -H "Accept: application/json"</code></pre>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <h6 class="fw-bold text-body-emphasis small text-uppercase mb-0">Sample Response (200 OK)</h6>
+                                <button class="btn btn-outline-secondary btn-sm px-2 py-0 copy-btn font-monospace" type="button" style="font-size: 0.75rem;" data-copy-target="#singleAttendanceRes">
+                                    <i data-lucide="copy" style="width: 12px; height: 12px;"></i> Copy
+                                </button>
+                            </div>
+                            <pre class="bg-body-secondary p-3 rounded-3 border font-monospace small text-body mb-0" id="singleAttendanceRes"><code>{
+  "success": true,
+  "data": {
+    "id": 1,
+    "card_no": "7701",
+    "punch_date": "{{ date('Y-m-d') }}",
+    "check_in_time": "08:55:00",
+    "check_out_time": "17:05:00",
+    "show_status": "present",
+    "employee": {
+      "employee_id": "EMP-1001",
+      "full_name": "Alexander Pierce",
+      "email": "alex.pierce@example.com",
+      "company": "ROI Technologies"
+    }
+  }
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

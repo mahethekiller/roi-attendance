@@ -41,6 +41,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     // API Documentation & TXT Export
     Route::get('/api-docs', [ApiDocsController::class, 'index'])->name('api-docs.index');
     Route::get('/api-docs/export-txt', [ApiDocsController::class, 'exportTxt'])->name('api-docs.export-txt');
+    Route::get('/api-docs/export/{endpoint}', [ApiDocsController::class, 'exportEndpointTxt'])->name('api-docs.export-endpoint');
 
     // API Request Audit Logs
     Route::get('/api-logs', [ApiLogController::class, 'index'])->name('api-logs.index');
@@ -58,3 +59,4 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
