@@ -36,9 +36,6 @@ class HRsaleAttendanceResource extends JsonResource
             $clockOut = Carbon::parse($this->check_out_datetime)->format('H:i:s');
         }
 
-        // Clock In/Out flag ('1' if punched in, '0' otherwise)
-        $clockInOut = !empty($clockIn) ? '1' : '0';
-
         // Calculate total work duration
         $totalWork = '00:00:00';
         if (!empty($clockIn) && !empty($clockOut)) {
@@ -57,24 +54,6 @@ class HRsaleAttendanceResource extends JsonResource
             }
         }
 
-        // Late time formatting
-        $timeLate = '00:00:00';
-        if (strtolower($this->show_status ?? '') === 'late' && !empty($clockIn)) {
-            try {
-                $shiftStart = Carbon::parse("{$punchDate} 09:00:00");
-                $actualIn = Carbon::parse("{$punchDate} {$clockIn}");
-                if ($actualIn->greaterThan($shiftStart)) {
-                    $diffInSeconds = abs((int) $actualIn->diffInSeconds($shiftStart));
-                    $hours = intdiv($diffInSeconds, 3600);
-                    $minutes = intdiv($diffInSeconds % 3600, 60);
-                    $seconds = $diffInSeconds % 60;
-                    $timeLate = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
-                }
-            } catch (\Throwable $e) {
-                $timeLate = '00:00:00';
-            }
-        }
-
         $employeeName = $this->employee?->full_name;
         if (empty($employeeName) || trim($employeeName) === '') {
             $employeeName = 'Employee #' . ($this->badgenumber ?? $this->card_no);
@@ -88,16 +67,8 @@ class HRsaleAttendanceResource extends JsonResource
             'card_no'             => (string) $this->card_no,
             'punch_date'          => $punchDate,
             'clock_in'            => $clockIn,
-            'clock_in_ip_address' => '127.0.0.1',
             'clock_out'           => $clockOut,
-            'clock_out_ip_address'=> '127.0.0.1',
-            'clock_in_out'        => $clockInOut,
-            'time_late'           => $timeLate,
-            'early_leaving'       => '00:00:00',
-            'overtime'            => '00:00:00',
             'total_work'          => $totalWork,
-            'total_rest'          => '00:00:00',
-            'attendance_status'   => ucfirst($this->show_status ?? 'Present'),
             'employee_id'         => $employeeId,
             'employee_name'       => $employeeName,
             'company_name'        => $companyName,

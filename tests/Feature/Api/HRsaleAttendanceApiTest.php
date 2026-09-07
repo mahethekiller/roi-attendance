@@ -83,13 +83,18 @@ class HRsaleAttendanceApiTest extends TestCase
         $this->assertEquals('1002', $data[0]['card_no']);
         $this->assertEquals('09:15:00', $data[0]['clock_in']);
         $this->assertEquals('18:15:00', $data[0]['clock_out']);
-        $this->assertEquals('1', $data[0]['clock_in_out']);
         $this->assertEquals('09:00:00', $data[0]['total_work']);
-        $this->assertEquals('00:15:00', $data[0]['time_late']);
-        $this->assertEquals('Late', $data[0]['attendance_status']);
         $this->assertEquals('EMP-1002', $data[0]['employee_id']);
         $this->assertEquals('John Doe', $data[0]['employee_name']);
         $this->assertEquals('Demo Company', $data[0]['company_name']);
+
+        // Assert removed fields are absent
+        $this->assertArrayNotHasKey('attendance_status', $data[0]);
+        $this->assertArrayNotHasKey('clock_in_ip_address', $data[0]);
+        $this->assertArrayNotHasKey('clock_out_ip_address', $data[0]);
+        $this->assertArrayNotHasKey('clock_in_out', $data[0]);
+        $this->assertArrayNotHasKey('time_late', $data[0]);
+        $this->assertArrayNotHasKey('total_rest', $data[0]);
     }
 
     public function test_post_attendance_filter_by_punch_date(): void
@@ -107,7 +112,7 @@ class HRsaleAttendanceApiTest extends TestCase
         $this->assertEquals('2026-06-29', $data[0]['punch_date']);
         $this->assertEquals('09:00:00', $data[0]['clock_in']);
         $this->assertEquals('18:00:00', $data[0]['clock_out']);
-        $this->assertEquals('Present', $data[0]['attendance_status']);
+        $this->assertEquals('09:00:00', $data[0]['total_work']);
     }
 
     public function test_post_attendance_filter_by_date_range(): void
