@@ -238,7 +238,7 @@
                                     <button class="nav-link py-1 px-3" id="tab-py" data-bs-toggle="tab" data-bs-target="#content-py" type="button" role="tab">Python</button>
                                 </li>
                             </ul>
-                            <button class="btn btn-outline-secondary btn-sm px-2 py-1 copy-btn d-flex align-items-center gap-1 font-monospace" style="font-size: 0.75rem;" data-copy-active-tab="#hrsaleCodeTabsContent">
+                            <button class="btn btn-outline-secondary btn-sm px-2 py-1 copy-btn d-flex align-items-center gap-1 font-monospace" type="button" style="font-size: 0.75rem;" data-copy-active-tab="#hrsaleCodeTabsContent">
                                 <i data-lucide="copy" style="width: 13px; height: 13px;"></i>
                                 <span>Copy Code</span>
                             </button>
@@ -318,10 +318,13 @@ print(response.json())</code></pre>
                                 <span class="badge bg-success font-monospace px-2 py-1">200 OK</span>
                                 <span class="fw-bold text-body-emphasis small font-monospace">application/json</span>
                             </div>
-                            <span class="badge bg-body-tertiary text-body-secondary border font-monospace small">Raw JSON Array</span>
+                            <button class="btn btn-outline-secondary btn-sm px-2 py-1 copy-btn d-flex align-items-center gap-1 font-monospace" type="button" style="font-size: 0.75rem;" data-copy-target="#hrsaleResponsePreview">
+                                <i data-lucide="copy" style="width: 13px; height: 13px;"></i>
+                                <span>Copy Response</span>
+                            </button>
                         </div>
                         <div class="card-body p-0">
-                            <pre class="m-0 p-3 bg-body-secondary font-monospace small text-body" style="border-radius: 0 0 0.5rem 0.5rem; max-height: 320px; overflow-y: auto;"><code>[
+                            <pre class="m-0 p-3 bg-body-secondary font-monospace small text-body" id="hrsaleResponsePreview" style="border-radius: 0 0 0.5rem 0.5rem; max-height: 320px; overflow-y: auto;"><code>[
   {
     "time_attendance_id": "12",
     "card_no": "1002",
@@ -354,16 +357,26 @@ print(response.json())</code></pre>
                 <div class="card-body p-3 p-md-4">
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <h6 class="fw-bold text-body-emphasis small text-uppercase mb-2">Request Body (JSON)</h6>
-                            <pre class="bg-body-secondary p-3 rounded-3 border font-monospace small text-body mb-0"><code>{
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <h6 class="fw-bold text-body-emphasis small text-uppercase mb-0">Request Body (JSON)</h6>
+                                <button class="btn btn-outline-secondary btn-sm px-2 py-0 copy-btn font-monospace" type="button" style="font-size: 0.75rem;" data-copy-target="#authTokenReq">
+                                    <i data-lucide="copy" style="width: 12px; height: 12px;"></i> Copy
+                                </button>
+                            </div>
+                            <pre class="bg-body-secondary p-3 rounded-3 border font-monospace small text-body mb-0" id="authTokenReq"><code>{
   "email": "admin@example.com",
   "password": "your_secure_password",
   "token_name": "hrsale_service"
 }</code></pre>
                         </div>
                         <div class="col-md-6">
-                            <h6 class="fw-bold text-body-emphasis small text-uppercase mb-2">Response (200 OK)</h6>
-                            <pre class="bg-body-secondary p-3 rounded-3 border font-monospace small text-body mb-0"><code>{
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <h6 class="fw-bold text-body-emphasis small text-uppercase mb-0">Response (200 OK)</h6>
+                                <button class="btn btn-outline-secondary btn-sm px-2 py-0 copy-btn font-monospace" type="button" style="font-size: 0.75rem;" data-copy-target="#authTokenRes">
+                                    <i data-lucide="copy" style="width: 12px; height: 12px;"></i> Copy
+                                </button>
+                            </div>
+                            <pre class="bg-body-secondary p-3 rounded-3 border font-monospace small text-body mb-0" id="authTokenRes"><code>{
   "success": true,
   "message": "Token generated successfully.",
   "token": "1|qWeRtYuIoP123456789...",
@@ -442,13 +455,23 @@ print(response.json())</code></pre>
                         </table>
                     </div>
 
-                    <h6 class="fw-bold text-body-emphasis small text-uppercase mb-2">Example cURL Request</h6>
-                    <pre class="bg-body-secondary p-3 rounded-3 border font-monospace small text-body mb-3"><code>curl -X GET "{{ $baseUrl }}/attendances?start_date={{ date('Y-m-d') }}&status=present" \
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h6 class="fw-bold text-body-emphasis small text-uppercase mb-0">Example cURL Request</h6>
+                        <button class="btn btn-outline-secondary btn-sm px-2 py-0 copy-btn font-monospace" type="button" style="font-size: 0.75rem;" data-copy-target="#getAttendancesCurl">
+                            <i data-lucide="copy" style="width: 12px; height: 12px;"></i> Copy
+                        </button>
+                    </div>
+                    <pre class="bg-body-secondary p-3 rounded-3 border font-monospace small text-body mb-3" id="getAttendancesCurl"><code>curl -X GET "{{ $baseUrl }}/attendances?start_date={{ date('Y-m-d') }}&status=present" \
   -H "Authorization: Bearer YOUR_API_TOKEN" \
   -H "Accept: application/json"</code></pre>
 
-                    <h6 class="fw-bold text-body-emphasis small text-uppercase mb-2">Paginated Response Sample</h6>
-                    <pre class="bg-body-secondary p-3 rounded-3 border font-monospace small text-body mb-0" style="max-height: 240px; overflow-y: auto;"><code>{
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h6 class="fw-bold text-body-emphasis small text-uppercase mb-0">Paginated Response Sample</h6>
+                        <button class="btn btn-outline-secondary btn-sm px-2 py-0 copy-btn font-monospace" type="button" style="font-size: 0.75rem;" data-copy-target="#getAttendancesRes">
+                            <i data-lucide="copy" style="width: 12px; height: 12px;"></i> Copy
+                        </button>
+                    </div>
+                    <pre class="bg-body-secondary p-3 rounded-3 border font-monospace small text-body mb-0" id="getAttendancesRes" style="max-height: 240px; overflow-y: auto;"><code>{
   "success": true,
   "message": "Attendance records retrieved successfully.",
   "data": [
@@ -495,13 +518,23 @@ print(response.json())</code></pre>
                             <h6 class="fw-bold text-body-emphasis small text-uppercase mb-2">Query Parameters</h6>
                             <p class="small text-body-secondary"><code>date</code> &mdash; (Optional, <code>YYYY-MM-DD</code>, defaults to today's date: <code>{{ date('Y-m-d') }}</code>).</p>
                             
-                            <h6 class="fw-bold text-body-emphasis small text-uppercase mb-2 mt-3">cURL Request</h6>
-                            <pre class="bg-body-secondary p-3 rounded-3 border font-monospace small text-body mb-0"><code>curl -X GET "{{ $baseUrl }}/attendances/daily-summary?date={{ date('Y-m-d') }}" \
+                            <div class="d-flex align-items-center justify-content-between mb-2 mt-3">
+                                <h6 class="fw-bold text-body-emphasis small text-uppercase mb-0">cURL Request</h6>
+                                <button class="btn btn-outline-secondary btn-sm px-2 py-0 copy-btn font-monospace" type="button" style="font-size: 0.75rem;" data-copy-target="#dailySummaryCurl">
+                                    <i data-lucide="copy" style="width: 12px; height: 12px;"></i> Copy
+                                </button>
+                            </div>
+                            <pre class="bg-body-secondary p-3 rounded-3 border font-monospace small text-body mb-0" id="dailySummaryCurl"><code>curl -X GET "{{ $baseUrl }}/attendances/daily-summary?date={{ date('Y-m-d') }}" \
   -H "Authorization: Bearer YOUR_API_TOKEN"</code></pre>
                         </div>
                         <div class="col-md-6">
-                            <h6 class="fw-bold text-body-emphasis small text-uppercase mb-2">Sample Response (200 OK)</h6>
-                            <pre class="bg-body-secondary p-3 rounded-3 border font-monospace small text-body mb-0"><code>{
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <h6 class="fw-bold text-body-emphasis small text-uppercase mb-0">Sample Response (200 OK)</h6>
+                                <button class="btn btn-outline-secondary btn-sm px-2 py-0 copy-btn font-monospace" type="button" style="font-size: 0.75rem;" data-copy-target="#dailySummaryRes">
+                                    <i data-lucide="copy" style="width: 12px; height: 12px;"></i> Copy
+                                </button>
+                            </div>
+                            <pre class="bg-body-secondary p-3 rounded-3 border font-monospace small text-body mb-0" id="dailySummaryRes"><code>{
   "success": true,
   "date": "{{ date('Y-m-d') }}",
   "summary": {
@@ -520,35 +553,88 @@ print(response.json())</code></pre>
 
     <!-- Client Script for Interactive Copy Buttons -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Setup copy buttons
-            document.querySelectorAll('.copy-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    let textToCopy = '';
-                    
-                    if (this.dataset.copyTarget) {
-                        const target = document.querySelector(this.dataset.copyTarget);
-                        if (target) textToCopy = target.value || target.innerText;
-                    } else if (this.dataset.copyActiveTab) {
-                        const activeTabPane = document.querySelector(this.dataset.copyActiveTab + ' .tab-pane.active code');
-                        if (activeTabPane) textToCopy = activeTabPane.innerText;
-                    }
+        (function() {
+            function copyTextToClipboard(text, btnElement) {
+                if (!text) return;
 
-                    if (textToCopy) {
-                        navigator.clipboard.writeText(textToCopy).then(() => {
-                            const originalHTML = this.innerHTML;
-                            this.innerHTML = '<i data-lucide="check" style="width: 13px; height: 13px;" class="text-success"></i> <span class="text-success">Copied!</span>';
-                            if (window.lucide) lucide.createIcons();
-                            setTimeout(() => {
-                                this.innerHTML = originalHTML;
-                                if (window.lucide) lucide.createIcons();
-                            }, 2000);
-                        }).catch(err => {
-                            console.error('Copy failed: ', err);
-                        });
+                function showSuccess() {
+                    if (!btnElement) return;
+                    const originalHTML = btnElement.innerHTML;
+                    btnElement.innerHTML = '<i data-lucide="check" style="width: 13px; height: 13px;" class="text-success"></i> <span class="text-success fw-bold">Copied!</span>';
+                    if (window.lucide) {
+                        try { lucide.createIcons(); } catch(e) {}
                     }
-                });
+                    setTimeout(function() {
+                        btnElement.innerHTML = originalHTML;
+                        if (window.lucide) {
+                            try { lucide.createIcons(); } catch(e) {}
+                        }
+                    }, 2000);
+                }
+
+                // Try modern navigator.clipboard first if available
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(text).then(showSuccess).catch(function() {
+                        fallbackCopy(text, showSuccess);
+                    });
+                } else {
+                    fallbackCopy(text, showSuccess);
+                }
+            }
+
+            function fallbackCopy(text, callback) {
+                try {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = text;
+                    textArea.style.position = "fixed";
+                    textArea.style.left = "-999999px";
+                    textArea.style.top = "-999999px";
+                    textArea.setAttribute("readonly", "");
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    textArea.setSelectionRange(0, 99999);
+                    const successful = document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    if (successful && callback) {
+                        callback();
+                    }
+                } catch (err) {
+                    console.error('Fallback copy execution failed: ', err);
+                }
+            }
+
+            // Global delegated event listener for all .copy-btn buttons
+            document.addEventListener('click', function(e) {
+                const btn = e.target.closest('.copy-btn');
+                if (!btn) return;
+                
+                e.preventDefault();
+                e.stopPropagation();
+
+                let textToCopy = '';
+
+                if (btn.dataset.copyTarget) {
+                    const target = document.querySelector(btn.dataset.copyTarget);
+                    if (target) {
+                        textToCopy = target.value !== undefined && target.tagName === 'INPUT' 
+                            ? target.value 
+                            : (target.innerText || target.textContent);
+                    }
+                } else if (btn.dataset.copyActiveTab) {
+                    const container = document.querySelector(btn.dataset.copyActiveTab);
+                    if (container) {
+                        const activePane = container.querySelector('.tab-pane.active');
+                        if (activePane) {
+                            textToCopy = activePane.innerText || activePane.textContent;
+                        }
+                    }
+                }
+
+                if (textToCopy) {
+                    copyTextToClipboard(textToCopy.trim(), btn);
+                }
             });
-        });
+        })();
     </script>
 </x-admin-layout>
