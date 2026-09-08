@@ -2,36 +2,43 @@
     <!-- Header Title & Quick Actions -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
-            <div class="flex items-center gap-2 mb-1">
-                <h2 class="text-2xl font-bold text-base-content tracking-tight">Dashboard Overview</h2>
-                <span class="badge badge-primary badge-soft font-mono text-xs hidden sm:inline-flex items-center gap-1">
+            <div class="flex items-center gap-2.5 mb-1.5 flex-wrap">
+                <h2 class="text-2xl sm:text-3xl font-bold text-base-content tracking-tight">Dashboard Overview</h2>
+                <span class="badge badge-primary badge-soft font-mono text-xs inline-flex items-center gap-1.5 px-2.5 py-1">
                     <i data-lucide="calendar" style="width: 13px; height: 13px;"></i>
-                    {{ now()->format('D, M d, Y') }}
+                    <span>{{ now()->format('D, M d, Y') }}</span>
+                </span>
+                <span class="badge badge-success badge-soft font-mono text-xs hidden sm:inline-flex items-center gap-1 px-2.5 py-1">
+                    <span class="telemetry-beacon">
+                        <span class="telemetry-pulse"></span>
+                        <span class="telemetry-dot"></span>
+                    </span>
+                    <span>Live Biometric Feed</span>
                 </span>
             </div>
-            <p class="text-sm text-base-content/70">
-                Welcome back, <strong class="text-base-content">{{ Auth::user()->name }}</strong>. Here is your corporate workforce and biometric attendance intelligence.
+            <p class="text-sm text-base-content/70 max-w-2xl leading-relaxed">
+                Welcome back, <strong class="text-base-content font-semibold">{{ Auth::user()->name }}</strong>. Here is your corporate workforce and biometric attendance intelligence.
             </p>
         </div>
-        <div class="flex flex-wrap items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2.5">
             <x-authorized permission="attendances.sync">
                 <form action="{{ route('admin.attendances.sync') }}" method="POST" class="inline" id="quickSyncForm">
                     @csrf
-                    <button type="submit" class="btn btn-primary btn-outline btn-sm shadow-xs flex items-center gap-1.5" id="quickSyncBtn">
-                        <i data-lucide="refresh-cw" style="width: 15px; height: 15px;" id="quickSyncIcon"></i>
+                    <button type="submit" class="btn btn-primary btn-outline btn-sm shadow-xs flex items-center gap-2 transition-all duration-200 hover:shadow-sm" id="quickSyncBtn">
+                        <i data-lucide="refresh-cw" style="width: 14px; height: 14px;" id="quickSyncIcon"></i>
                         <span>Sync Biometrics</span>
                     </button>
                 </form>
             </x-authorized>
             <x-authorized permission="attendances.view">
-                <a href="{{ route('admin.attendances.index') }}" class="btn btn-outline btn-sm shadow-xs flex items-center gap-1.5">
-                    <i data-lucide="calendar-check" style="width: 15px; height: 15px;"></i>
+                <a href="{{ route('admin.attendances.index') }}" class="btn btn-outline btn-sm shadow-xs flex items-center gap-2 transition-all duration-200 hover:shadow-sm">
+                    <i data-lucide="calendar-check" style="width: 14px; height: 14px;"></i>
                     <span>View Attendance Logs</span>
                 </a>
             </x-authorized>
             <x-authorized permission="employees.create">
-                <a href="{{ route('admin.employees.create') }}" class="btn btn-primary btn-sm shadow-xs flex items-center gap-1.5">
-                    <i data-lucide="plus" style="width: 15px; height: 15px;"></i>
+                <a href="{{ route('admin.employees.create') }}" class="btn btn-primary btn-sm shadow-xs flex items-center gap-2 transition-all duration-200 hover:shadow-sm">
+                    <i data-lucide="plus" style="width: 14px; height: 14px;"></i>
                     <span>Add Employee</span>
                 </a>
             </x-authorized>
@@ -39,47 +46,54 @@
     </div>
 
     @if(session('success'))
-        <div class="alert alert-success shadow-xs mb-6 flex items-center gap-2" role="alert">
-            <i data-lucide="check-circle-2" class="text-success" style="width: 18px; height: 18px;"></i>
+        <div class="alert alert-success shadow-xs mb-6 flex items-center gap-3 border border-success/20" role="alert">
+            <i data-lucide="check-circle-2" class="text-success shrink-0" style="width: 18px; height: 18px;"></i>
             <span class="flex-1 text-sm font-medium">{{ session('success') }}</span>
         </div>
     @endif
 
     @if(session('error'))
-        <div class="alert alert-error shadow-xs mb-6 flex items-center gap-2" role="alert">
-            <i data-lucide="alert-triangle" class="text-error" style="width: 18px; height: 18px;"></i>
+        <div class="alert alert-error shadow-xs mb-6 flex items-center gap-3 border border-error/20" role="alert">
+            <i data-lucide="alert-triangle" class="text-error shrink-0" style="width: 18px; height: 18px;"></i>
             <span class="flex-1 text-sm font-medium">{{ session('error') }}</span>
         </div>
     @endif
 
     {{-- Employee Self-Service Banner if linked to employee record --}}
     @if($personalStats && $employeeRecord)
-        <div class="card bg-base-100 border border-base-200 shadow-sm mb-6">
-            <div class="card-body p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="avatar placeholder">
-                        <div class="bg-primary/10 text-primary rounded-full w-11 h-11 font-bold font-mono text-sm flex items-center justify-center">
+        <div class="card bg-base-100 border border-base-200 shadow-xs mb-6 transition-all duration-200 hover:border-base-content/20 hover:shadow-sm">
+            <div class="card-body p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex items-center gap-3.5">
+                    <div class="avatar placeholder shrink-0">
+                        <div class="bg-primary/10 text-primary border border-primary/20 rounded-2xl w-12 h-12 font-bold font-mono text-sm flex items-center justify-center shadow-xs">
                             {{ $employeeRecord->initials }}
                         </div>
                     </div>
                     <div>
-                        <div class="font-semibold text-base-content text-sm">My Attendance Card ({{ $employeeRecord->full_name }})</div>
-                        <div class="text-xs text-base-content/60 font-mono">Card ID: {{ $employeeRecord->card_no }} &bull; {{ $employeeRecord->company ?? 'General' }}</div>
+                        <div class="font-bold text-base-content text-sm sm:text-base flex items-center gap-2">
+                            <span>My Attendance Card ({{ $employeeRecord->full_name }})</span>
+                            <span class="badge badge-primary badge-soft badge-xs font-mono">Self Service</span>
+                        </div>
+                        <div class="text-xs text-base-content/60 font-mono mt-0.5 flex items-center gap-2">
+                            <span>Card ID: {{ $employeeRecord->card_no }}</span>
+                            <span>&bull;</span>
+                            <span>{{ $employeeRecord->company ?? 'General' }}</span>
+                        </div>
                     </div>
                 </div>
-                <div class="flex items-center gap-4">
-                    <div class="text-right">
-                        <span class="text-xs text-base-content/60 block">This Month</span>
-                        <strong class="text-success text-sm">{{ $personalStats['daysPresent'] }} Days Present</strong>
+                <div class="flex items-center gap-5 shrink-0">
+                    <div class="text-left md:text-right">
+                        <span class="text-xs text-base-content/60 block font-medium">This Month</span>
+                        <strong class="text-success text-sm font-mono tabular-nums">{{ $personalStats['daysPresent'] }} Days Present</strong>
                     </div>
-                    <div class="border-l border-base-200 pl-4">
-                        <span class="text-xs text-base-content/60 block">Today's Punch</span>
+                    <div class="border-l border-base-200 pl-5">
+                        <span class="text-xs text-base-content/60 block font-medium">Today's Punch</span>
                         @if($personalStats['todayRecord'])
-                            <span class="badge badge-success badge-soft font-mono text-xs">
+                            <span class="badge badge-success badge-soft font-mono text-xs px-2.5 py-1">
                                 In: {{ $personalStats['todayRecord']->check_in_time ?? $personalStats['todayRecord']->check_in_datetime?->format('h:i A') }}
                             </span>
                         @else
-                            <span class="badge badge-neutral badge-soft text-xs">
+                            <span class="badge badge-neutral badge-soft text-xs px-2.5 py-1">
                                 No punch yet
                             </span>
                         @endif
@@ -90,7 +104,7 @@
     @endif
 
     {{-- Top KPI Metric Cards Grid --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5 mb-6">
         <x-kpi-metric-card
             title="Total Staff"
             :value="number_format($totalEmployees)"
@@ -138,14 +152,14 @@
         {{-- Left Column: Trend & Flow Charts (2 cols on lg) --}}
         <div class="lg:col-span-2 flex flex-col gap-6">
             {{-- 7-Day Attendance Trend Analysis --}}
-            <div class="card bg-base-100 border border-base-200 shadow-sm">
+            <div class="card bg-base-100 border border-base-200 shadow-xs transition-all duration-200 hover:border-base-content/20 hover:shadow-sm">
                 <div class="card-body p-4 sm:p-5">
                     <div class="flex items-center justify-between flex-wrap gap-2 mb-4 pb-3 border-b border-base-200">
                         <div>
-                            <h3 class="font-bold text-base text-base-content">7-Day Attendance Trends</h3>
+                            <h3 class="font-bold text-base text-base-content tracking-tight">7-Day Attendance Trends</h3>
                             <p class="text-xs text-base-content/60">Daily comparison of Present and Absent personnel</p>
                         </div>
-                        <span class="badge badge-neutral badge-soft font-mono text-xs">
+                        <span class="badge badge-neutral badge-soft font-mono text-xs px-2.5 py-1">
                             Last 7 Days
                         </span>
                     </div>
@@ -156,18 +170,18 @@
             </div>
 
             {{-- Hourly Punch Distribution Flow --}}
-            <div class="card bg-base-100 border border-base-200 shadow-sm">
+            <div class="card bg-base-100 border border-base-200 shadow-xs transition-all duration-200 hover:border-base-content/20 hover:shadow-sm">
                 <div class="card-body p-4 sm:p-5">
                     <div class="flex items-center justify-between flex-wrap gap-2 mb-4 pb-3 border-b border-base-200">
                         <div>
-                            <h3 class="font-bold text-base text-base-content">Peak Check-in Distribution</h3>
+                            <h3 class="font-bold text-base text-base-content tracking-tight">Peak Check-in Distribution</h3>
                             <p class="text-xs text-base-content/60">Punch volume across hourly shifts today (06:00 AM – 06:00 PM)</p>
                         </div>
-                        <span class="badge badge-primary badge-soft font-mono text-xs">
+                        <span class="badge badge-primary badge-soft font-mono text-xs px-2.5 py-1">
                             Today's Flow
                         </span>
                     </div>
-                    <div style="position: relative; height: 170px; width: 100%;">
+                    <div style="position: relative; height: 180px; width: 100%;">
                         <canvas id="hourlyPunchChart"></canvas>
                     </div>
                 </div>
@@ -177,15 +191,17 @@
         {{-- Right Column: Hardware Health & Company Breakdown (1 col on lg) --}}
         <div class="lg:col-span-1 flex flex-col gap-6">
             {{-- Biometric Sync Engine Card --}}
-            <div class="card bg-base-100 border border-base-200 shadow-sm">
+            <div class="card bg-base-100 border border-base-200 shadow-xs transition-all duration-200 hover:border-base-content/20 hover:shadow-sm">
                 <div class="card-body p-4 sm:p-5">
                     <div class="flex items-center justify-between mb-4 pb-3 border-b border-base-200">
-                        <div class="flex items-center gap-2">
-                            <i data-lucide="radio" class="text-primary" style="width: 18px; height: 18px;"></i>
-                            <h3 class="font-bold text-base text-base-content">Biometric Hardware Sync</h3>
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                                <i data-lucide="radio" style="width: 16px; height: 16px;"></i>
+                            </div>
+                            <h3 class="font-bold text-base text-base-content tracking-tight">Biometric Hardware Sync</h3>
                         </div>
                         @if($latestSync && $latestSync->status === 'success')
-                            <span class="badge badge-success badge-soft font-medium flex items-center gap-2">
+                            <span class="badge badge-success badge-soft font-medium flex items-center gap-2 px-2.5 py-1">
                                 <span class="telemetry-beacon">
                                     <span class="telemetry-pulse"></span>
                                     <span class="telemetry-dot"></span>
@@ -193,43 +209,43 @@
                                 <span>Online</span>
                             </span>
                         @elseif($latestSync && $latestSync->status === 'failed')
-                            <span class="badge badge-error badge-soft font-medium flex items-center gap-1">
-                                <i data-lucide="alert-circle" style="width: 12px; height: 12px;"></i>
-                                Sync Error
+                            <span class="badge badge-error badge-soft font-medium flex items-center gap-1.5 px-2.5 py-1">
+                                <i data-lucide="alert-circle" style="width: 13px; height: 13px;"></i>
+                                <span>Sync Error</span>
                             </span>
                         @else
-                            <span class="badge badge-neutral badge-soft">
+                            <span class="badge badge-neutral badge-soft px-2.5 py-1">
                                 Standby
                             </span>
                         @endif
                     </div>
 
                     <div class="flex flex-col gap-3">
-                        <div class="p-2.5 rounded-lg bg-base-200/60 border border-base-200 flex items-center justify-between text-xs">
-                            <span class="text-base-content/70">Last Sync Run</span>
-                            <span class="font-semibold text-base-content font-mono">
+                        <div class="p-3 rounded-xl bg-base-200/50 border border-base-200 flex items-center justify-between text-xs">
+                            <span class="text-base-content/70 font-medium">Last Sync Run</span>
+                            <span class="font-semibold text-base-content font-mono tabular-nums">
                                 {{ $latestSync ? $latestSync->created_at->diffForHumans() : 'No sync recorded' }}
                             </span>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-2 text-center">
-                            <div class="p-2.5 rounded-lg bg-base-200/60 border border-base-200">
-                                <span class="block text-xs text-base-content/60 mb-1">Today's Runs</span>
-                                <span class="text-lg font-bold text-base-content font-mono">{{ $todaySyncCount }}</span>
+                        <div class="grid grid-cols-2 gap-2.5 text-center">
+                            <div class="p-3 rounded-xl bg-base-200/50 border border-base-200">
+                                <span class="block text-xs text-base-content/60 mb-1 font-medium">Today's Runs</span>
+                                <span class="text-xl font-bold text-base-content font-mono tabular-nums">{{ $todaySyncCount }}</span>
                             </div>
-                            <div class="p-2.5 rounded-lg bg-base-200/60 border border-base-200">
-                                <span class="block text-xs text-base-content/60 mb-1">Punches Pulled</span>
-                                <span class="text-lg font-bold text-success font-mono">{{ number_format($todayImportedCount) }}</span>
+                            <div class="p-3 rounded-xl bg-base-200/50 border border-base-200">
+                                <span class="block text-xs text-base-content/60 mb-1 font-medium">Punches Pulled</span>
+                                <span class="text-xl font-bold text-success font-mono tabular-nums">{{ number_format($todayImportedCount) }}</span>
                             </div>
                         </div>
 
                         {{-- API Engine Quick Status --}}
-                        <div class="p-2.5 rounded-lg bg-base-200/60 border border-base-200 flex items-center justify-between text-xs">
+                        <div class="p-3 rounded-xl bg-base-200/50 border border-base-200 flex items-center justify-between text-xs">
                             <div class="flex items-center gap-2">
-                                <i data-lucide="activity" class="text-primary" style="width: 15px; height: 15px;"></i>
-                                <span class="text-base-content/70">API Traffic & Latency</span>
+                                <i data-lucide="activity" class="text-primary shrink-0" style="width: 14px; height: 14px;"></i>
+                                <span class="text-base-content/70 font-medium">API Traffic & Latency</span>
                             </div>
-                            <span class="font-semibold text-base-content font-mono">
+                            <span class="font-semibold text-base-content font-mono tabular-nums">
                                 {{ $todayApiRequests }} reqs &bull; {{ $avgApiLatency }}ms
                             </span>
                         </div>
@@ -237,7 +253,7 @@
                         <x-authorized permission="attendances.sync">
                             <form action="{{ route('admin.attendances.sync') }}" method="POST" class="mt-1">
                                 @csrf
-                                <button type="submit" class="btn btn-primary btn-outline btn-sm w-full flex items-center justify-center gap-2">
+                                <button type="submit" class="btn btn-primary btn-outline btn-sm w-full flex items-center justify-center gap-2 shadow-xs transition-all duration-200 hover:shadow-sm">
                                     <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i>
                                     <span>Sync Attendances Now</span>
                                 </button>
@@ -246,9 +262,9 @@
 
                         <x-authorized permission="sync-logs.view">
                             <div class="text-center mt-1">
-                                <a href="{{ route('admin.sync-logs.index') }}" class="text-xs text-base-content/60 hover:text-primary transition-colors inline-flex items-center gap-1">
+                                <a href="{{ route('admin.sync-logs.index') }}" class="text-xs text-base-content/60 hover:text-primary transition-colors inline-flex items-center gap-1.5 py-1">
                                     <span>View complete sync history logs</span>
-                                    <i data-lucide="chevron-right" style="width: 12px; height: 12px;"></i>
+                                    <i data-lucide="chevron-right" style="width: 13px; height: 13px;"></i>
                                 </a>
                             </div>
                         </x-authorized>
@@ -257,30 +273,34 @@
             </div>
 
             {{-- Company / Department Attendance Rate Card --}}
-            <div class="card bg-base-100 border border-base-200 shadow-sm">
+            <div class="card bg-base-100 border border-base-200 shadow-xs transition-all duration-200 hover:border-base-content/20 hover:shadow-sm">
                 <div class="card-body p-4 sm:p-5">
                     <div class="flex items-center justify-between mb-4 pb-3 border-b border-base-200">
                         <div>
-                            <h3 class="font-bold text-base text-base-content">Company Divisions</h3>
+                            <h3 class="font-bold text-base text-base-content tracking-tight">Company Divisions</h3>
                             <p class="text-xs text-base-content/60">Workforce attendance rate</p>
                         </div>
-                        <i data-lucide="building-2" class="text-base-content/50" style="width: 18px; height: 18px;"></i>
+                        <div class="w-8 h-8 rounded-lg bg-base-200/70 text-base-content/70 flex items-center justify-center shrink-0">
+                            <i data-lucide="building-2" style="width: 16px; height: 16px;"></i>
+                        </div>
                     </div>
 
-                    <div>
+                    <div class="flex flex-col gap-3.5">
                         @forelse($companyBreakdown as $comp)
-                            <div class="mb-3.5 {{ $loop->last ? 'mb-0' : '' }}">
-                                <div class="flex justify-between items-center text-xs mb-1">
-                                    <span class="font-medium text-base-content">{{ $comp['name'] }}</span>
-                                    <span class="text-base-content/70 font-mono">
+                            <div class="p-2.5 rounded-xl bg-base-200/30 border border-base-200/60">
+                                <div class="flex justify-between items-center text-xs mb-1.5">
+                                    <span class="font-semibold text-base-content truncate">{{ $comp['name'] }}</span>
+                                    <span class="text-base-content/70 font-mono tabular-nums text-[11px] shrink-0">
                                         {{ $comp['present'] }}/{{ $comp['total'] }} ({{ $comp['rate'] }}%)
                                     </span>
                                 </div>
                                 <progress class="progress {{ $comp['rate'] >= 80 ? 'progress-success' : ($comp['rate'] >= 50 ? 'progress-primary' : 'progress-warning') }} w-full" value="{{ $comp['rate'] }}" max="100" style="height: 6px;"></progress>
                             </div>
                         @empty
-                            <div class="text-center py-4 text-base-content/50 text-xs">
-                                <i data-lucide="layers" style="width: 24px; height: 24px;" class="mx-auto mb-1 opacity-50"></i>
+                            <div class="text-center py-6 text-base-content/50 text-xs">
+                                <div class="w-10 h-10 rounded-full bg-base-200 flex items-center justify-center mx-auto mb-2 opacity-60">
+                                    <i data-lucide="layers" style="width: 20px; height: 20px;"></i>
+                                </div>
                                 <div>No company divisions registered yet.</div>
                             </div>
                         @endforelse
@@ -291,21 +311,21 @@
     </div>
 
     {{-- Today's Live Attendance Feed Table --}}
-    <div class="card bg-base-100 border border-base-200 shadow-sm overflow-hidden">
-        <div class="card-body p-4 sm:p-5 pb-0">
+    <div class="card bg-base-100 border border-base-200 shadow-xs overflow-hidden transition-all duration-200 hover:border-base-content/20 hover:shadow-sm">
+        <div class="card-body p-4 sm:p-5 pb-3">
             <div class="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-base-200">
                 <div>
-                    <h3 class="font-bold text-base text-base-content">Today's Live Punch Feed</h3>
+                    <h3 class="font-bold text-base text-base-content tracking-tight">Today's Live Punch Feed</h3>
                     <p class="text-xs text-base-content/60">Stream of biometric punches synchronized from devices</p>
                 </div>
-                <div class="flex items-center gap-2">
-                    <span class="badge badge-primary badge-soft font-mono text-xs">
+                <div class="flex items-center gap-2.5">
+                    <span class="badge badge-primary badge-soft font-mono text-xs px-2.5 py-1">
                         {{ $recentPunches->count() }} Recent Records
                     </span>
                     <x-authorized permission="attendances.view">
-                        <a href="{{ route('admin.attendances.index') }}" class="btn btn-xs btn-outline gap-1">
+                        <a href="{{ route('admin.attendances.index') }}" class="btn btn-xs btn-outline gap-1.5 shadow-xs">
                             <span>All Logs</span>
-                            <i data-lucide="arrow-right" style="width: 13px; height: 13px;"></i>
+                            <i data-lucide="arrow-right" style="width: 12px; height: 12px;"></i>
                         </a>
                     </x-authorized>
                 </div>
@@ -315,17 +335,17 @@
             <table class="table table-zebra table-hover w-full text-sm">
                 <thead class="bg-base-200/50 text-base-content/70 text-xs uppercase font-semibold tracking-wider">
                     <tr>
-                        <th class="pl-5">Employee</th>
-                        <th>Card / Badge</th>
-                        <th>Company</th>
-                        <th>Punch Date</th>
-                        <th>Clock In</th>
-                        <th>Clock Out</th>
-                        <th>Status</th>
-                        <th class="text-right pr-5">Action</th>
+                        <th class="pl-5 py-3">Employee</th>
+                        <th class="py-3">Card / Badge</th>
+                        <th class="py-3">Company</th>
+                        <th class="py-3">Punch Date</th>
+                        <th class="py-3">Clock In</th>
+                        <th class="py-3">Clock Out</th>
+                        <th class="py-3">Status</th>
+                        <th class="text-right pr-5 py-3">Action</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-base-200/60">
                     @forelse($recentPunches as $punch)
                         @php
                             $empName = $punch->employee ? $punch->employee->full_name : 'Card #' . $punch->card_no;
@@ -333,57 +353,57 @@
                             $company = $punch->employee?->company ?? '—';
                         @endphp
                         <tr class="hover:bg-base-200/40 transition-colors">
-                            <td class="pl-5">
-                                <div class="flex items-center gap-2.5">
-                                    <div class="avatar placeholder">
-                                        <div class="bg-primary/10 text-primary rounded-full w-8 h-8 text-xs font-bold font-mono flex items-center justify-center">
+                            <td class="pl-5 py-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="avatar placeholder shrink-0">
+                                        <div class="bg-primary/10 text-primary border border-primary/20 rounded-xl w-8 h-8 text-xs font-bold font-mono flex items-center justify-center shadow-2xs">
                                             {{ $empInitials }}
                                         </div>
                                     </div>
                                     <div>
                                         <div class="font-semibold text-base-content leading-tight">{{ $empName }}</div>
                                         @if($punch->employee?->employee_id)
-                                            <div class="text-[11px] text-base-content/60 font-mono">
+                                            <div class="text-[11px] text-base-content/60 font-mono mt-0.5">
                                                 ID: {{ $punch->employee->employee_id }}
                                             </div>
                                         @endif
                                     </div>
                                 </div>
                             </td>
-                            <td>
-                                <span class="badge badge-sm badge-neutral badge-soft font-mono">
+                            <td class="py-3">
+                                <span class="badge badge-sm badge-neutral badge-soft font-mono px-2 py-0.5">
                                     {{ $punch->card_no }}
                                 </span>
                             </td>
-                            <td class="text-xs text-base-content/70">
+                            <td class="text-xs text-base-content/70 py-3 font-medium">
                                 {{ $company }}
                             </td>
-                            <td class="font-mono text-xs text-base-content">
+                            <td class="font-mono text-xs text-base-content py-3 tabular-nums">
                                 {{ $punch->punch_date ? $punch->punch_date->format('M d, Y') : '—' }}
                             </td>
-                            <td>
-                                <span class="font-mono text-xs font-medium text-base-content">
+                            <td class="py-3">
+                                <span class="font-mono text-xs font-semibold text-base-content tabular-nums">
                                     {{ $punch->check_in_time ?? ($punch->check_in_datetime ? $punch->check_in_datetime->format('h:i A') : '—') }}
                                 </span>
                             </td>
-                            <td>
+                            <td class="py-3">
                                 @if($punch->check_out_time || $punch->check_out_datetime)
-                                    <span class="font-mono text-xs text-base-content">
+                                    <span class="font-mono text-xs text-base-content tabular-nums">
                                         {{ $punch->check_out_time ?? $punch->check_out_datetime->format('h:i A') }}
                                     </span>
                                 @else
                                     <span class="text-base-content/40 font-mono text-xs">-- : --</span>
                                 @endif
                             </td>
-                            <td>
-                                <span class="badge badge-sm badge-success badge-soft flex items-center gap-1 font-mono">
+                            <td class="py-3">
+                                <span class="badge badge-sm badge-success badge-soft flex items-center gap-1 font-mono px-2 py-0.5">
                                     <i data-lucide="check" style="width: 12px; height: 12px;"></i>
-                                    Present
+                                    <span>Present</span>
                                 </span>
                             </td>
-                            <td class="text-right pr-5">
+                            <td class="text-right pr-5 py-3">
                                 <x-authorized permission="attendances.view">
-                                    <a href="{{ route('admin.attendances.index', ['card_no' => $punch->card_no]) }}" class="btn btn-xs btn-outline" title="View historical records for this card">
+                                    <a href="{{ route('admin.attendances.index', ['card_no' => $punch->card_no]) }}" class="btn btn-xs btn-outline font-medium transition-all duration-150 hover:border-primary hover:text-primary" title="View historical records for this card">
                                         Logs
                                     </a>
                                 </x-authorized>
@@ -391,17 +411,17 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="text-center py-10 text-base-content/60">
+                            <td colspan="8" class="text-center py-12 text-base-content/60">
                                 <div class="flex flex-col items-center justify-center">
-                                    <div class="rounded-full bg-base-200 p-4 mb-3">
-                                        <i data-lucide="calendar-x" class="text-base-content/50" style="width: 32px; height: 32px;"></i>
+                                    <div class="rounded-2xl bg-base-200 p-4 mb-3 text-base-content/50">
+                                        <i data-lucide="calendar-x" style="width: 32px; height: 32px;"></i>
                                     </div>
-                                    <h4 class="font-semibold text-base-content text-base mb-1">No attendance punches recorded today</h4>
-                                    <p class="text-xs text-base-content/60 mb-4 max-w-sm">Punches will automatically stream here upon biometric device synchronization.</p>
+                                    <h4 class="font-bold text-base-content text-base mb-1">No attendance punches recorded today</h4>
+                                    <p class="text-xs text-base-content/60 mb-4 max-w-sm leading-relaxed">Punches will automatically stream here upon biometric device synchronization.</p>
                                     <x-authorized permission="attendances.sync">
                                         <form action="{{ route('admin.attendances.sync') }}" method="POST">
                                             @csrf
-                                            <button type="submit" class="btn btn-primary btn-sm inline-flex items-center gap-2">
+                                            <button type="submit" class="btn btn-primary btn-sm inline-flex items-center gap-2 shadow-xs transition-all duration-200">
                                                 <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i>
                                                 <span>Synchronize Devices Now</span>
                                             </button>
@@ -434,7 +454,10 @@
                     if (quickSyncIcon) {
                         quickSyncIcon.classList.add('animate-spin-smooth');
                     }
-                    quickSyncBtn.querySelector('span').innerText = 'Syncing...';
+                    const spanEl = quickSyncBtn.querySelector('span');
+                    if (spanEl) {
+                        spanEl.innerText = 'Syncing...';
+                    }
                 });
             }
 
@@ -447,7 +470,7 @@
                     gridColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)',
                     tooltipBg: isDark ? '#1E293B' : '#FFFFFF',
                     tooltipText: isDark ? '#F8FAFC' : '#0F172A',
-                    tooltipBorder: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+                    tooltipBorder: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.1)',
                 };
             }
 

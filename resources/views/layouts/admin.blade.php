@@ -64,18 +64,6 @@
                         <i data-lucide="sun" style="width: 18px; height: 18px;"></i>
                     </button>
 
-                    <!-- Notifications Dropdown -->
-                    <div class="dropdown dropdown-end">
-                        <div tabindex="0" role="button" class="btn btn-ghost btn-circle btn-sm relative" aria-label="View notifications">
-                            <i data-lucide="bell" style="width: 18px; height: 18px;"></i>
-                            <span class="badge badge-xs badge-error absolute top-1 right-1 p-1"></span>
-                        </div>
-                        <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-50 w-72 p-2 shadow-lg border border-base-200 mt-2">
-                            <li class="menu-title text-xs font-bold text-base-content/70">Notifications</li>
-                            <li><a class="text-xs py-2">Biometric sync cycle active</a></li>
-                            <li><a class="text-xs py-2">System health: All services nominal</a></li>
-                        </ul>
-                    </div>
 
                     <!-- User Profile Dropdown -->
                     <div class="dropdown dropdown-end">
