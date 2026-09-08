@@ -50,13 +50,13 @@
         <div class="card bg-base-100 border border-base-200/60 shadow-xs">
             <div class="card-body p-4">
                 <span class="text-xs font-medium text-base-content/60 uppercase tracking-wider">Present on {{ \Carbon\Carbon::parse($date)->format('M d, Y') }}</span>
-                <h3 class="text-2xl font-bold text-base-content mt-1">{{ $totalPresentToday }}</h3>
+                <h3 class="text-2xl font-bold text-success mt-1">{{ $totalPresentToday }}</h3>
             </div>
         </div>
         <div class="card bg-base-100 border border-base-200/60 shadow-xs">
             <div class="card-body p-4">
-                <span class="text-xs font-medium text-base-content/60 uppercase tracking-wider">Late Arrivals</span>
-                <h3 class="text-2xl font-bold text-warning mt-1">{{ $totalLateToday }}</h3>
+                <span class="text-xs font-medium text-base-content/60 uppercase tracking-wider">Absent Staff</span>
+                <h3 class="text-2xl font-bold text-error mt-1">{{ $totalAbsentToday }}</h3>
             </div>
         </div>
         <div class="card bg-base-100 border border-base-200/60 shadow-xs">
@@ -91,9 +91,7 @@
                     <select name="status" class="select select-bordered select-sm sm:select-md w-full bg-base-100 text-base-content" aria-label="Filter by attendance status">
                         <option value="">All Statuses</option>
                         <option value="present" {{ $status === 'present' ? 'selected' : '' }}>Present</option>
-                        <option value="late" {{ $status === 'late' ? 'selected' : '' }}>Late</option>
-                        <option value="early_exit" {{ $status === 'early_exit' ? 'selected' : '' }}>Early Exit</option>
-                        <option value="half_day" {{ $status === 'half_day' ? 'selected' : '' }}>Half Day</option>
+                        <option value="absent" {{ $status === 'absent' ? 'selected' : '' }}>Absent</option>
                     </select>
                 </div>
 
@@ -129,6 +127,7 @@
                         <th>Punch Date</th>
                         <th>Check In</th>
                         <th>Check Out</th>
+                        <th>Total Time</th>
                         <th>Status</th>
                     </tr>
                 </thead>
@@ -178,24 +177,30 @@
                                 @endif
                             </td>
                             <td>
-                                @php
-                                    $statusClass = match($attendance->show_status) {
-                                        'present' => 'badge-success',
-                                        'late' => 'badge-warning',
-                                        'early_exit' => 'badge-info',
-                                        'half_day' => 'badge-secondary',
-                                        'absent' => 'badge-error',
-                                        default => 'badge-primary'
-                                    };
-                                @endphp
-                                <span class="badge {{ $statusClass }} badge-soft font-medium capitalize">
-                                    {{ str_replace('_', ' ', $attendance->show_status) }}
-                                </span>
+                                @if($attendance->total_time)
+                                    <span class="badge badge-primary badge-soft font-mono font-semibold text-xs px-2.5 py-1 inline-flex items-center gap-1">
+                                        <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                                        <span>{{ $attendance->total_time }}</span>
+                                    </span>
+                                @else
+                                    <span class="text-base-content/40 text-xs font-mono">--:--</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if(strtolower((string) $attendance->show_status) === 'absent')
+                                    <span class="badge badge-error badge-soft font-medium">
+                                        Absent
+                                    </span>
+                                @else
+                                    <span class="badge badge-success badge-soft font-medium">
+                                        Present
+                                    </span>
+                                @endif
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center py-10 text-base-content/60">
+                            <td colspan="8" class="text-center py-10 text-base-content/60">
                                 <i data-lucide="calendar-x" class="mb-2 mx-auto text-base-content/30 w-9 h-9"></i>
                                 <span>No attendance records logged for {{ \Carbon\Carbon::parse($date)->format('M d, Y') }}.</span>
                             </td>

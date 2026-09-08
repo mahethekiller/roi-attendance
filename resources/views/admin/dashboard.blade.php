@@ -341,6 +341,7 @@
                         <th class="py-3">Punch Date</th>
                         <th class="py-3">Clock In</th>
                         <th class="py-3">Clock Out</th>
+                        <th class="py-3">Total Time</th>
                         <th class="py-3">Status</th>
                         <th class="text-right pr-5 py-3">Action</th>
                     </tr>
@@ -396,6 +397,16 @@
                                 @endif
                             </td>
                             <td class="py-3">
+                                @if($punch->total_time)
+                                    <span class="badge badge-primary badge-soft font-mono font-semibold text-xs px-2 py-0.5 flex items-center gap-1 w-fit">
+                                        <i data-lucide="clock" style="width: 11px; height: 11px;"></i>
+                                        <span>{{ $punch->total_time }}</span>
+                                    </span>
+                                @else
+                                    <span class="text-base-content/40 font-mono text-xs">-- : --</span>
+                                @endif
+                            </td>
+                            <td class="py-3">
                                 <span class="badge badge-sm badge-success badge-soft flex items-center gap-1 font-mono px-2 py-0.5">
                                     <i data-lucide="check" style="width: 12px; height: 12px;"></i>
                                     <span>Present</span>
@@ -411,7 +422,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="text-center py-12 text-base-content/60">
+                            <td colspan="9" class="text-center py-12 text-base-content/60">
                                 <div class="flex flex-col items-center justify-center">
                                     <div class="rounded-2xl bg-base-200 p-4 mb-3 text-base-content/50">
                                         <i data-lucide="calendar-x" style="width: 32px; height: 32px;"></i>

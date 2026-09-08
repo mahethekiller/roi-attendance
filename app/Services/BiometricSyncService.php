@@ -167,10 +167,8 @@ class BiometricSyncService
                     }
                 }
 
+                // Status is strictly 'present' for any recorded punch (no 'late')
                 $status = 'present';
-                if ($minTime && strtotime($minTime) > strtotime('09:30:00')) {
-                    $status = 'late';
-                }
 
                 if ($existing) {
                     $hasCheckOutChanged = ($existing->check_out_time != $maxTime || $existing->check_out_datetime != $maxCheckTime);

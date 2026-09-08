@@ -18,6 +18,7 @@ class AttendanceResource extends JsonResource
             'check_out_time'      => $this->check_out_time,
             'check_in_datetime'   => $this->check_in_datetime ? $this->check_in_datetime->format('Y-m-d H:i:s') : null,
             'check_out_datetime'  => $this->check_out_datetime ? $this->check_out_datetime->format('Y-m-d H:i:s') : null,
+            'total_time'          => $this->total_time,
             'show_status'         => $this->show_status,
             'employee'            => $this->whenLoaded('employee', function () {
                 return $this->employee ? [

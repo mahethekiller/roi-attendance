@@ -39,8 +39,9 @@ class AttendanceController extends Controller
         $attendances = $attendancesQuery->paginate(15)->withQueryString();
 
         $totalPresentToday = Attendance::whereDate('punch_date', $date)->count();
-        $totalLateToday = Attendance::whereDate('punch_date', $date)->where('show_status', 'late')->count();
         $totalEmployees = Employee::count();
+        $totalAbsentToday = max(0, $totalEmployees - $totalPresentToday);
+        $totalLateToday = 0;
 
         return view('admin.attendances.index', compact(
             'attendances',
@@ -48,6 +49,7 @@ class AttendanceController extends Controller
             'date',
             'status',
             'totalPresentToday',
+            'totalAbsentToday',
             'totalLateToday',
             'totalEmployees'
         ));

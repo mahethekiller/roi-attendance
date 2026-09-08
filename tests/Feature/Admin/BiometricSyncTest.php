@@ -121,7 +121,7 @@ class BiometricSyncTest extends TestCase
 
         $this->assertDatabaseHas('attendances', [
             'card_no' => '8802',
-            'show_status' => 'late',
+            'show_status' => 'present',
         ]);
     }
 

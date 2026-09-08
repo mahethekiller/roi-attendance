@@ -23,6 +23,10 @@ class Attendance extends Model
         'show_status',
     ];
 
+    protected $appends = [
+        'total_time',
+    ];
+
     protected function casts(): array
     {
         return [
@@ -30,6 +34,33 @@ class Attendance extends Model
             'check_in_datetime' => 'datetime',
             'check_out_datetime' => 'datetime',
         ];
+    }
+
+    /**
+     * Compute total time duration between check in and check out.
+     */
+    public function getTotalTimeAttribute(): ?string
+    {
+        $in = $this->check_in_datetime;
+        $out = $this->check_out_datetime;
+
+        if (!$in && !empty($this->check_in_time) && !empty($this->punch_date)) {
+            $in = \Carbon\Carbon::parse($this->punch_date->format('Y-m-d') . ' ' . $this->check_in_time);
+        }
+
+        if (!$out && !empty($this->check_out_time) && !empty($this->punch_date)) {
+            $out = \Carbon\Carbon::parse($this->punch_date->format('Y-m-d') . ' ' . $this->check_out_time);
+        }
+
+        if (!$in || !$out || $in->equalTo($out) || $out->lessThan($in)) {
+            return null;
+        }
+
+        $diffMinutes = $in->diffInMinutes($out);
+        $hours = intdiv($diffMinutes, 60);
+        $minutes = $diffMinutes % 60;
+
+        return sprintf('%dh %02dm', $hours, $minutes);
     }
 
     public function employee(): BelongsTo
