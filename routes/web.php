@@ -46,6 +46,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
 
     // Sync History Logs
     Route::get('/sync-logs', [SyncLogController::class, 'index'])->middleware('permission:sync-logs.view')->name('sync-logs.index');
+    Route::post('/sync-logs/clear', [SyncLogController::class, 'clear'])->middleware('permission:sync-logs.clear')->name('sync-logs.clear');
 
     // Attendance Overrides Management (Super Admin)
     Route::middleware('permission:attendance.overrides.manage')->group(function () {

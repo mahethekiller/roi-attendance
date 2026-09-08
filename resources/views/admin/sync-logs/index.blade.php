@@ -5,7 +5,13 @@
             <h1 class="text-2xl font-bold text-base-content tracking-tight">Biometric Sync History</h1>
             <p class="text-sm text-base-content/70 mt-0.5">Audit logs of all automated cron executions, manual triggers, and webhook sync runs.</p>
         </div>
-        <div>
+        <div class="flex items-center gap-2">
+            <x-authorized permission="sync-logs.clear">
+                <button type="button" class="btn btn-outline btn-error btn-sm sm:btn-md gap-2 shadow-xs" onclick="document.getElementById('clearSyncLogsModal').showModal()">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    <span>Clear Logs</span>
+                </button>
+            </x-authorized>
             <form method="POST" action="{{ route('admin.attendances.sync') }}" class="inline">
                 @csrf
                 <button type="submit" class="btn btn-primary btn-sm sm:btn-md gap-2 shadow-xs">
@@ -15,6 +21,21 @@
             </form>
         </div>
     </div>
+
+    <!-- Feedback Alerts -->
+    @if(session('success'))
+        <div class="alert alert-success shadow-xs mb-6" role="alert">
+            <i data-lucide="check-circle" class="w-5 h-5 shrink-0"></i>
+            <span>{{ session('success') }}</span>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-error shadow-xs mb-6" role="alert">
+            <i data-lucide="alert-circle" class="w-5 h-5 shrink-0"></i>
+            <span>{{ session('error') }}</span>
+        </div>
+    @endif
 
     <!-- Metrics Summary Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -244,4 +265,56 @@
             document.getElementById('logDetailModal').showModal();
         }
     </script>
+
+    <!-- Clear Sync Logs Modal (Super Admin Only) -->
+    <x-authorized permission="sync-logs.clear">
+        <dialog id="clearSyncLogsModal" class="modal modal-bottom sm:modal-middle">
+            <div class="modal-box bg-base-100 border border-base-200 shadow-xl">
+                <div class="flex items-center justify-between pb-3 border-b border-base-200">
+                    <div class="flex items-center gap-2 text-error font-bold text-lg">
+                        <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                        <span>Clear Sync History Logs</span>
+                    </div>
+                    <form method="dialog">
+                        <button class="btn btn-sm btn-circle btn-ghost">✕</button>
+                    </form>
+                </div>
+
+                <form method="POST" action="{{ route('admin.sync-logs.clear') }}" class="mt-4">
+                    @csrf
+                    <p class="text-sm text-base-content/80 mb-4">
+                        Select which logs to purge. This action will permanently remove audit records from the database.
+                    </p>
+
+                    <div class="form-control mb-4">
+                        <label class="label pb-1.5" for="clearScope">
+                            <span class="label-text font-semibold text-xs text-base-content/80">Select Purge Scope</span>
+                        </label>
+                        <select name="scope" id="clearScope" required class="select select-bordered select-sm sm:select-md w-full bg-base-100 text-base-content">
+                            <option value="all">Purge All Logs (Complete Reset)</option>
+                            <option value="older_than_7_days">Logs Older Than 7 Days</option>
+                            <option value="older_than_30_days">Logs Older Than 30 Days</option>
+                            <option value="failed_only">Failed Sync Attempts Only</option>
+                        </select>
+                    </div>
+
+                    <div class="p-3 bg-error/10 border border-error/20 rounded-lg text-xs text-error font-medium mb-5 flex items-start gap-2">
+                        <i data-lucide="info" class="w-4 h-4 shrink-0 mt-0.5"></i>
+                        <span>Permanent action: Deleted sync logs cannot be recovered.</span>
+                    </div>
+
+                    <div class="modal-action flex items-center justify-end gap-2">
+                        <button type="button" class="btn btn-ghost btn-sm sm:btn-md" onclick="document.getElementById('clearSyncLogsModal').close()">Cancel</button>
+                        <button type="submit" class="btn btn-error btn-sm sm:btn-md gap-2 shadow-xs">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            <span>Confirm & Clear</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <form method="dialog" class="modal-backdrop">
+                <button>close</button>
+            </form>
+        </dialog>
+    </x-authorized>
 </x-admin-layout>

@@ -53,6 +53,7 @@ class RoleAndPermissionSeeder extends Seeder
 
             // Sync History Logs
             'sync-logs.view',
+            'sync-logs.clear',
 
             // Reports & Analytics
             'reports.view',
