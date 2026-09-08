@@ -55,7 +55,7 @@
 
     {{-- Employee Self-Service Banner if linked to employee record --}}
     @if($personalStats && $employeeRecord)
-        <div class="card border-0 shadow-sm bg-body text-body mb-4 border-start border-primary border-4">
+        <div class="card border shadow-sm bg-body text-body mb-4">
             <div class="card-body p-3 d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
                 <div class="d-flex align-items-center gap-3">
                     <div class="rounded-circle bg-primary-subtle text-primary p-2 d-flex align-items-center justify-content-center fw-bold font-monospace" style="width: 44px; height: 44px; font-size: 1rem;">
@@ -191,9 +191,12 @@
                         <h6 class="fw-bold mb-0 text-body-emphasis">Biometric Hardware Sync</h6>
                     </div>
                     @if($latestSync && $latestSync->status === 'success')
-                        <span class="badge bg-success-subtle text-success border border-success-subtle d-inline-flex align-items-center gap-1">
-                            <span class="spinner-grow spinner-grow-sm text-success" style="width: 6px; height: 6px;" role="status"></span>
-                            Online
+                        <span class="badge bg-success-subtle text-success border border-success-subtle d-inline-flex align-items-center gap-2">
+                            <span class="telemetry-beacon">
+                                <span class="telemetry-pulse"></span>
+                                <span class="telemetry-dot"></span>
+                            </span>
+                            <span>Online</span>
                         </span>
                     @elseif($latestSync && $latestSync->status === 'failed')
                         <span class="badge bg-danger-subtle text-danger border border-danger-subtle d-inline-flex align-items-center gap-1">
@@ -282,7 +285,7 @@
                                 </span>
                             </div>
                             <div class="progress" style="height: 6px;" role="progressbar" aria-valuenow="{{ $comp['rate'] }}" aria-valuemin="0" aria-valuemax="100">
-                                <div class="progress-bar {{ $comp['rate'] >= 80 ? 'bg-success' : ($comp['rate'] >= 50 ? 'bg-primary' : 'bg-warning') }}" style="width: {{ $comp['rate'] }}%"></div>
+                                <div class="progress-bar {{ $comp['rate'] >= 80 ? 'bg-success' : ($comp['rate'] >= 50 ? 'bg-primary' : 'bg-warning') }}" style="width: {{ $comp['rate'] }}%; transition: width 0.8s var(--ease-out-expo);"></div>
                             </div>
                         </div>
                     @empty
@@ -434,7 +437,7 @@
                 quickSyncForm.addEventListener('submit', function () {
                     quickSyncBtn.disabled = true;
                     if (quickSyncIcon) {
-                        quickSyncIcon.classList.add('animate-spin');
+                        quickSyncIcon.classList.add('animate-spin-smooth');
                     }
                     quickSyncBtn.querySelector('span').innerText = 'Syncing...';
                 });
@@ -454,7 +457,7 @@
 
             let themeColors = getThemeConfig();
 
-            // 1. Initialize 7-Day Trend Chart
+            // 1. Initialize 7-Day Trend Chart with smooth easing
             const trendCtx = document.getElementById('attendanceTrendChart');
             let trendChart = null;
             if (trendCtx) {
@@ -492,6 +495,10 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        animation: {
+                            duration: 650,
+                            easing: 'easeOutQuart',
+                        },
                         interaction: {
                             intersect: false,
                             mode: 'index',
@@ -554,6 +561,10 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        animation: {
+                            duration: 650,
+                            easing: 'easeOutQuart',
+                        },
                         plugins: {
                             legend: { display: false },
                             tooltip: {
@@ -584,7 +595,45 @@
                 });
             }
 
-            // 3. Dynamic Theme Switch Listener for Chart Updates
+            // 3. Smooth Counter Interpolation for KPI Cards (Respects prefers-reduced-motion)
+            function animateCounters() {
+                const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                if (prefersReduced) return;
+
+                const counters = document.querySelectorAll('.counter-value');
+                counters.forEach(counter => {
+                    const target = parseFloat(counter.getAttribute('data-counter-target'));
+                    const suffix = counter.getAttribute('data-counter-suffix') || '';
+                    if (isNaN(target)) return;
+
+                    const duration = 650;
+                    const startTime = performance.now();
+                    const isDecimal = target % 1 !== 0;
+
+                    function updateCount(currentTime) {
+                        const elapsed = currentTime - startTime;
+                        const progress = Math.min(elapsed / duration, 1);
+                        // Quartic ease out: 1 - pow(1 - progress, 4)
+                        const easeOut = 1 - Math.pow(1 - progress, 4);
+                        const currentVal = isDecimal 
+                            ? (target * easeOut).toFixed(1)
+                            : Math.round(target * easeOut).toLocaleString();
+
+                        counter.innerText = currentVal + suffix;
+
+                        if (progress < 1) {
+                            requestAnimationFrame(updateCount);
+                        } else {
+                            counter.innerText = (isDecimal ? target.toFixed(1) : Math.round(target).toLocaleString()) + suffix;
+                        }
+                    }
+
+                    requestAnimationFrame(updateCount);
+                });
+            }
+            animateCounters();
+
+            // 4. Dynamic Theme Switch Listener for Chart Updates
             window.addEventListener('roi-theme-changed', function (e) {
                 const updatedTheme = getThemeConfig();
 

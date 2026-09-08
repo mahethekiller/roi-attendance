@@ -26,6 +26,11 @@
         :root {
             --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+            --duration-instant: 120ms;
+            --duration-normal: 220ms;
+            --duration-focal: 500ms;
         }
         body {
             font-family: var(--font-sans);
@@ -43,30 +48,117 @@
         .table td, .table th, .stat-card h3, .badge {
             font-variant-numeric: tabular-nums;
         }
+
+        /* Themed selection & custom scrollbars */
+        ::selection {
+            background-color: rgba(99, 102, 241, 0.25);
+            color: inherit;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.3);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(148, 163, 184, 0.5);
+        }
+
+        /* Focus rings */
+        :focus-visible {
+            outline: 2px solid #6366F1;
+            outline-offset: 2px;
+        }
+
         .admin-sidebar {
             width: 260px;
             min-height: calc(100vh - 65px);
-            transition: all 0.3s ease;
+            transition: all var(--duration-normal) var(--ease-out-expo);
         }
         .nav-link.active {
             font-weight: 600;
         }
         .stat-card {
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: transform var(--duration-normal) var(--ease-out-expo), box-shadow var(--duration-normal) var(--ease-out-expo);
+            will-change: transform;
         }
         .stat-card:hover {
-            transform: translateY(-3px);
+            transform: translateY(-2px);
         }
         .lucide {
             vertical-align: middle;
         }
+
+        /* Telemetry Beacon Radar Animation (Focal Moment) */
+        .telemetry-beacon {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 8px;
+            height: 8px;
+        }
+        .telemetry-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #10B981;
+        }
+        .telemetry-pulse {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: #10B981;
+            opacity: 0.75;
+            animation: radar-ping 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+        }
+        @keyframes radar-ping {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+            70%, 100% {
+                transform: scale(3.2);
+                opacity: 0;
+            }
+        }
+
+        /* Smooth spin animation */
+        .animate-spin-smooth {
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Subtle row highlight transition */
+        .table-hover > tbody > tr {
+            transition: background-color var(--duration-instant) ease;
+        }
+
+        /* Accessible Reduced Motion Fallbacks */
         @media (prefers-reduced-motion: reduce) {
             .stat-card,
             .admin-sidebar,
             .btn,
-            .nav-link {
+            .nav-link,
+            .table-hover > tbody > tr {
                 transition: none !important;
                 transform: none !important;
+            }
+            .telemetry-pulse {
+                animation: none !important;
+                display: none;
+            }
+            .animate-spin-smooth {
+                animation: none !important;
             }
         }
     </style>
