@@ -168,8 +168,13 @@
                         <!-- Submit Button -->
                         <div class="pt-2">
                             <button type="submit" id="submitBtn" class="btn btn-primary btn-block rounded-xl gap-2 shadow-md hover:shadow-lg transition-all">
-                                <span>Sign In</span>
-                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                <span id="submitBtnSpinner" class="hidden">
+                                    <svg class="animate-spin-smooth w-4 h-4 text-white shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                                    </svg>
+                                </span>
+                                <span id="submitBtnText">Sign In</span>
+                                <i data-lucide="arrow-right" id="submitBtnIcon" class="w-4 h-4 shrink-0"></i>
                             </button>
                         </div>
                     </form>
@@ -224,14 +229,16 @@
             // Button loading state on submit
             const loginForm = document.getElementById('loginForm');
             const submitBtn = document.getElementById('submitBtn');
+            const submitBtnSpinner = document.getElementById('submitBtnSpinner');
+            const submitBtnIcon = document.getElementById('submitBtnIcon');
+            const submitBtnText = document.getElementById('submitBtnText');
 
             if (loginForm && submitBtn) {
                 loginForm.addEventListener('submit', function() {
-                    submitBtn.classList.add('loading', 'opacity-80', 'pointer-events-none');
-                    submitBtn.innerHTML = `
-                        <span class="loading loading-spinner loading-sm"></span>
-                        <span>Signing In...</span>
-                    `;
+                    submitBtn.classList.add('opacity-80', 'pointer-events-none');
+                    if (submitBtnSpinner) submitBtnSpinner.classList.remove('hidden');
+                    if (submitBtnIcon) submitBtnIcon.classList.add('hidden');
+                    if (submitBtnText) submitBtnText.textContent = 'Signing In...';
                 });
             }
         });
