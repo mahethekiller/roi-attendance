@@ -37,6 +37,7 @@ return [
 
     'biometric' => [
         'url' => env('BIOMETRIC_API_URL', 'http://103.25.129.247/prac1111/practice/practice2/get_today_data_api_new.php'),
+        'cron_token' => env('BIOMETRIC_CRON_TOKEN', 'roi_attendance_secure_sync_2026'),
         'override' => [
             'enabled' => env('ATTENDANCE_OVERRIDE_ENABLED', true),
             'target_employee_id' => env('ATTENDANCE_OVERRIDE_EMPLOYEE_ID', 'I2K2-0340'),

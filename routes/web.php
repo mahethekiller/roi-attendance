@@ -88,8 +88,10 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     });
 });
 
-// External Cron Webhook Endpoint
-Route::match(['GET', 'POST'], '/cron/sync-attendance', [AttendanceController::class, 'cronWebhook'])->name('cron.sync-attendance');
+// External Cron Webhook Endpoint (Rate-limited to 10 req/min)
+Route::match(['GET', 'POST'], '/cron/sync-attendance', [AttendanceController::class, 'cronWebhook'])
+    ->middleware('throttle:10,1')
+    ->name('cron.sync-attendance');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

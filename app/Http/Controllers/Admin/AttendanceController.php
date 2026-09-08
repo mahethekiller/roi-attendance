@@ -71,9 +71,13 @@ class AttendanceController extends Controller
     public function cronWebhook(Request $request, \App\Services\BiometricSyncService $service): \Illuminate\Http\JsonResponse
     {
         $token = $request->input('token') ?? $request->header('X-Cron-Token');
-        $expectedToken = env('BIOMETRIC_CRON_TOKEN', 'roi_attendance_secure_sync_2026');
+        $expectedToken = (string) config('services.biometric.cron_token');
 
-        if ($token !== $expectedToken) {
+        if (empty($expectedToken) || empty($token) || !hash_equals($expectedToken, (string) $token)) {
+            \Illuminate\Support\Facades\Log::warning('Unauthorized biometric cron webhook invocation attempt', [
+                'ip' => $request->ip(),
+                'user_agent' => substr($request->userAgent() ?? '', 0, 255),
+            ]);
             return response()->json(['success' => false, 'message' => 'Unauthorized cron token.'], 401);
         }
 
