@@ -172,20 +172,6 @@
                                 <i data-lucide="arrow-right" class="w-4 h-4"></i>
                             </button>
                         </div>
-
-                        <!-- Quick Credentials Chip (Dev/Admin convenience) -->
-                        <div class="pt-4 mt-6 border-t border-base-200 dark:border-base-300 text-center">
-                            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-base-200/70 border border-base-300 text-xs text-base-content/70">
-                                <i data-lucide="key-round" class="w-3.5 h-3.5 text-primary"></i>
-                                <span>Demo Admin:</span>
-                                <button type="button"
-                                        id="autoFillBtn"
-                                        class="font-mono text-primary font-semibold hover:underline cursor-pointer"
-                                        title="Click to auto-fill credentials">
-                                    admin@example.com / password
-                                </button>
-                            </div>
-                        </div>
                     </form>
                 </div>
             </div>
@@ -232,18 +218,6 @@
                         passwordEyeIcon.setAttribute('data-lucide', isPassword ? 'eye-off' : 'eye');
                         window.lucide.createIcons();
                     }
-                });
-            }
-
-            // Quick auto-fill button
-            const autoFillBtn = document.getElementById('autoFillBtn');
-            const emailInput = document.getElementById('emailInput');
-
-            if (autoFillBtn && emailInput && passwordInput) {
-                autoFillBtn.addEventListener('click', function() {
-                    emailInput.value = 'admin@example.com';
-                    passwordInput.value = 'password';
-                    emailInput.focus();
                 });
             }
 
