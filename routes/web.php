@@ -76,14 +76,16 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     // API Request Audit Logs
     Route::get('/api-logs', [ApiLogController::class, 'index'])->middleware('permission:api.logs.view')->name('api-logs.index');
 
-    // User Management
-    Route::get('/users', [UserController::class, 'index'])->middleware('permission:users.view')->name('users.index');
-    Route::get('/users/create', [UserController::class, 'create'])->middleware('permission:users.create')->name('users.create');
-    Route::post('/users', [UserController::class, 'store'])->middleware('permission:users.create')->name('users.store');
-    Route::get('/users/{user}', [UserController::class, 'show'])->middleware('permission:users.view')->name('users.show');
-    Route::get('/users/{user}/edit', [UserController::class, 'edit'])->middleware('permission:users.edit')->name('users.edit');
-    Route::match(['put', 'patch'], '/users/{user}', [UserController::class, 'update'])->middleware('permission:users.edit')->name('users.update');
-    Route::delete('/users/{user}', [UserController::class, 'destroy'])->middleware('permission:users.delete')->name('users.destroy');
+    // User Management (Super Admin Only)
+    Route::middleware('role:super-admin')->group(function () {
+        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+        Route::post('/users', [UserController::class, 'store'])->name('users.store');
+        Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
+        Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+        Route::match(['put', 'patch'], '/users/{user}', [UserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+    });
 });
 
 // External Cron Webhook Endpoint

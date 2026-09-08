@@ -27,6 +27,15 @@ class UserManagementTest extends TestCase
         $response->assertRedirect('/login');
     }
 
+    public function test_regular_admin_cannot_access_user_management(): void
+    {
+        $regularAdmin = User::factory()->create();
+        $regularAdmin->assignRole('admin');
+
+        $response = $this->actingAs($regularAdmin)->get('/admin/users');
+        $response->assertStatus(403);
+    }
+
     public function test_admin_can_view_users_list(): void
     {
         $response = $this->actingAs($this->adminUser)->get('/admin/users');

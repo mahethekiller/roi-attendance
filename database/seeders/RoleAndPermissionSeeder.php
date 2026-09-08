@@ -75,7 +75,6 @@ class RoleAndPermissionSeeder extends Seeder
         $adminRole->givePermissionTo([
             'view dashboard',
             'view reports',
-            'manage users',
             'dashboard.view',
             'employees.view',
             'employees.create',
@@ -84,9 +83,6 @@ class RoleAndPermissionSeeder extends Seeder
             'attendances.view',
             'attendances.sync',
             'attendances.export',
-            'users.view',
-            'users.create',
-            'users.edit',
             'api.docs.view',
             'sync-logs.view',
         ]);

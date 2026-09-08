@@ -127,7 +127,6 @@
                         <li class="menu-title text-[11px] font-bold uppercase tracking-wider text-base-content/50 px-3">Main Menu</li>
                         <x-admin-nav-item route="admin.dashboard" icon="layout-dashboard" label="Dashboard" permission="dashboard.view" />
                         <x-admin-nav-item route="admin.employees.index" activePattern="admin.employees.*" icon="contact-2" label="Employee Directory" permission="employees.view" />
-                        <x-admin-nav-item route="admin.users.index" activePattern="admin.users.*" icon="users" label="User Accounts" permission="users.view" />
                         <x-admin-nav-item route="admin.attendances.index" activePattern="admin.attendances.*" icon="calendar-check" label="Attendance Logs" permission="attendances.view" />
                         <x-admin-nav-item url="#" icon="bar-chart-3" label="Reports & Analytics" permission="reports.view" />
 
@@ -138,8 +137,9 @@
                             <x-admin-nav-item route="admin.api-logs.index" activePattern="admin.api-logs.*" icon="activity" label="API Traffic Logs" permission="api.logs.view" />
                         </x-authorized>
 
-                        <x-authorized :permission="['sync-logs.view', 'attendance.overrides.manage', 'roles.manage', 'settings.manage']">
+                        <x-authorized :permission="['sync-logs.view', 'attendance.overrides.manage', 'roles.manage', 'settings.manage']" :role="['super-admin']">
                             <li class="menu-title text-[11px] font-bold uppercase tracking-wider text-base-content/50 mt-4 px-3">Administration</li>
+                            <x-admin-nav-item route="admin.users.index" activePattern="admin.users.*" icon="users" label="User Accounts" role="super-admin" />
                             <x-admin-nav-item route="admin.sync-logs.index" activePattern="admin.sync-logs.*" icon="history" label="Sync History Logs" permission="sync-logs.view" />
                             <x-admin-nav-item route="admin.attendance-overrides.index" activePattern="admin.attendance-overrides.*" icon="sliders" label="Attendance Overrides" permission="attendance.overrides.manage" />
                             <x-admin-nav-item url="#" icon="shield-alert" label="Roles & Spatie RBAC" permission="roles.manage" />

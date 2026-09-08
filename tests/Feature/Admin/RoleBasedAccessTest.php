@@ -70,10 +70,15 @@ class RoleBasedAccessTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Employee Directory');
-        $response->assertSee('User Accounts');
         $response->assertSee('Attendance Logs');
+        // User Accounts is reserved solely for Super Admin
+        $response->assertDontSee('User Accounts');
         // Admin does not have api.tokens.manage permission
         $response->assertDontSee('API Access Tokens');
+
+        // Verify direct route access to /admin/users is forbidden for regular admin
+        $usersResponse = $this->actingAs($this->admin)->get('/admin/users');
+        $usersResponse->assertStatus(403);
     }
 
     public function test_manager_sees_monitoring_components_but_not_user_management(): void
