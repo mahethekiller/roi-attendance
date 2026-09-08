@@ -1,29 +1,29 @@
 <x-admin-layout>
     <!-- Page Header & Action Buttons -->
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div>
-            <h2 class="fw-bold text-body-emphasis mb-1">Attendance Logs</h2>
-            <p class="text-body-secondary mb-0">Biometric punch entries, check-in/out timestamps, and employee status tracking.</p>
+            <h1 class="text-2xl font-bold text-base-content tracking-tight">Attendance Logs</h1>
+            <p class="text-sm text-base-content/70 mt-0.5">Biometric punch entries, check-in/out timestamps, and employee status tracking.</p>
         </div>
-        <div class="d-flex flex-wrap gap-2">
+        <div class="flex flex-wrap items-center gap-2">
             <x-authorized permission="sync-logs.view">
-                <a href="{{ route('admin.sync-logs.index') }}" class="btn btn-outline-secondary btn-sm px-3 shadow-sm d-flex align-items-center gap-2">
-                    <i data-lucide="history" style="width: 16px; height: 16px;"></i>
+                <a href="{{ route('admin.sync-logs.index') }}" class="btn btn-outline btn-sm sm:btn-md gap-2 shadow-xs">
+                    <i data-lucide="history" class="w-4 h-4"></i>
                     <span>View Sync History</span>
                 </a>
             </x-authorized>
             <x-authorized permission="attendances.sync">
-                <form method="POST" action="{{ route('admin.attendances.sync') }}" class="d-inline">
+                <form method="POST" action="{{ route('admin.attendances.sync') }}" class="inline">
                     @csrf
-                    <button type="submit" class="btn btn-primary btn-sm px-3 shadow-sm d-flex align-items-center gap-2">
-                        <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i>
+                    <button type="submit" class="btn btn-primary btn-sm sm:btn-md gap-2 shadow-xs">
+                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
                         <span>Sync Biometric Data</span>
                     </button>
                 </form>
             </x-authorized>
             <x-authorized permission="attendances.export">
-                <button class="btn btn-outline-secondary btn-sm px-3 shadow-sm d-flex align-items-center gap-2" onclick="window.print()">
-                    <i data-lucide="printer" style="width: 16px; height: 16px;"></i>
+                <button type="button" class="btn btn-outline btn-sm sm:btn-md gap-2 shadow-xs" onclick="window.print()">
+                    <i data-lucide="printer" class="w-4 h-4"></i>
                     <span>Print Daily Sheet</span>
                 </button>
             </x-authorized>
@@ -32,69 +32,63 @@
 
     <!-- Feedback Alerts -->
     @if(session('success'))
-        <div class="alert alert-success border-0 shadow-sm mb-4 d-flex align-items-center gap-2" role="alert">
-            <i data-lucide="check-circle" style="width: 20px; height: 20px;"></i>
-            <div>{{ session('success') }}</div>
+        <div class="alert alert-success shadow-xs mb-6" role="alert">
+            <i data-lucide="check-circle" class="w-5 h-5 shrink-0"></i>
+            <span>{{ session('success') }}</span>
         </div>
     @endif
 
     @if(session('error'))
-        <div class="alert alert-danger border-0 shadow-sm mb-4 d-flex align-items-center gap-2" role="alert">
-            <i data-lucide="alert-circle" style="width: 20px; height: 20px;"></i>
-            <div>{{ session('error') }}</div>
+        <div class="alert alert-error shadow-xs mb-6" role="alert">
+            <i data-lucide="alert-circle" class="w-5 h-5 shrink-0"></i>
+            <span>{{ session('error') }}</span>
         </div>
     @endif
 
     <!-- Metrics Row -->
-    <div class="row g-3 mb-4">
-        <div class="col-sm-6 col-md-4">
-            <div class="card border-0 shadow-sm bg-body text-body">
-                <div class="card-body p-3">
-                    <span class="text-body-secondary small fw-medium">Present on {{ \Carbon\Carbon::parse($date)->format('M d, Y') }}</span>
-                    <h3 class="mb-0 fw-bold text-body-emphasis mt-1">{{ $totalPresentToday }}</h3>
-                </div>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <div class="card bg-base-100 border border-base-200/60 shadow-xs">
+            <div class="card-body p-4">
+                <span class="text-xs font-medium text-base-content/60 uppercase tracking-wider">Present on {{ \Carbon\Carbon::parse($date)->format('M d, Y') }}</span>
+                <h3 class="text-2xl font-bold text-base-content mt-1">{{ $totalPresentToday }}</h3>
             </div>
         </div>
-        <div class="col-sm-6 col-md-4">
-            <div class="card border-0 shadow-sm bg-body text-body">
-                <div class="card-body p-3">
-                    <span class="text-body-secondary small fw-medium">Late Arrivals</span>
-                    <h3 class="mb-0 fw-bold text-warning mt-1">{{ $totalLateToday }}</h3>
-                </div>
+        <div class="card bg-base-100 border border-base-200/60 shadow-xs">
+            <div class="card-body p-4">
+                <span class="text-xs font-medium text-base-content/60 uppercase tracking-wider">Late Arrivals</span>
+                <h3 class="text-2xl font-bold text-warning mt-1">{{ $totalLateToday }}</h3>
             </div>
         </div>
-        <div class="col-sm-6 col-md-4">
-            <div class="card border-0 shadow-sm bg-body text-body">
-                <div class="card-body p-3">
-                    <span class="text-body-secondary small fw-medium">Total Registered Employees</span>
-                    <h3 class="mb-0 fw-bold text-body-emphasis mt-1">{{ $totalEmployees }}</h3>
-                </div>
+        <div class="card bg-base-100 border border-base-200/60 shadow-xs">
+            <div class="card-body p-4">
+                <span class="text-xs font-medium text-base-content/60 uppercase tracking-wider">Total Registered Employees</span>
+                <h3 class="text-2xl font-bold text-base-content mt-1">{{ $totalEmployees }}</h3>
             </div>
         </div>
     </div>
 
     <!-- Filter Card -->
-    <div class="card border-0 shadow-sm bg-body text-body mb-4">
-        <div class="card-body p-3">
-            <form method="GET" action="{{ route('admin.attendances.index') }}" class="row g-2 align-items-center">
+    <div class="card bg-base-100 border border-base-200/60 shadow-xs mb-6">
+        <div class="card-body p-4">
+            <form method="GET" action="{{ route('admin.attendances.index') }}" class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
                 <!-- Date Picker -->
-                <div class="col-12 col-md-3">
-                    <input type="date" name="date" class="form-control bg-body-tertiary text-body" aria-label="Select attendance date" value="{{ $date }}">
+                <div class="sm:col-span-3">
+                    <input type="date" name="date" class="input input-bordered input-sm sm:input-md w-full bg-base-100 text-base-content" aria-label="Select attendance date" value="{{ $date }}">
                 </div>
 
                 <!-- Search Input -->
-                <div class="col-12 col-md-4">
-                    <div class="input-group">
-                        <span class="input-group-text bg-body-tertiary border-end-0 text-body-secondary">
-                            <i data-lucide="search" style="width: 18px; height: 18px;"></i>
+                <div class="sm:col-span-4">
+                    <div class="join w-full">
+                        <span class="join-item btn btn-sm sm:btn-md btn-disabled bg-base-200 border-base-300 px-3">
+                            <i data-lucide="search" class="w-4 h-4 text-base-content/60"></i>
                         </span>
-                        <input type="search" name="search" class="form-control bg-body-tertiary border-start-0 text-body" placeholder="Search Card, Badge No, or Name..." aria-label="Search by Card, Badge No, or Name" value="{{ $search }}">
+                        <input type="search" name="search" class="input input-bordered input-sm sm:input-md join-item w-full bg-base-100 text-base-content" placeholder="Search Card, Badge No, or Name..." aria-label="Search by Card, Badge No, or Name" value="{{ $search }}">
                     </div>
                 </div>
 
                 <!-- Status Filter -->
-                <div class="col-12 col-md-3">
-                    <select name="status" class="form-select bg-body-tertiary text-body" aria-label="Filter by attendance status">
+                <div class="sm:col-span-3">
+                    <select name="status" class="select select-bordered select-sm sm:select-md w-full bg-base-100 text-base-content" aria-label="Filter by attendance status">
                         <option value="">All Statuses</option>
                         <option value="present" {{ $status === 'present' ? 'selected' : '' }}>Present</option>
                         <option value="late" {{ $status === 'late' ? 'selected' : '' }}>Late</option>
@@ -104,13 +98,13 @@
                 </div>
 
                 <!-- Submit Button -->
-                <div class="col-12 col-md-2 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-1">
-                        <i data-lucide="filter" style="width: 16px; height: 16px;"></i> Filter
+                <div class="sm:col-span-2 flex items-center gap-2">
+                    <button type="submit" class="btn btn-primary btn-sm sm:btn-md gap-2 w-full">
+                        <i data-lucide="filter" class="w-4 h-4"></i> Filter
                     </button>
                     @if($search || $status || $date !== date('Y-m-d'))
-                        <a href="{{ route('admin.attendances.index') }}" class="btn btn-outline-secondary d-flex align-items-center justify-content-center" title="Reset Filters" aria-label="Reset attendance filters">
-                            <i data-lucide="rotate-ccw" style="width: 16px; height: 16px;"></i>
+                        <a href="{{ route('admin.attendances.index') }}" class="btn btn-outline btn-sm sm:btn-md btn-square" title="Reset Filters" aria-label="Reset attendance filters">
+                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
                         </a>
                     @endif
                 </div>
@@ -119,16 +113,16 @@
     </div>
 
     <!-- Attendance Table Card -->
-    <div class="card border-0 shadow-sm bg-body text-body">
-        <div class="card-header bg-body border-bottom p-3 d-flex align-items-center justify-content-between">
-            <h6 class="fw-bold mb-0 text-body-emphasis">
+    <div class="card bg-base-100 border border-base-200/60 shadow-xs overflow-hidden">
+        <div class="p-4 border-b border-base-200/60 flex items-center justify-between">
+            <h2 class="font-semibold text-base-content">
                 Daily Records for {{ \Carbon\Carbon::parse($date)->format('M d, Y') }} ({{ $attendances->total() }})
-            </h6>
+            </h2>
         </div>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light text-body-secondary">
-                    <tr>
+        <div class="overflow-x-auto">
+            <table class="table table-zebra w-full">
+                <thead>
+                    <tr class="bg-base-200/50 text-base-content/70">
                         <th>Employee</th>
                         <th>Card No</th>
                         <th>Badge No</th>
@@ -140,67 +134,69 @@
                 </thead>
                 <tbody>
                     @forelse($attendances as $attendance)
-                        <tr>
+                        <tr class="hover:bg-base-200/40 transition-colors">
                             <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="rounded-circle bg-primary bg-opacity-10 text-primary fw-bold d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; font-size: 0.8rem;">
-                                        {{ $attendance->employee->initials ?? 'NA' }}
+                                <div class="flex items-center gap-3">
+                                    <div class="avatar placeholder">
+                                        <div class="bg-primary/10 text-primary font-bold rounded-full w-8 h-8 text-xs">
+                                            <span>{{ $attendance->employee->initials ?? 'NA' }}</span>
+                                        </div>
                                     </div>
                                     <div>
-                                        <div class="fw-semibold text-body-emphasis">
+                                        <div class="font-semibold text-base-content">
                                             {{ $attendance->employee->full_name ?? 'Unregistered Card' }}
                                         </div>
-                                        <div class="text-body-secondary small">
+                                        <div class="text-xs text-base-content/60 font-mono">
                                             {{ $attendance->employee->employee_id ?? 'N/A' }}
                                         </div>
                                     </div>
                                 </div>
                             </td>
                             <td>
-                                <span class="badge bg-body-tertiary text-body border fw-mono">
+                                <span class="badge badge-neutral badge-soft font-mono px-2 py-1">
                                     {{ $attendance->card_no ?? 'N/A' }}
                                 </span>
                             </td>
-                            <td class="text-body-secondary">{{ $attendance->badgenumber ?? '-' }}</td>
-                            <td class="text-body-secondary">{{ $attendance->punch_date ? $attendance->punch_date->format('M d, Y') : '-' }}</td>
+                            <td class="text-sm text-base-content/70 font-mono">{{ $attendance->badgenumber ?? '-' }}</td>
+                            <td class="text-sm text-base-content/70">{{ $attendance->punch_date ? $attendance->punch_date->format('M d, Y') : '-' }}</td>
                             <td>
                                 @if($attendance->check_in_time)
-                                    <span class="text-body-emphasis fw-medium">{{ $attendance->check_in_time }}</span>
+                                    <span class="text-base-content font-medium text-sm font-mono">{{ $attendance->check_in_time }}</span>
                                 @elseif($attendance->check_in_datetime)
-                                    <span class="text-body-emphasis fw-medium">{{ $attendance->check_in_datetime->format('h:i A') }}</span>
+                                    <span class="text-base-content font-medium text-sm font-mono">{{ $attendance->check_in_datetime->format('h:i A') }}</span>
                                 @else
-                                    <span class="text-body-secondary">--:--</span>
+                                    <span class="text-base-content/40 text-sm">--:--</span>
                                 @endif
                             </td>
                             <td>
                                 @if($attendance->check_out_time)
-                                    <span class="text-body-emphasis fw-medium">{{ $attendance->check_out_time }}</span>
+                                    <span class="text-base-content font-medium text-sm font-mono">{{ $attendance->check_out_time }}</span>
                                 @elseif($attendance->check_out_datetime)
-                                    <span class="text-body-emphasis fw-medium">{{ $attendance->check_out_datetime->format('h:i A') }}</span>
+                                    <span class="text-base-content font-medium text-sm font-mono">{{ $attendance->check_out_datetime->format('h:i A') }}</span>
                                 @else
-                                    <span class="text-body-secondary">--:--</span>
+                                    <span class="text-base-content/40 text-sm">--:--</span>
                                 @endif
                             </td>
                             <td>
                                 @php
-                                    $statusBadge = match($attendance->show_status) {
-                                        'present' => 'success',
-                                        'late' => 'warning',
-                                        'early_exit' => 'info',
-                                        'half_day' => 'secondary',
-                                        'absent' => 'danger',
-                                        default => 'primary'
+                                    $statusClass = match($attendance->show_status) {
+                                        'present' => 'badge-success',
+                                        'late' => 'badge-warning',
+                                        'early_exit' => 'badge-info',
+                                        'half_day' => 'badge-secondary',
+                                        'absent' => 'badge-error',
+                                        default => 'badge-primary'
                                     };
                                 @endphp
-                                <span class="badge bg-{{ $statusBadge }}-subtle text-{{ $statusBadge }} border border-{{ $statusBadge }}-subtle">
-                                    {{ ucfirst(str_replace('_', ' ', $attendance->show_status)) }}
+                                <span class="badge {{ $statusClass }} badge-soft font-medium capitalize">
+                                    {{ str_replace('_', ' ', $attendance->show_status) }}
                                 </span>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center py-5 text-body-secondary">
-                                <i data-lucide="calendar-x" class="mb-2 d-block mx-auto text-body-tertiary" style="width: 36px; height: 36px;"></i>
+                            <td colspan="7" class="text-center py-10 text-base-content/60">
+                                <i data-lucide="calendar-x" class="mb-2 mx-auto text-base-content/30 w-9 h-9"></i>
                                 <span>No attendance records logged for {{ \Carbon\Carbon::parse($date)->format('M d, Y') }}.</span>
                             </td>
                         </tr>
@@ -210,8 +206,8 @@
         </div>
 
         @if($attendances->hasPages())
-            <div class="card-footer bg-body border-top p-3">
-                {{ $attendances->links('pagination::bootstrap-5') }}
+            <div class="border-t border-base-200/60">
+                {{ $attendances->links('vendor.pagination.daisyui') }}
             </div>
         @endif
     </div>

@@ -1,15 +1,15 @@
 <x-admin-layout>
     <!-- Page Header & Action Buttons -->
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div>
-            <h2 class="fw-bold text-body-emphasis mb-1">Biometric Sync History</h2>
-            <p class="text-body-secondary mb-0">Audit logs of all automated cron executions, manual triggers, and webhook sync runs.</p>
+            <h1 class="text-2xl font-bold text-base-content tracking-tight">Biometric Sync History</h1>
+            <p class="text-sm text-base-content/70 mt-0.5">Audit logs of all automated cron executions, manual triggers, and webhook sync runs.</p>
         </div>
-        <div class="d-flex gap-2">
-            <form method="POST" action="{{ route('admin.attendances.sync') }}" class="d-inline">
+        <div>
+            <form method="POST" action="{{ route('admin.attendances.sync') }}" class="inline">
                 @csrf
-                <button type="submit" class="btn btn-primary btn-sm px-3 shadow-sm d-flex align-items-center gap-2">
-                    <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i>
+                <button type="submit" class="btn btn-primary btn-sm sm:btn-md gap-2 shadow-xs">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
                     <span>Trigger Sync Now</span>
                 </button>
             </form>
@@ -17,47 +17,39 @@
     </div>
 
     <!-- Metrics Summary Grid -->
-    <div class="row g-3 mb-4">
-        <div class="col-sm-6 col-md-3">
-            <div class="card border-0 shadow-sm bg-body text-body">
-                <div class="card-body p-3">
-                    <span class="text-body-secondary small fw-medium">Total Sync Runs</span>
-                    <h3 class="mb-0 fw-bold text-body-emphasis mt-1">{{ $totalSyncs }}</h3>
-                </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="card bg-base-100 border border-base-200/60 shadow-xs">
+            <div class="card-body p-4">
+                <span class="text-xs font-medium text-base-content/60 uppercase tracking-wider">Total Sync Runs</span>
+                <h3 class="text-2xl font-bold text-base-content mt-1">{{ $totalSyncs }}</h3>
             </div>
         </div>
-        <div class="col-sm-6 col-md-3">
-            <div class="card border-0 shadow-sm bg-body text-body">
-                <div class="card-body p-3">
-                    <span class="text-body-secondary small fw-medium">Successful Runs</span>
-                    <h3 class="mb-0 fw-bold text-success mt-1">{{ $successfulSyncs }}</h3>
-                </div>
+        <div class="card bg-base-100 border border-base-200/60 shadow-xs">
+            <div class="card-body p-4">
+                <span class="text-xs font-medium text-base-content/60 uppercase tracking-wider">Successful Runs</span>
+                <h3 class="text-2xl font-bold text-success mt-1">{{ $successfulSyncs }}</h3>
             </div>
         </div>
-        <div class="col-sm-6 col-md-3">
-            <div class="card border-0 shadow-sm bg-body text-body">
-                <div class="card-body p-3">
-                    <span class="text-body-secondary small fw-medium">Failed Runs</span>
-                    <h3 class="mb-0 fw-bold text-danger mt-1">{{ $failedSyncs }}</h3>
-                </div>
+        <div class="card bg-base-100 border border-base-200/60 shadow-xs">
+            <div class="card-body p-4">
+                <span class="text-xs font-medium text-base-content/60 uppercase tracking-wider">Failed Runs</span>
+                <h3 class="text-2xl font-bold text-error mt-1">{{ $failedSyncs }}</h3>
             </div>
         </div>
-        <div class="col-sm-6 col-md-3">
-            <div class="card border-0 shadow-sm bg-body text-body">
-                <div class="card-body p-3">
-                    <span class="text-body-secondary small fw-medium">Punches Inserted / Updated</span>
-                    <h3 class="mb-0 fw-bold text-body-emphasis mt-1">{{ $totalImported }} / {{ $totalUpdated }}</h3>
-                </div>
+        <div class="card bg-base-100 border border-base-200/60 shadow-xs">
+            <div class="card-body p-4">
+                <span class="text-xs font-medium text-base-content/60 uppercase tracking-wider">Punches Inserted / Updated</span>
+                <h3 class="text-2xl font-bold text-base-content mt-1">{{ $totalImported }} / {{ $totalUpdated }}</h3>
             </div>
         </div>
     </div>
 
     <!-- Filters Card -->
-    <div class="card border-0 shadow-sm bg-body text-body mb-4">
-        <div class="card-body p-3">
-            <form method="GET" action="{{ route('admin.sync-logs.index') }}" class="row g-2 align-items-center">
-                <div class="col-12 col-md-5">
-                    <select name="trigger" class="form-select bg-body-tertiary text-body" aria-label="Filter by trigger type">
+    <div class="card bg-base-100 border border-base-200/60 shadow-xs mb-6">
+        <div class="card-body p-4">
+            <form method="GET" action="{{ route('admin.sync-logs.index') }}" class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+                <div class="sm:col-span-5">
+                    <select name="trigger" class="select select-bordered select-sm sm:select-md w-full bg-base-100 text-base-content" aria-label="Filter by trigger type">
                         <option value="">All Trigger Types (Cron, Manual, Webhook, CLI)</option>
                         <option value="cron" {{ $trigger === 'cron' ? 'selected' : '' }}>Cron</option>
                         <option value="manual_ui" {{ $trigger === 'manual_ui' ? 'selected' : '' }}>Manual Dashboard Click</option>
@@ -65,20 +57,20 @@
                         <option value="webhook" {{ $trigger === 'webhook' ? 'selected' : '' }}>HTTP Webhook</option>
                     </select>
                 </div>
-                <div class="col-12 col-md-4">
-                    <select name="status" class="form-select bg-body-tertiary text-body" aria-label="Filter by execution status">
+                <div class="sm:col-span-4">
+                    <select name="status" class="select select-bordered select-sm sm:select-md w-full bg-base-100 text-base-content" aria-label="Filter by execution status">
                         <option value="">All Statuses (Success & Failed)</option>
                         <option value="success" {{ $status === 'success' ? 'selected' : '' }}>Success Only</option>
                         <option value="failed" {{ $status === 'failed' ? 'selected' : '' }}>Failed Only</option>
                     </select>
                 </div>
-                <div class="col-12 col-md-3 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-1">
-                        <i data-lucide="filter" style="width: 16px; height: 16px;"></i> Filter
+                <div class="sm:col-span-3 flex items-center gap-2">
+                    <button type="submit" class="btn btn-primary btn-sm sm:btn-md gap-2 w-full">
+                        <i data-lucide="filter" class="w-4 h-4"></i> Filter
                     </button>
                     @if($status || $trigger)
-                        <a href="{{ route('admin.sync-logs.index') }}" class="btn btn-outline-secondary d-flex align-items-center justify-content-center" title="Reset Filters" aria-label="Reset sync log filters">
-                            <i data-lucide="rotate-ccw" style="width: 16px; height: 16px;"></i>
+                        <a href="{{ route('admin.sync-logs.index') }}" class="btn btn-outline btn-sm sm:btn-md btn-square" title="Reset Filters" aria-label="Reset sync log filters">
+                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
                         </a>
                     @endif
                 </div>
@@ -87,14 +79,14 @@
     </div>
 
     <!-- Sync Logs Data Table -->
-    <div class="card border-0 shadow-sm bg-body text-body">
-        <div class="card-header bg-body border-bottom p-3 d-flex align-items-center justify-content-between">
-            <h6 class="fw-bold mb-0 text-body-emphasis">Execution Logs ({{ $logs->total() }})</h6>
+    <div class="card bg-base-100 border border-base-200/60 shadow-xs overflow-hidden">
+        <div class="p-4 border-b border-base-200/60 flex items-center justify-between">
+            <h2 class="font-semibold text-base-content">Execution Logs ({{ $logs->total() }})</h2>
         </div>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light text-body-secondary">
-                    <tr>
+        <div class="overflow-x-auto">
+            <table class="table table-zebra w-full">
+                <thead>
+                    <tr class="bg-base-200/50 text-base-content/70">
                         <th>Execution Time</th>
                         <th>Trigger Source</th>
                         <th>Date Range</th>
@@ -102,81 +94,80 @@
                         <th>Inserted</th>
                         <th>Updated</th>
                         <th>Message</th>
-                        <th class="text-end">Details</th>
+                        <th class="text-right">Details</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($logs as $log)
-                        <tr>
+                        <tr class="hover:bg-base-200/40 transition-colors">
                             <td>
-                                <div class="fw-medium text-body-emphasis">{{ $log->created_at->format('M d, Y h:i:s A') }}</div>
-                                <span class="text-body-secondary small">{{ $log->created_at->diffForHumans() }}</span>
+                                <div class="font-medium text-base-content">{{ $log->created_at->format('M d, Y h:i:s A') }}</div>
+                                <span class="text-xs text-base-content/60">{{ $log->created_at->diffForHumans() }}</span>
                             </td>
                             <td>
                                 @php
                                     $triggerBadge = match($log->trigger_type) {
-                                        'manual_ui' => ['color' => 'primary', 'icon' => 'mouse-pointer-click', 'label' => 'Manual UI'],
-                                        'webhook' => ['color' => 'info', 'icon' => 'globe', 'label' => 'Webhook URL'],
-                                        'command' => ['color' => 'secondary', 'icon' => 'terminal', 'label' => 'CLI Command'],
-                                        default => ['color' => 'dark', 'icon' => 'clock', 'label' => 'Cron']
+                                        'manual_ui' => ['color' => 'badge-primary', 'icon' => 'mouse-pointer-click', 'label' => 'Manual UI'],
+                                        'webhook' => ['color' => 'badge-info', 'icon' => 'globe', 'label' => 'Webhook URL'],
+                                        'command' => ['color' => 'badge-secondary', 'icon' => 'terminal', 'label' => 'CLI Command'],
+                                        default => ['color' => 'badge-neutral', 'icon' => 'clock', 'label' => 'Cron']
                                     };
                                 @endphp
-                                <span class="badge bg-{{ $triggerBadge['color'] }}-subtle text-{{ $triggerBadge['color'] }} border border-{{ $triggerBadge['color'] }}-subtle d-inline-flex align-items-center gap-1">
-                                    <i data-lucide="{{ $triggerBadge['icon'] }}" style="width: 13px; height: 13px;"></i>
+                                <span class="badge {{ $triggerBadge['color'] }} badge-soft gap-1">
+                                    <i data-lucide="{{ $triggerBadge['icon'] }}" class="w-3 h-3"></i>
                                     {{ $triggerBadge['label'] }}
                                 </span>
                             </td>
-                            <td class="text-body-secondary small">
+                            <td class="text-xs text-base-content/70">
                                 {{ $log->start_date ? $log->start_date->format('M d') : '-' }} &rarr; {{ $log->end_date ? $log->end_date->format('M d, Y') : '-' }}
                             </td>
                             <td>
                                 @if($log->status === 'success')
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle d-inline-flex align-items-center gap-1">
-                                        <i data-lucide="check-circle-2" style="width: 13px; height: 13px;"></i> Success
+                                    <span class="badge badge-success badge-soft gap-1">
+                                        <i data-lucide="check-circle-2" class="w-3 h-3"></i> Success
                                     </span>
                                 @else
-                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle d-inline-flex align-items-center gap-1">
-                                        <i data-lucide="x-circle" style="width: 13px; height: 13px;"></i> Failed
+                                    <span class="badge badge-error badge-soft gap-1">
+                                        <i data-lucide="x-circle" class="w-3 h-3"></i> Failed
                                     </span>
                                 @endif
                             </td>
                             <td>
-                                <span class="badge bg-body-tertiary text-body border fw-mono">
+                                <span class="badge badge-neutral badge-soft font-mono">
                                     +{{ $log->imported_count }}
                                 </span>
                             </td>
                             <td>
-                                <span class="badge bg-body-tertiary text-body border fw-mono">
+                                <span class="badge badge-neutral badge-soft font-mono">
                                     ~{{ $log->updated_count }}
                                 </span>
                             </td>
                             <td>
-                                <div class="text-body text-truncate" style="max-width: 260px;" title="{{ $log->message }}">
+                                <div class="text-sm text-base-content/80 max-w-xs truncate" title="{{ $log->message }}">
                                     {{ $log->message }}
                                 </div>
                             </td>
-                            <td class="text-end">
-                                <button type="button" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1 p-2"
+                            <td class="text-right">
+                                <button type="button" class="btn btn-sm btn-ghost btn-square text-base-content/70 hover:text-primary"
                                         title="View Log Details"
                                         aria-label="View sync log details from {{ $log->created_at->format('M d, Y h:i:s A') }}"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#logDetailModal"
-                                        data-log-time="{{ $log->created_at->format('M d, Y h:i:s A') }}"
-                                        data-log-trigger="{{ $triggerBadge['label'] }}"
-                                        data-log-status="{{ $log->status }}"
-                                        data-log-message="{{ $log->message }}"
-                                        data-log-imported="{{ $log->imported_count }}"
-                                        data-log-updated="{{ $log->updated_count }}"
-                                        data-log-payload="{{ json_encode($log->payload_summary, JSON_PRETTY_PRINT) }}">
-                                    <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
-                                    <span>View</span>
+                                        onclick="openLogModal(
+                                            '{{ $log->created_at->format('M d, Y h:i:s A') }}',
+                                            '{{ $triggerBadge['label'] }}',
+                                            '{{ $log->status }}',
+                                            '{{ addslashes($log->message) }}',
+                                            '{{ $log->imported_count }}',
+                                            '{{ $log->updated_count }}',
+                                            {{ json_encode($log->payload_summary ? json_encode($log->payload_summary, JSON_PRETTY_PRINT) : '') }}
+                                        )">
+                                    <i data-lucide="eye" class="w-4 h-4"></i>
                                 </button>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="text-center py-5 text-body-secondary">
-                                <i data-lucide="history" class="mb-2 d-block mx-auto text-body-tertiary" style="width: 36px; height: 36px;"></i>
+                            <td colspan="8" class="text-center py-10 text-base-content/60">
+                                <i data-lucide="history" class="mb-2 mx-auto text-base-content/30 w-9 h-9"></i>
                                 <span>No synchronization logs recorded yet.</span>
                             </td>
                         </tr>
@@ -186,84 +177,71 @@
         </div>
 
         @if($logs->hasPages())
-            <div class="card-footer bg-body border-top p-3">
-                {{ $logs->links('pagination::bootstrap-5') }}
+            <div class="border-t border-base-200/60">
+                {{ $logs->links('vendor.pagination.daisyui') }}
             </div>
         @endif
     </div>
 
     <!-- Sync Log Detail Modal -->
-    <div class="modal fade" id="logDetailModal" tabindex="-1" aria-labelledby="logDetailModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content bg-body border-0 shadow">
-                <div class="modal-header border-bottom">
-                    <h5 class="modal-title fw-bold text-body-emphasis" id="logDetailModalLabel">
-                        <i data-lucide="file-text" class="text-primary me-2" style="width: 20px; height: 20px;"></i>
-                        Biometric Sync Execution Details
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <dialog id="logDetailModal" class="modal">
+        <div class="modal-box bg-base-100 max-w-2xl border border-base-200">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+            </form>
+            <h3 class="font-bold text-lg text-base-content flex items-center gap-2 mb-4">
+                <i data-lucide="file-text" class="w-5 h-5 text-primary"></i>
+                Biometric Sync Execution Details
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <span class="text-xs font-semibold text-base-content/60 uppercase">Executed At</span>
+                    <div id="modalLogTime" class="font-medium text-base-content text-sm mt-0.5"></div>
                 </div>
-                <div class="modal-body text-body">
-                    <div class="row g-3 mb-3">
-                        <div class="col-sm-6">
-                            <span class="text-body-secondary small fw-medium">Executed At</span>
-                            <div id="modalLogTime" class="fw-semibold text-body-emphasis"></div>
-                        </div>
-                        <div class="col-sm-6">
-                            <span class="text-body-secondary small fw-medium">Trigger Source</span>
-                            <div id="modalLogTrigger" class="fw-semibold text-body-emphasis"></div>
-                        </div>
-                        <div class="col-sm-6">
-                            <span class="text-body-secondary small fw-medium">Status</span>
-                            <div id="modalLogStatus"></div>
-                        </div>
-                        <div class="col-sm-6">
-                            <span class="text-body-secondary small fw-medium">Stats</span>
-                            <div id="modalLogStats" class="fw-semibold text-body-emphasis"></div>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <span class="text-body-secondary small fw-medium">Result Message</span>
-                        <div id="modalLogMessage" class="p-3 bg-body-tertiary rounded-3 border text-body-emphasis font-monospace small"></div>
-                    </div>
-
-                    <div>
-                        <span class="text-body-secondary small fw-medium">Payload / Response Summary</span>
-                        <pre id="modalLogPayload" class="p-3 bg-body-tertiary rounded-3 border text-body-emphasis font-monospace small mb-0" style="max-height: 200px; overflow-y: auto;"></pre>
-                    </div>
+                <div>
+                    <span class="text-xs font-semibold text-base-content/60 uppercase">Trigger Source</span>
+                    <div id="modalLogTrigger" class="font-medium text-base-content text-sm mt-0.5"></div>
                 </div>
-                <div class="modal-footer border-top">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                <div>
+                    <span class="text-xs font-semibold text-base-content/60 uppercase">Status</span>
+                    <div id="modalLogStatus" class="mt-0.5"></div>
+                </div>
+                <div>
+                    <span class="text-xs font-semibold text-base-content/60 uppercase">Stats</span>
+                    <div id="modalLogStats" class="font-medium text-base-content text-sm mt-0.5"></div>
                 </div>
             </div>
+
+            <div class="mb-4">
+                <span class="text-xs font-semibold text-base-content/60 uppercase block mb-1">Result Message</span>
+                <div id="modalLogMessage" class="p-3 bg-base-200/60 rounded-lg text-xs font-mono text-base-content border border-base-200"></div>
+            </div>
+
+            <div>
+                <span class="text-xs font-semibold text-base-content/60 uppercase block mb-1">Payload / Response Summary</span>
+                <pre id="modalLogPayload" class="p-3 bg-base-200/60 rounded-lg text-xs font-mono text-base-content border border-base-200 max-h-48 overflow-y-auto"></pre>
+            </div>
+
+            <div class="modal-action">
+                <button type="button" class="btn btn-ghost" onclick="document.getElementById('logDetailModal').close()">Close</button>
+            </div>
         </div>
-    </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const logModal = document.getElementById('logDetailModal');
-            if (logModal) {
-                logModal.addEventListener('show.bs.modal', (event) => {
-                    const button = event.relatedTarget;
-                    const time = button.getAttribute('data-log-time');
-                    const trigger = button.getAttribute('data-log-trigger');
-                    const status = button.getAttribute('data-log-status');
-                    const message = button.getAttribute('data-log-message');
-                    const imported = button.getAttribute('data-log-imported');
-                    const updated = button.getAttribute('data-log-updated');
-                    const payload = button.getAttribute('data-log-payload');
-
-                    document.getElementById('modalLogTime').textContent = time;
-                    document.getElementById('modalLogTrigger').textContent = trigger;
-                    document.getElementById('modalLogStatus').innerHTML = status === 'success'
-                        ? '<span class="badge bg-success-subtle text-success border border-success-subtle">Success</span>'
-                        : '<span class="badge bg-danger-subtle text-danger border border-danger-subtle">Failed</span>';
-                    document.getElementById('modalLogStats').textContent = `+${imported} inserted, ~${updated} updated`;
-                    document.getElementById('modalLogMessage').textContent = message || 'No message';
-                    document.getElementById('modalLogPayload').textContent = payload && payload !== 'null' ? payload : 'No payload details';
-                });
-            }
-        });
+        function openLogModal(time, trigger, status, message, imported, updated, payload) {
+            document.getElementById('modalLogTime').textContent = time;
+            document.getElementById('modalLogTrigger').textContent = trigger;
+            document.getElementById('modalLogStatus').innerHTML = status === 'success'
+                ? '<span class="badge badge-success badge-soft">Success</span>'
+                : '<span class="badge badge-error badge-soft">Failed</span>';
+            document.getElementById('modalLogStats').textContent = `+${imported} inserted, ~${updated} updated`;
+            document.getElementById('modalLogMessage').textContent = message || 'No message';
+            document.getElementById('modalLogPayload').textContent = payload && payload !== 'null' ? payload : 'No payload details';
+            document.getElementById('logDetailModal').showModal();
+        }
     </script>
 </x-admin-layout>

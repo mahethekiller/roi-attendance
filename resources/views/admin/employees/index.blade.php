@@ -1,24 +1,24 @@
 <x-admin-layout>
     <!-- Page Header & Action Buttons -->
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div>
-            <h2 class="fw-bold text-body-emphasis mb-1">Employee Directory</h2>
-            <p class="text-body-secondary mb-0">Manage employee records, RFID card mappings, and bulk import data.</p>
+            <h1 class="text-2xl font-bold text-base-content tracking-tight">Employee Directory</h1>
+            <p class="text-sm text-base-content/70 mt-0.5">Manage employee records, RFID card mappings, and bulk import data.</p>
         </div>
-        <div class="d-flex flex-wrap gap-2">
+        <div class="flex flex-wrap items-center gap-2">
             <x-authorized permission="employees.import">
-                <a href="{{ route('admin.employees.sample-csv') }}" class="btn btn-outline-secondary shadow-sm d-flex align-items-center gap-2">
-                    <i data-lucide="file-spreadsheet" style="width: 18px; height: 18px;"></i>
+                <a href="{{ route('admin.employees.sample-csv') }}" class="btn btn-outline btn-sm sm:btn-md gap-2 shadow-xs">
+                    <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
                     <span>Sample CSV</span>
                 </a>
-                <button type="button" class="btn btn-outline-primary shadow-sm d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#importCsvModal">
-                    <i data-lucide="upload" style="width: 18px; height: 18px;"></i>
+                <button type="button" class="btn btn-outline btn-primary btn-sm sm:btn-md gap-2 shadow-xs" onclick="document.getElementById('importCsvModal').showModal()">
+                    <i data-lucide="upload" class="w-4 h-4"></i>
                     <span>Import CSV</span>
                 </button>
             </x-authorized>
             <x-authorized permission="employees.create">
-                <a href="{{ route('admin.employees.create') }}" class="btn btn-primary px-3 shadow-sm d-flex align-items-center gap-2">
-                    <i data-lucide="user-plus" style="width: 18px; height: 18px;"></i>
+                <a href="{{ route('admin.employees.create') }}" class="btn btn-primary btn-sm sm:btn-md gap-2 shadow-xs">
+                    <i data-lucide="user-plus" class="w-4 h-4"></i>
                     <span>Add Employee</span>
                 </a>
             </x-authorized>
@@ -27,58 +27,52 @@
 
     <!-- Feedback Alerts -->
     @if(session('success'))
-        <div class="alert alert-success border-0 shadow-sm mb-4 d-flex align-items-center gap-2" role="alert">
-            <i data-lucide="check-circle" style="width: 20px; height: 20px;"></i>
-            <div>{{ session('success') }}</div>
+        <div class="alert alert-success shadow-xs mb-6" role="alert">
+            <i data-lucide="check-circle" class="w-5 h-5 shrink-0"></i>
+            <span>{{ session('success') }}</span>
         </div>
     @endif
 
     @if(session('error'))
-        <div class="alert alert-danger border-0 shadow-sm mb-4 d-flex align-items-center gap-2" role="alert">
-            <i data-lucide="alert-circle" style="width: 20px; height: 20px;"></i>
-            <div>{{ session('error') }}</div>
+        <div class="alert alert-error shadow-xs mb-6" role="alert">
+            <i data-lucide="alert-circle" class="w-5 h-5 shrink-0"></i>
+            <span>{{ session('error') }}</span>
         </div>
     @endif
 
     <!-- Metrics Row -->
-    <div class="row g-3 mb-4">
-        <div class="col-sm-6 col-md-3">
-            <div class="card border-0 shadow-sm bg-body text-body">
-                <div class="card-body p-3">
-                    <span class="text-body-secondary small fw-medium">Total Employees</span>
-                    <h3 class="mb-0 fw-bold text-body-emphasis mt-1">{{ $totalEmployees }}</h3>
-                </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="card bg-base-100 border border-base-200/60 shadow-xs">
+            <div class="card-body p-4">
+                <span class="text-xs font-medium text-base-content/60 uppercase tracking-wider">Total Employees</span>
+                <h3 class="text-2xl font-bold text-base-content mt-1">{{ $totalEmployees }}</h3>
             </div>
         </div>
-        <div class="col-sm-6 col-md-3">
-            <div class="card border-0 shadow-sm bg-body text-body">
-                <div class="card-body p-3">
-                    <span class="text-body-secondary small fw-medium">Assigned Smart Cards</span>
-                    <h3 class="mb-0 fw-bold text-body-emphasis mt-1">{{ $assignedCards }}</h3>
-                </div>
+        <div class="card bg-base-100 border border-base-200/60 shadow-xs">
+            <div class="card-body p-4">
+                <span class="text-xs font-medium text-base-content/60 uppercase tracking-wider">Assigned Smart Cards</span>
+                <h3 class="text-2xl font-bold text-base-content mt-1">{{ $assignedCards }}</h3>
             </div>
         </div>
     </div>
 
     <!-- Search Card -->
-    <div class="card border-0 shadow-sm bg-body text-body mb-4">
-        <div class="card-body p-3">
-            <form method="GET" action="{{ route('admin.employees.index') }}" class="row g-2 align-items-center">
-                <div class="col-12 col-md-9">
-                    <div class="input-group">
-                        <span class="input-group-text bg-body-tertiary border-end-0 text-body-secondary">
-                            <i data-lucide="search" style="width: 18px; height: 18px;"></i>
-                        </span>
-                        <input type="search" name="search" class="form-control bg-body-tertiary border-start-0 text-body" placeholder="Search by Employee ID, Card No, Name, or Email..." aria-label="Search employees by ID, Card No, Name, or Email" value="{{ $search }}">
-                    </div>
+    <div class="card bg-base-100 border border-base-200/60 shadow-xs mb-6">
+        <div class="card-body p-4">
+            <form method="GET" action="{{ route('admin.employees.index') }}" class="flex flex-col sm:flex-row gap-3 items-center">
+                <div class="join w-full flex-1">
+                    <span class="join-item btn btn-sm sm:btn-md btn-disabled bg-base-200 border-base-300 px-3">
+                        <i data-lucide="search" class="w-4 h-4 text-base-content/60"></i>
+                    </span>
+                    <input type="search" name="search" class="input input-bordered input-sm sm:input-md join-item w-full bg-base-100 text-base-content" placeholder="Search by Employee ID, Card No, Name, or Email..." aria-label="Search employees by ID, Card No, Name, or Email" value="{{ $search }}">
                 </div>
-                <div class="col-12 col-md-3 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-1">
-                        <i data-lucide="filter" style="width: 16px; height: 16px;"></i> Search
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <button type="submit" class="btn btn-primary btn-sm sm:btn-md gap-2 w-full sm:w-auto">
+                        <i data-lucide="filter" class="w-4 h-4"></i> Search
                     </button>
                     @if($search)
-                        <a href="{{ route('admin.employees.index') }}" class="btn btn-outline-secondary d-flex align-items-center justify-content-center" title="Reset Search" aria-label="Reset search filter">
-                            <i data-lucide="rotate-ccw" style="width: 16px; height: 16px;"></i>
+                        <a href="{{ route('admin.employees.index') }}" class="btn btn-outline btn-sm sm:btn-md btn-square" title="Reset Search" aria-label="Reset search filter">
+                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
                         </a>
                     @endif
                 </div>
@@ -87,14 +81,14 @@
     </div>
 
     <!-- Employees Data Table -->
-    <div class="card border-0 shadow-sm bg-body text-body">
-        <div class="card-header bg-body border-bottom p-3 d-flex align-items-center justify-content-between">
-            <h6 class="fw-bold mb-0 text-body-emphasis">Employees List ({{ $employees->total() }})</h6>
+    <div class="card bg-base-100 border border-base-200/60 shadow-xs overflow-hidden">
+        <div class="p-4 border-b border-base-200/60 flex items-center justify-between">
+            <h2 class="font-semibold text-base-content">Employees List ({{ $employees->total() }})</h2>
         </div>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light text-body-secondary">
-                    <tr>
+        <div class="overflow-x-auto">
+            <table class="table table-zebra w-full">
+                <thead>
+                    <tr class="bg-base-200/50 text-base-content/70">
                         <th>Employee</th>
                         <th>Employee ID</th>
                         <th>Card No</th>
@@ -102,67 +96,68 @@
                         <th>Company</th>
                         <th>Created At</th>
                         <x-authorized :permission="['employees.edit', 'employees.delete']">
-                            <th class="text-end">Actions</th>
+                            <th class="text-right">Actions</th>
                         </x-authorized>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($employees as $employee)
-                        <tr>
+                        <tr class="hover:bg-base-200/40 transition-colors">
                             <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="rounded-circle bg-primary bg-opacity-10 text-primary fw-bold d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; font-size: 0.85rem;">
-                                        {{ $employee->initials }}
+                                <div class="flex items-center gap-3">
+                                    <div class="avatar placeholder">
+                                        <div class="bg-primary/10 text-primary font-bold rounded-full w-9 h-9 text-xs">
+                                            <span>{{ $employee->initials }}</span>
+                                        </div>
                                     </div>
                                     <div>
-                                        <div class="fw-semibold text-body-emphasis">{{ $employee->full_name }}</div>
-                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.7rem;">Active</span>
+                                        <div class="font-semibold text-base-content">{{ $employee->full_name }}</div>
+                                        <span class="badge badge-xs badge-success badge-soft font-mono">Active</span>
                                     </div>
                                 </div>
                             </td>
                             <td>
-                                <span class="badge bg-body-tertiary text-body border fw-mono px-2 py-1">
+                                <span class="badge badge-neutral badge-soft font-mono px-2 py-1">
                                     {{ $employee->employee_id }}
                                 </span>
                             </td>
                             <td>
                                 @if($employee->card_no)
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle">
-                                        <i data-lucide="credit-card" class="me-1" style="width: 13px; height: 13px;"></i>
+                                    <span class="badge badge-success badge-soft gap-1">
+                                        <i data-lucide="credit-card" class="w-3 h-3"></i>
                                         {{ $employee->card_no }}
                                     </span>
                                 @else
-                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">Unassigned</span>
+                                    <span class="badge badge-ghost badge-soft text-base-content/50">Unassigned</span>
                                 @endif
                             </td>
-                            <td class="text-body-secondary">{{ $employee->email }}</td>
+                            <td class="text-base-content/80 text-sm">{{ $employee->email }}</td>
                             <td>
                                 @if($employee->company)
-                                    <span class="badge bg-info-subtle text-info border border-info-subtle">
-                                        <i data-lucide="building-2" class="me-1" style="width: 12px; height: 12px;"></i>
+                                    <span class="badge badge-info badge-soft gap-1">
+                                        <i data-lucide="building-2" class="w-3 h-3"></i>
                                         {{ $employee->company }}
                                     </span>
                                 @else
-                                    <span class="text-body-secondary small">-</span>
+                                    <span class="text-base-content/40 text-sm">-</span>
                                 @endif
                             </td>
-                            <td class="text-body-secondary">{{ $employee->created_at->format('M d, Y') }}</td>
+                            <td class="text-base-content/70 text-sm">{{ $employee->created_at->format('M d, Y') }}</td>
                             <x-authorized :permission="['employees.edit', 'employees.delete']">
-                                <td class="text-end">
-                                    <div class="d-inline-flex gap-1">
+                                <td class="text-right">
+                                    <div class="inline-flex items-center gap-1">
                                         <x-authorized permission="employees.edit">
-                                            <a href="{{ route('admin.employees.edit', $employee) }}" class="btn btn-sm btn-outline-secondary p-2 d-inline-flex align-items-center justify-content-center" title="Edit Employee" aria-label="Edit employee {{ $employee->full_name }}">
-                                                <i data-lucide="edit-3" style="width: 16px; height: 16px;"></i>
+                                            <a href="{{ route('admin.employees.edit', $employee) }}" class="btn btn-sm btn-ghost btn-square text-base-content/70 hover:text-primary" title="Edit Employee" aria-label="Edit employee {{ $employee->full_name }}">
+                                                <i data-lucide="edit-3" class="w-4 h-4"></i>
                                             </a>
                                         </x-authorized>
                                         <x-authorized permission="employees.delete">
-                                            <button type="button" class="btn btn-sm btn-outline-danger p-2 d-inline-flex align-items-center justify-content-center" title="Delete Employee"
+                                            <button type="button" class="btn btn-sm btn-ghost btn-square text-error hover:bg-error/10" title="Delete Employee"
                                                     aria-label="Delete employee {{ $employee->full_name }}"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#deleteEmployeeModal"
-                                                    data-emp-name="{{ $employee->full_name }}"
-                                                    data-emp-action="{{ route('admin.employees.destroy', $employee) }}">
-                                                <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+                                                    onclick="openDeleteModal('{{ $employee->full_name }}', '{{ route('admin.employees.destroy', $employee) }}')">
+                                                <i data-lucide="trash-2" class="w-4 h-4"></i>
                                             </button>
                                         </x-authorized>
                                     </div>
@@ -171,8 +166,8 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center py-5 text-body-secondary">
-                                <i data-lucide="users" class="mb-2 d-block mx-auto text-body-tertiary" style="width: 36px; height: 36px;"></i>
+                            <td colspan="7" class="text-center py-10 text-base-content/60">
+                                <i data-lucide="users" class="mb-2 mx-auto text-base-content/30 w-9 h-9"></i>
                                 <span>No employees found in the directory.</span>
                             </td>
                         </tr>
@@ -182,96 +177,84 @@
         </div>
 
         @if($employees->hasPages())
-            <div class="card-footer bg-body border-top p-3">
-                {{ $employees->links('pagination::bootstrap-5') }}
+            <div class="border-t border-base-200/60">
+                {{ $employees->links('vendor.pagination.daisyui') }}
             </div>
         @endif
     </div>
 
     {{-- Import CSV Modal --}}
     <x-authorized permission="employees.import">
-        <div class="modal fade" id="importCsvModal" tabindex="-1" aria-labelledby="importCsvModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content bg-body border-0 shadow">
-                    <form method="POST" action="{{ route('admin.employees.import') }}" enctype="multipart/form-data">
-                        @csrf
-                        <div class="modal-header border-bottom">
-                            <h5 class="modal-title fw-bold text-body-emphasis" id="importCsvModalLabel">
-                                <i data-lucide="upload" class="text-primary me-2" style="width: 20px; height: 20px;"></i>
-                                Bulk Import Employees
-                            </h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body text-body">
-                            <p class="text-body-secondary small mb-3">
-                                Upload a standard CSV file with columns: <code>employee_id, card_no, first_name, last_name, email</code>.
-                            </p>
-                            <div class="mb-3">
-                                <label for="csv_file" class="form-label fw-semibold text-body-emphasis">Select CSV File <span class="text-danger">*</span></label>
-                                <input type="file" name="csv_file" id="csv_file" class="form-control bg-body-tertiary text-body" accept=".csv,text/csv" required>
-                            </div>
-                            <div class="p-3 bg-body-tertiary rounded-3 border small text-body-secondary">
-                                <i data-lucide="info" class="me-1 text-primary" style="width: 14px; height: 14px;"></i>
-                                Need a template? <a href="{{ route('admin.employees.sample-csv') }}" class="text-primary fw-medium text-decoration-none">Download Dummy Sample CSV</a>
-                            </div>
-                        </div>
-                        <div class="modal-footer border-top">
-                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-primary d-flex align-items-center gap-2">
-                                <i data-lucide="upload-cloud" style="width: 16px; height: 16px;"></i>
-                                <span>Start Import</span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
+        <dialog id="importCsvModal" class="modal">
+            <div class="modal-box bg-base-100 max-w-md border border-base-200">
+                <form method="dialog">
+                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                </form>
+                <form method="POST" action="{{ route('admin.employees.import') }}" enctype="multipart/form-data">
+                    @csrf
+                    <h3 class="font-bold text-lg text-base-content flex items-center gap-2 mb-3">
+                        <i data-lucide="upload" class="w-5 h-5 text-primary"></i>
+                        Bulk Import Employees
+                    </h3>
+                    <p class="text-xs text-base-content/70 mb-4">
+                        Upload a standard CSV file with columns: <code class="badge badge-neutral badge-xs">employee_id, card_no, first_name, last_name, email</code>.
+                    </p>
+                    <div class="form-control mb-4">
+                        <label for="csv_file" class="label text-sm font-semibold text-base-content">Select CSV File <span class="text-error">*</span></label>
+                        <input type="file" name="csv_file" id="csv_file" class="file-input file-input-bordered file-input-primary w-full text-sm" accept=".csv,text/csv" required>
+                    </div>
+                    <div class="p-3 bg-base-200/60 rounded-lg text-xs text-base-content/70 mb-6 flex items-start gap-2">
+                        <i data-lucide="info" class="w-4 h-4 text-primary shrink-0 mt-0.5"></i>
+                        <span>Need a template? <a href="{{ route('admin.employees.sample-csv') }}" class="link link-primary font-medium">Download Dummy Sample CSV</a></span>
+                    </div>
+                    <div class="modal-action">
+                        <button type="button" class="btn btn-ghost" onclick="document.getElementById('importCsvModal').close()">Cancel</button>
+                        <button type="submit" class="btn btn-primary gap-2">
+                            <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+                            <span>Start Import</span>
+                        </button>
+                    </div>
+                </form>
             </div>
-        </div>
+            <form method="dialog" class="modal-backdrop">
+                <button>close</button>
+            </form>
+        </dialog>
     </x-authorized>
 
     {{-- Delete Confirmation Modal --}}
     <x-authorized permission="employees.delete">
-        <div class="modal fade" id="deleteEmployeeModal" tabindex="-1" aria-labelledby="deleteEmployeeModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content bg-body border-0 shadow">
-                    <div class="modal-header border-bottom">
-                        <h5 class="modal-title fw-bold text-body-emphasis" id="deleteEmployeeModalLabel">
-                            <i data-lucide="alert-triangle" class="text-danger me-2" style="width: 22px; height: 22px;"></i>
-                            Delete Employee
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body text-body">
-                        <p class="mb-2">Are you sure you want to delete employee <strong id="deleteEmpName" class="text-body-emphasis"></strong>?</p>
-                        <p class="text-body-secondary small mb-0">This will remove the employee record and their associated user account.</p>
-                    </div>
-                    <div class="modal-footer border-top">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <form id="deleteEmployeeForm" method="POST" action="">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger">Delete Employee</button>
-                        </form>
-                    </div>
+        <dialog id="deleteEmployeeModal" class="modal">
+            <div class="modal-box bg-base-100 max-w-md border border-base-200">
+                <form method="dialog">
+                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                </form>
+                <h3 class="font-bold text-lg text-error flex items-center gap-2 mb-3">
+                    <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                    Delete Employee
+                </h3>
+                <p class="text-sm text-base-content mb-2">Are you sure you want to delete employee <strong id="deleteEmpName" class="text-base-content font-bold"></strong>?</p>
+                <p class="text-xs text-base-content/60 mb-6">This will remove the employee record and their associated user account.</p>
+                <div class="modal-action">
+                    <button type="button" class="btn btn-ghost" onclick="document.getElementById('deleteEmployeeModal').close()">Cancel</button>
+                    <form id="deleteEmployeeForm" method="POST" action="">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-error">Delete Employee</button>
+                    </form>
                 </div>
             </div>
-        </div>
-    </x-authorized>
+            <form method="dialog" class="modal-backdrop">
+                <button>close</button>
+            </form>
+        </dialog>
 
-    <x-authorized permission="employees.delete">
         <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                const deleteModal = document.getElementById('deleteEmployeeModal');
-                if (deleteModal) {
-                    deleteModal.addEventListener('show.bs.modal', (event) => {
-                        const button = event.relatedTarget;
-                        const empName = button.getAttribute('data-emp-name');
-                        const empAction = button.getAttribute('data-emp-action');
-
-                        document.getElementById('deleteEmpName').textContent = empName;
-                        document.getElementById('deleteEmployeeForm').setAttribute('action', empAction);
-                    });
-                }
-            });
+            function openDeleteModal(name, actionUrl) {
+                document.getElementById('deleteEmpName').textContent = name;
+                document.getElementById('deleteEmployeeForm').setAttribute('action', actionUrl);
+                document.getElementById('deleteEmployeeModal').showModal();
+            }
         </script>
     </x-authorized>
 </x-admin-layout>

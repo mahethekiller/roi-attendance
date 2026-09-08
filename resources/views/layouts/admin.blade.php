@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-bs-theme="dark">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-theme="dark" data-bs-theme="dark">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,6 +11,7 @@
     <script>
         (function() {
             const savedTheme = localStorage.getItem('roi_theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
             document.documentElement.setAttribute('data-bs-theme', savedTheme);
         })();
     </script>
@@ -20,229 +21,87 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    @vite(['resources/js/app.js'])
-
-    <style>
-        :root {
-            --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-            --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
-            --duration-instant: 120ms;
-            --duration-normal: 220ms;
-            --duration-focal: 500ms;
-        }
-        body {
-            font-family: var(--font-sans);
-            min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
-            letter-spacing: -0.01em;
-        }
-        h1, h2, h3, h4, h5, h6 {
-            letter-spacing: -0.025em;
-        }
-        .font-monospace, code, pre, .font-mono, .badge.fw-mono {
-            font-family: var(--font-mono) !important;
-            letter-spacing: -0.01em;
-        }
-        .table td, .table th, .stat-card h3, .badge {
-            font-variant-numeric: tabular-nums;
-        }
-
-        /* Themed selection & custom scrollbars */
-        ::selection {
-            background-color: rgba(99, 102, 241, 0.25);
-            color: inherit;
-        }
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(148, 163, 184, 0.3);
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(148, 163, 184, 0.5);
-        }
-
-        /* Focus rings */
-        :focus-visible {
-            outline: 2px solid #6366F1;
-            outline-offset: 2px;
-        }
-
-        .admin-sidebar {
-            width: 260px;
-            min-height: calc(100vh - 65px);
-            transition: all var(--duration-normal) var(--ease-out-expo);
-        }
-        .nav-link.active {
-            font-weight: 600;
-        }
-        .stat-card {
-            transition: transform var(--duration-normal) var(--ease-out-expo), box-shadow var(--duration-normal) var(--ease-out-expo);
-            will-change: transform;
-        }
-        .stat-card:hover {
-            transform: translateY(-2px);
-        }
-        .lucide {
-            vertical-align: middle;
-        }
-
-        /* Telemetry Beacon Radar Animation (Focal Moment) */
-        .telemetry-beacon {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 8px;
-            height: 8px;
-        }
-        .telemetry-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: #10B981;
-        }
-        .telemetry-pulse {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background-color: #10B981;
-            opacity: 0.75;
-            animation: radar-ping 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
-        }
-        @keyframes radar-ping {
-            0% {
-                transform: scale(1);
-                opacity: 0.8;
-            }
-            70%, 100% {
-                transform: scale(3.2);
-                opacity: 0;
-            }
-        }
-
-        /* Smooth spin animation */
-        .animate-spin-smooth {
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        /* Subtle row highlight transition */
-        .table-hover > tbody > tr {
-            transition: background-color var(--duration-instant) ease;
-        }
-
-        /* Accessible Reduced Motion Fallbacks */
-        @media (prefers-reduced-motion: reduce) {
-            .stat-card,
-            .admin-sidebar,
-            .btn,
-            .nav-link,
-            .table-hover > tbody > tr {
-                transition: none !important;
-                transform: none !important;
-            }
-            .telemetry-pulse {
-                animation: none !important;
-                display: none;
-            }
-            .animate-spin-smooth {
-                animation: none !important;
-            }
-        }
-    </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-body-tertiary text-body">
-    <!-- Top Header Navigation Bar -->
-    <header class="navbar navbar-expand-lg border-bottom sticky-top bg-body shadow-sm">
-        <div class="container-fluid px-3 px-lg-4">
-            <div class="d-flex align-items-center gap-2">
-                <!-- Mobile Navigation Drawer Toggle -->
-                <button class="btn btn-outline-secondary btn-sm d-md-none p-2 d-flex align-items-center justify-content-center" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminMobileDrawer" aria-controls="adminMobileDrawer" aria-label="Open Navigation Menu" style="width: 36px; height: 36px;">
-                    <i data-lucide="menu" style="width: 20px; height: 20px;"></i>
-                </button>
+<body class="bg-base-200 text-base-content min-h-screen">
+    <div class="drawer lg:drawer-open min-h-screen">
+        <input id="admin-drawer" type="checkbox" class="drawer-toggle" />
+        
+        <!-- Drawer Content (Main Area + Navbar) -->
+        <div class="drawer-content flex flex-col min-w-0">
+            <!-- Top Navbar -->
+            <header class="navbar bg-base-100 border-b border-base-200 sticky top-0 z-30 px-4 gap-2 shadow-xs">
+                <!-- Mobile Drawer Toggle -->
+                <div class="flex-none lg:hidden">
+                    <label for="admin-drawer" class="btn btn-ghost btn-square btn-sm" aria-label="Open Navigation Menu">
+                        <i data-lucide="menu" style="width: 20px; height: 20px;"></i>
+                    </label>
+                </div>
 
-                <a class="navbar-brand d-flex align-items-center gap-2 fw-bold text-body-emphasis me-2 me-lg-4" href="{{ route('admin.dashboard') }}">
-                    <div class="rounded-3 bg-primary bg-opacity-10 p-2 text-primary d-flex align-items-center justify-content-center">
-                        <i data-lucide="shield-check" style="width: 22px; height: 22px;"></i>
+                <!-- Brand Logo (Mobile visible) -->
+                <div class="flex-1 flex items-center gap-2">
+                    <a class="flex items-center gap-2 font-bold text-base-content lg:hidden" href="{{ route('admin.dashboard') }}">
+                        <div class="rounded-lg bg-primary/10 p-1.5 text-primary">
+                            <i data-lucide="shield-check" style="width: 20px; height: 20px;"></i>
+                        </div>
+                        <span class="text-sm font-semibold">ROI Attendance</span>
+                    </a>
+
+                    <!-- Global Search Bar -->
+                    <div class="hidden sm:flex items-center w-full max-w-md ml-2">
+                        <label class="input input-sm input-bordered flex items-center gap-2 w-full bg-base-200/50">
+                            <i data-lucide="search" style="width: 16px; height: 16px;" class="text-base-content/50"></i>
+                            <input type="search" id="globalSearchInput" class="grow" placeholder="Search employees, logs, cards... (Ctrl+K)" aria-label="Search employees, reports, and logs" />
+                            <kbd class="kbd kbd-xs font-mono opacity-60">Ctrl K</kbd>
+                        </label>
                     </div>
-                    <span class="d-none d-sm-inline">ROI Attendance</span>
-                </a>
-            </div>
+                </div>
 
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#topNavbar" aria-label="Toggle navigation search">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="topNavbar">
-                <form class="me-auto my-2 my-lg-0 col-12 col-lg-5" role="search">
-                    <div class="input-group">
-                        <span class="input-group-text bg-body-tertiary border-end-0 text-body-secondary">
-                            <i data-lucide="search" style="width: 18px; height: 18px;"></i>
-                        </span>
-                        <input type="search" id="globalSearchInput" class="form-control bg-body-tertiary border-start-0 border-end-0 text-body" placeholder="Search employees, reports, logs..." aria-label="Search employees, reports, and logs">
-                        <span class="input-group-text bg-body-tertiary border-start-0 text-body-secondary d-none d-sm-flex">
-                            <kbd class="bg-body text-body-secondary px-1.5 py-0.5 rounded border small" style="font-size: 0.7rem;">Ctrl K</kbd>
-                        </span>
-                    </div>
-                </form>
-
-                <div class="d-flex align-items-center gap-3 ms-auto mt-2 mt-lg-0">
-                    <!-- Dark/Light Theme Toggle -->
-                    <button class="btn btn-outline-secondary btn-sm rounded-circle p-2 d-flex align-items-center justify-content-center" id="themeToggleBtn" type="button" aria-label="Toggle Theme Mode" title="Toggle Dark/Light Mode" style="width: 36px; height: 36px;">
-                        <i data-lucide="sun" id="themeIcon" style="width: 18px; height: 18px;"></i>
+                <!-- Right Action Icons -->
+                <div class="flex-none flex items-center gap-2">
+                    <!-- Theme Mode Controller Button -->
+                    <button class="btn btn-ghost btn-circle btn-sm" id="themeToggleBtn" type="button" aria-label="Toggle Theme Mode" title="Toggle Dark/Light Mode">
+                        <i data-lucide="sun" style="width: 18px; height: 18px;"></i>
                     </button>
 
                     <!-- Notifications Dropdown -->
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary btn-sm rounded-circle p-2 position-relative d-flex align-items-center justify-content-center" type="button" data-bs-toggle="dropdown" aria-label="View notifications" aria-expanded="false" style="width: 36px; height: 36px;">
+                    <div class="dropdown dropdown-end">
+                        <div tabindex="0" role="button" class="btn btn-ghost btn-circle btn-sm relative" aria-label="View notifications">
                             <i data-lucide="bell" style="width: 18px; height: 18px;"></i>
-                            <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 p-2" style="width: 280px;">
-                            <li><h6 class="dropdown-header text-uppercase fw-bold">Notifications</h6></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item rounded-2 py-2 small" href="#">John Doe logged clock-in at 09:00 AM</a></li>
-                            <li><a class="dropdown-item rounded-2 py-2 small" href="#">New attendance exception flag</a></li>
+                            <span class="badge badge-xs badge-error absolute top-1 right-1 p-1"></span>
+                        </div>
+                        <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-50 w-72 p-2 shadow-lg border border-base-200 mt-2">
+                            <li class="menu-title text-xs font-bold text-base-content/70">Notifications</li>
+                            <li><a class="text-xs py-2">Biometric sync cycle active</a></li>
+                            <li><a class="text-xs py-2">System health: All services nominal</a></li>
                         </ul>
                     </div>
 
                     <!-- User Profile Dropdown -->
-                    <div class="dropdown">
-                        <button class="btn btn-body d-flex align-items-center gap-2 border-0 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px;">
-                                {{ substr(Auth::user()->name ?? 'Admin', 0, 1) }}
-                            </div>
-                            <div class="text-start d-none d-sm-block">
-                                <div class="fw-semibold small text-body-emphasis mb-0">{{ Auth::user()->name ?? 'Admin' }}</div>
-                                <div class="text-body-secondary" style="font-size: 0.75rem;">
-                                    {{ Auth::user()->getRoleNames()->first() ?? 'Super Admin' }}
+                    <div class="dropdown dropdown-end">
+                        <div tabindex="0" role="button" class="btn btn-ghost btn-sm gap-2 pl-2 pr-3">
+                            <div class="avatar placeholder">
+                                <div class="bg-primary text-primary-content rounded-full w-7 h-7 text-xs font-bold flex items-center justify-center">
+                                    {{ substr(Auth::user()->name ?? 'Admin', 0, 1) }}
                                 </div>
                             </div>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2">
+                            <div class="text-left hidden md:block leading-tight">
+                                <div class="font-semibold text-xs text-base-content">{{ Auth::user()->name ?? 'Admin' }}</div>
+                                <div class="text-[10px] text-base-content/60">{{ Auth::user()->getRoleNames()->first() ?? 'Super Admin' }}</div>
+                            </div>
+                            <i data-lucide="chevron-down" style="width: 14px; height: 14px;" class="opacity-50"></i>
+                        </div>
+                        <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-50 w-52 p-2 shadow-lg border border-base-200 mt-2">
                             <li>
-                                <a class="dropdown-item d-flex align-items-center gap-2" href="{{ route('profile.edit') }}">
+                                <a href="{{ route('profile.edit') }}" class="flex items-center gap-2">
                                     <i data-lucide="user" style="width: 16px; height: 16px;"></i>
                                     <span>Profile</span>
                                 </a>
                             </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <form method="POST" action="{{ route('logout') }}">
+                            <li class="border-t border-base-200 mt-1 pt-1">
+                                <form method="POST" action="{{ route('logout') }}" class="w-full">
                                     @csrf
-                                    <button type="submit" class="dropdown-item text-danger d-flex align-items-center gap-2">
+                                    <button type="submit" class="text-error flex items-center gap-2 w-full text-left">
                                         <i data-lucide="log-out" style="width: 16px; height: 16px;"></i>
                                         <span>Log Out</span>
                                     </button>
@@ -251,89 +110,70 @@
                         </ul>
                     </div>
                 </div>
-            </div>
-        </div>
-    </header>
+            </header>
 
-    <!-- Mobile Offcanvas Sidebar Drawer -->
-    <div class="offcanvas offcanvas-start bg-body text-body" tabindex="-1" id="adminMobileDrawer" aria-labelledby="adminMobileDrawerLabel">
-        <div class="offcanvas-header border-bottom">
-            <div class="d-flex align-items-center gap-2" id="adminMobileDrawerLabel">
-                <div class="rounded-3 bg-primary bg-opacity-10 p-2 text-primary d-flex align-items-center justify-content-center">
-                    <i data-lucide="shield-check" style="width: 22px; height: 22px;"></i>
-                </div>
-                <span class="fw-bold text-body-emphasis">ROI Attendance</span>
-            </div>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body p-3">
-            <div class="text-uppercase small fw-bold text-body-secondary mb-3 px-2">Main Menu</div>
-            <ul class="nav nav-pills flex-column gap-1 mb-4">
-                <x-admin-nav-item route="admin.dashboard" icon="layout-dashboard" label="Dashboard" permission="dashboard.view" />
-                <x-admin-nav-item route="admin.employees.index" activePattern="admin.employees.*" icon="contact-2" label="Employee Directory" permission="employees.view" />
-                <x-admin-nav-item route="admin.users.index" activePattern="admin.users.*" icon="users" label="User Accounts" permission="users.view" />
-                <x-admin-nav-item route="admin.attendances.index" activePattern="admin.attendances.*" icon="calendar-check" label="Attendance Logs" permission="attendances.view" />
-                <x-admin-nav-item url="#" icon="bar-chart-3" label="Reports & Analytics" permission="reports.view" />
-            </ul>
-
-            <x-authorized :permission="['api.docs.view', 'api.tokens.manage', 'api.logs.view']">
-                <div class="text-uppercase small fw-bold text-body-secondary mb-3 px-2">Developer & API</div>
-                <ul class="nav nav-pills flex-column gap-1 mb-4">
-                    <x-admin-nav-item route="admin.api-docs.index" activePattern="admin.api-docs.*" icon="book-open" label="API Documentation" permission="api.docs.view" />
-                    <x-admin-nav-item route="admin.api-tokens.index" activePattern="admin.api-tokens.*" icon="key" label="API Access Tokens" permission="api.tokens.manage" />
-                    <x-admin-nav-item route="admin.api-logs.index" activePattern="admin.api-logs.*" icon="activity" label="API Traffic Logs" permission="api.logs.view" />
-                </ul>
-            </x-authorized>
-
-            <x-authorized :permission="['sync-logs.view', 'roles.manage', 'settings.manage']">
-                <div class="text-uppercase small fw-bold text-body-secondary mb-3 px-2">Administration</div>
-                <ul class="nav nav-pills flex-column gap-1">
-                    <x-admin-nav-item route="admin.sync-logs.index" activePattern="admin.sync-logs.*" icon="history" label="Sync History Logs" permission="sync-logs.view" />
-                    <x-admin-nav-item url="#" icon="shield-alert" label="Roles & Spatie RBAC" permission="roles.manage" />
-                    <x-admin-nav-item url="#" icon="settings" label="System Settings" permission="settings.manage" />
-                </ul>
-            </x-authorized>
-        </div>
-    </div>
-
-    <div class="container-fluid px-0">
-        <div class="d-flex">
-            <!-- Left Main Navigation Sidebar (Desktop) -->
-            <aside class="admin-sidebar bg-body border-end d-none d-md-block p-3">
-                <div class="text-uppercase small fw-bold text-body-secondary mb-3 px-3">Main Menu</div>
-                <ul class="nav nav-pills flex-column gap-1">
-                    <x-admin-nav-item route="admin.dashboard" icon="layout-dashboard" label="Dashboard" permission="dashboard.view" />
-                    <x-admin-nav-item route="admin.employees.index" activePattern="admin.employees.*" icon="contact-2" label="Employee Directory" permission="employees.view" />
-                    <x-admin-nav-item route="admin.users.index" activePattern="admin.users.*" icon="users" label="User Accounts" permission="users.view" />
-                    <x-admin-nav-item route="admin.attendances.index" activePattern="admin.attendances.*" icon="calendar-check" label="Attendance Logs" permission="attendances.view" />
-                    <x-admin-nav-item url="#" icon="bar-chart-3" label="Reports & Analytics" permission="reports.view" />
-                </ul>
-
-                <x-authorized :permission="['api.docs.view', 'api.tokens.manage', 'api.logs.view']">
-                    <div class="text-uppercase small fw-bold text-body-secondary mt-4 mb-3 px-3">Developer & API</div>
-                    <ul class="nav nav-pills flex-column gap-1">
-                        <x-admin-nav-item route="admin.api-docs.index" activePattern="admin.api-docs.*" icon="book-open" label="API Documentation" permission="api.docs.view" />
-                        <x-admin-nav-item route="admin.api-tokens.index" activePattern="admin.api-tokens.*" icon="key" label="API Access Tokens" permission="api.tokens.manage" />
-                        <x-admin-nav-item route="admin.api-logs.index" activePattern="admin.api-logs.*" icon="activity" label="API Traffic Logs" permission="api.logs.view" />
-                    </ul>
-                </x-authorized>
-
-                <x-authorized :permission="['sync-logs.view', 'roles.manage', 'settings.manage']">
-                    <div class="text-uppercase small fw-bold text-body-secondary mt-4 mb-3 px-3">Administration</div>
-                    <ul class="nav nav-pills flex-column gap-1">
-                        <x-admin-nav-item route="admin.sync-logs.index" activePattern="admin.sync-logs.*" icon="history" label="Sync History Logs" permission="sync-logs.view" />
-                        <x-admin-nav-item url="#" icon="shield-alert" label="Roles & Spatie RBAC" permission="roles.manage" />
-                        <x-admin-nav-item url="#" icon="settings" label="System Settings" permission="settings.manage" />
-                    </ul>
-                </x-authorized>
-            </aside>
-
-            <!-- Middle Main Content Area -->
-            <main class="flex-grow-1 p-3 p-md-4">
+            <!-- Main Dynamic Page Content Area -->
+            <main class="p-4 md:p-6 flex-1 min-w-0">
                 {{ $slot }}
             </main>
         </div>
+
+        <!-- Drawer Side (Left Sidebar Navigation) -->
+        <div class="drawer-side z-40">
+            <label for="admin-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+            <aside class="w-64 min-h-full bg-base-100 border-r border-base-200 p-4 flex flex-col justify-between">
+                <div>
+                    <!-- Brand Banner -->
+                    <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5 px-3 py-2 mb-4 border-b border-base-200 pb-4">
+                        <div class="rounded-xl bg-primary/10 text-primary p-2 flex items-center justify-center">
+                            <i data-lucide="shield-check" style="width: 22px; height: 22px;"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold text-base text-base-content leading-tight">ROI Attendance</div>
+                            <div class="text-[11px] text-base-content/60 font-mono">Biometric Intelligence</div>
+                        </div>
+                    </a>
+
+                    <!-- Sidebar Navigation Menus -->
+                    <ul class="menu menu-sm gap-1 w-full p-0">
+                        <li class="menu-title text-[11px] font-bold uppercase tracking-wider text-base-content/50 px-3">Main Menu</li>
+                        <x-admin-nav-item route="admin.dashboard" icon="layout-dashboard" label="Dashboard" permission="dashboard.view" />
+                        <x-admin-nav-item route="admin.employees.index" activePattern="admin.employees.*" icon="contact-2" label="Employee Directory" permission="employees.view" />
+                        <x-admin-nav-item route="admin.users.index" activePattern="admin.users.*" icon="users" label="User Accounts" permission="users.view" />
+                        <x-admin-nav-item route="admin.attendances.index" activePattern="admin.attendances.*" icon="calendar-check" label="Attendance Logs" permission="attendances.view" />
+                        <x-admin-nav-item url="#" icon="bar-chart-3" label="Reports & Analytics" permission="reports.view" />
+
+                        <x-authorized :permission="['api.docs.view', 'api.tokens.manage', 'api.logs.view']">
+                            <li class="menu-title text-[11px] font-bold uppercase tracking-wider text-base-content/50 mt-4 px-3">Developer & API</li>
+                            <x-admin-nav-item route="admin.api-docs.index" activePattern="admin.api-docs.*" icon="book-open" label="API Documentation" permission="api.docs.view" />
+                            <x-admin-nav-item route="admin.api-tokens.index" activePattern="admin.api-tokens.*" icon="key" label="API Access Tokens" permission="api.tokens.manage" />
+                            <x-admin-nav-item route="admin.api-logs.index" activePattern="admin.api-logs.*" icon="activity" label="API Traffic Logs" permission="api.logs.view" />
+                        </x-authorized>
+
+                        <x-authorized :permission="['sync-logs.view', 'roles.manage', 'settings.manage']">
+                            <li class="menu-title text-[11px] font-bold uppercase tracking-wider text-base-content/50 mt-4 px-3">Administration</li>
+                            <x-admin-nav-item route="admin.sync-logs.index" activePattern="admin.sync-logs.*" icon="history" label="Sync History Logs" permission="sync-logs.view" />
+                            <x-admin-nav-item url="#" icon="shield-alert" label="Roles & Spatie RBAC" permission="roles.manage" />
+                            <x-admin-nav-item url="#" icon="settings" label="System Settings" permission="settings.manage" />
+                        </x-authorized>
+                    </ul>
+                </div>
+
+                <!-- Bottom Version Tag -->
+                <div class="px-3 py-2 border-t border-base-200 text-xs text-base-content/50 flex items-center justify-between font-mono">
+                    <span>v2.1.0</span>
+                    <span class="flex items-center gap-1.5 text-success">
+                        <span class="telemetry-beacon" style="width:6px;height:6px;">
+                            <span class="telemetry-pulse" style="background-color:#10B981;"></span>
+                            <span class="telemetry-dot" style="width:6px;height:6px;background-color:#10B981;"></span>
+                        </span>
+                        Sync Ready
+                    </span>
+                </div>
+            </aside>
+        </div>
     </div>
+
     @stack('scripts')
 </body>
 </html>

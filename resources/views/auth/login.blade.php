@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-bs-theme="dark">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-theme="dark" data-bs-theme="dark">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,6 +11,7 @@
     <script>
         (function() {
             const savedTheme = localStorage.getItem('roi_theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
             document.documentElement.setAttribute('data-bs-theme', savedTheme);
         })();
     </script>
@@ -20,182 +21,154 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    @vite(['resources/js/app.js'])
-
-    <style>
-        :root {
-            --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-        }
-        body {
-            font-family: var(--font-sans);
-            min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
-            letter-spacing: -0.01em;
-        }
-        h1, h2, h3, h4, h5, h6 {
-            letter-spacing: -0.025em;
-        }
-        .font-monospace, code, pre, .font-mono, .badge.fw-mono {
-            font-family: var(--font-mono) !important;
-        }
-        .login-wrapper {
-            min-height: 100vh;
-        }
-        .brand-panel {
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
-            position: relative;
-            overflow: hidden;
-        }
-        .brand-panel::before {
-            content: '';
-            position: absolute;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, rgba(0,0,0,0) 70%);
-            top: -100px;
-            left: -100px;
-            border-radius: 50%;
-        }
-        .login-card {
-            max-width: 440px;
-            width: 100%;
-        }
-        .theme-toggle-btn {
-            position: absolute;
-            top: 1.5rem;
-            right: 1.5rem;
-            z-index: 10;
-        }
-        .lucide {
-            vertical-align: middle;
-        }
-        @media (prefers-reduced-motion: reduce) {
-            .btn,
-            .form-control {
-                transition: none !important;
-            }
-        }
-    </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-body">
+<body class="bg-base-100 text-base-content min-h-screen antialiased selection:bg-primary selection:text-white">
+
     <!-- Dark/Light Theme Toggle -->
-    <button class="btn btn-outline-secondary rounded-circle theme-toggle-btn p-2 d-flex align-items-center justify-content-center" id="themeToggleBtn" type="button" aria-label="Toggle Theme Mode" title="Toggle Theme" style="width: 40px; height: 40px;">
-        <i data-lucide="sun" id="themeIcon" style="width: 20px; height: 20px;"></i>
-    </button>
+    <div class="fixed top-5 right-5 z-50">
+        <button class="btn btn-circle btn-ghost btn-outline border-base-content/20 hover:border-primary shadow-xs" id="themeToggleBtn" type="button" aria-label="Toggle Theme Mode" title="Toggle Theme">
+            <i data-lucide="sun" id="themeIcon" class="w-5 h-5"></i>
+        </button>
+    </div>
 
-    <div class="container-fluid p-0">
-        <div class="row g-0 login-wrapper">
-            <!-- Left Branding Panel -->
-            <div class="col-lg-6 d-none d-lg-flex flex-column justify-content-between p-5 brand-panel text-white">
-                <div class="d-flex align-items-center gap-3 z-1">
-                    <div class="rounded-3 bg-primary bg-opacity-25 p-2 border border-primary border-opacity-50 d-flex align-items-center justify-content-center">
-                        <i data-lucide="shield-check" class="text-primary" style="width: 28px; height: 28px;"></i>
-                    </div>
-                    <div>
-                        <h4 class="fw-bold mb-0 text-white">ROI Attendance</h4>
-                        <small class="text-white-50">Enterprise Admin Portal</small>
-                    </div>
+    <div class="min-h-screen grid grid-cols-1 lg:grid-cols-12">
+        <!-- Left Branding Hero Panel (Desktop) -->
+        <div class="hidden lg:flex lg:col-span-6 xl:col-span-7 flex-col justify-between p-12 bg-linear-to-br from-slate-950 via-indigo-950 to-blue-950 text-white relative overflow-hidden">
+            <!-- Decorative Glow -->
+            <div class="absolute -top-24 -left-24 w-96 h-96 bg-primary/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <!-- Brand Header -->
+            <div class="flex items-center gap-3 relative z-10">
+                <div class="w-12 h-12 rounded-xl bg-primary/20 border border-primary/40 flex items-center justify-center text-primary shadow-inner">
+                    <i data-lucide="shield-check" class="w-7 h-7 text-primary"></i>
                 </div>
-
-                <div class="z-1 my-auto py-5">
-                    <span class="badge bg-primary bg-opacity-25 text-white border border-primary border-opacity-50 mb-3 px-3 py-2 rounded-pill d-inline-flex align-items-center gap-1">
-                        <i data-lucide="sparkles" style="width: 16px; height: 16px;"></i> Admin Management System
-                    </span>
-                    <h1 class="display-5 fw-bold mb-4">Streamline Attendance & HR Operations Effortlessly</h1>
-                    <p class="lead text-white-50">Secure role-based access, real-time analytics, automated tracking, and intuitive management tools built for high performance.</p>
-
-                    <div class="row g-3 mt-4">
-                        <div class="col-sm-6">
-                            <div class="p-3 rounded-3 bg-white bg-opacity-10 border border-white border-opacity-10">
-                                <i data-lucide="lock" class="text-info mb-2 d-block" style="width: 24px; height: 24px;"></i>
-                                <h6 class="fw-semibold text-white mb-1">Spatie RBAC</h6>
-                                <small class="text-white-50">Strict permissions & roles</small>
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="p-3 rounded-3 bg-white bg-opacity-10 border border-white border-opacity-10">
-                                <i data-lucide="gauge" class="text-warning mb-2 d-block" style="width: 24px; height: 24px;"></i>
-                                <h6 class="fw-semibold text-white mb-1">Live Analytics</h6>
-                                <small class="text-white-50">Real-time stats dashboard</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="z-1 d-flex justify-content-between align-items-center text-white-50 small">
-                    <span>&copy; {{ date('Y') }} ROI Attendance. All rights reserved.</span>
-                    <span class="badge bg-success-subtle text-success border border-success-subtle">v1.0.0</span>
+                <div>
+                    <h2 class="text-xl font-bold tracking-tight text-white">ROI Attendance</h2>
+                    <p class="text-xs text-indigo-200/70 font-mono">Enterprise Workforce OS</p>
                 </div>
             </div>
 
-            <!-- Right Login Form Panel -->
-            <div class="col-lg-6 d-flex align-items-center justify-content-center p-4 p-sm-5 bg-body-tertiary">
-                <div class="login-card">
-                    <div class="mb-4 text-center text-lg-start">
-                        <div class="d-lg-none mb-3 d-inline-flex align-items-center gap-2">
-                            <i data-lucide="shield-check" class="text-primary" style="width: 32px; height: 32px;"></i>
-                            <span class="fs-4 fw-bold text-body-emphasis">ROI Attendance</span>
+            <!-- Hero Body Content -->
+            <div class="my-auto py-12 relative z-10 max-w-xl">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/20 border border-primary/40 text-primary-content text-xs font-semibold uppercase tracking-wider mb-6">
+                    <i data-lucide="sparkles" class="w-4 h-4 text-primary"></i>
+                    <span>Next-Gen Attendance Infrastructure</span>
+                </div>
+                <h1 class="text-4xl xl:text-5xl font-extrabold tracking-tight text-white leading-tight mb-4">
+                    Streamline Attendance & HR Operations Effortlessly
+                </h1>
+                <p class="text-base text-slate-300/80 leading-relaxed mb-8">
+                    Secure role-based access, real-time biometric telemetry, automated sync pipelines, and high-frequency analytical dashboards.
+                </p>
+
+                <!-- Value Props Grid -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs">
+                        <i data-lucide="lock" class="w-6 h-6 text-sky-400 mb-2"></i>
+                        <h4 class="font-bold text-white text-sm">Spatie RBAC</h4>
+                        <p class="text-xs text-slate-400 mt-0.5">Role-guarded endpoint security</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs">
+                        <i data-lucide="gauge" class="w-6 h-6 text-amber-400 mb-2"></i>
+                        <h4 class="font-bold text-white text-sm">Live Telemetry</h4>
+                        <p class="text-xs text-slate-400 mt-0.5">Sub-second punch monitoring</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Brand Footer -->
+            <div class="flex items-center justify-between text-xs text-slate-400 relative z-10 pt-6 border-t border-white/10">
+                <span>&copy; {{ date('Y') }} ROI Attendance. All rights reserved.</span>
+                <span class="badge badge-success badge-soft font-mono">v2.0 daisyUI</span>
+            </div>
+        </div>
+
+        <!-- Right Login Form Panel -->
+        <div class="col-span-1 lg:col-span-6 xl:col-span-5 flex items-center justify-center p-6 sm:p-12 bg-base-100">
+            <div class="w-full max-w-md">
+                <!-- Mobile Brand Header -->
+                <div class="lg:hidden flex items-center gap-3 mb-8">
+                    <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                        <i data-lucide="shield-check" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-base-content">ROI Attendance</h2>
+                        <p class="text-xs text-base-content/60">Enterprise Admin Portal</p>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-base-content tracking-tight">Welcome Back</h2>
+                    <p class="text-sm text-base-content/70 mt-1">Enter your credentials to access the admin portal.</p>
+                </div>
+
+                <!-- Session Status Alerts -->
+                @if (session('status'))
+                    <div class="alert alert-success shadow-xs mb-6" role="alert">
+                        <i data-lucide="check-circle" class="w-5 h-5 shrink-0"></i>
+                        <span class="text-sm">{{ session('status') }}</span>
+                    </div>
+                @endif
+
+                @if ($errors->any())
+                    <div class="alert alert-error shadow-xs mb-6" role="alert">
+                        <i data-lucide="alert-circle" class="w-5 h-5 shrink-0"></i>
+                        <div class="text-sm">
+                            @foreach ($errors->all() as $error)
+                                <div>{{ $error }}</div>
+                            @endforeach
                         </div>
-                        <h2 class="fw-bold text-body-emphasis mb-1">Welcome Back</h2>
-                        <p class="text-body-secondary">Enter your credentials to access the admin portal.</p>
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('login') }}" class="space-y-4">
+                    @csrf
+
+                    <!-- Email Input -->
+                    <fieldset class="fieldset">
+                        <legend class="fieldset-legend text-xs font-bold uppercase tracking-wider text-base-content/70">Email Address <span class="text-error">*</span></legend>
+                        <label class="input input-bordered flex items-center gap-2 w-full @error('email') input-error @enderror">
+                            <i data-lucide="mail" class="w-4 h-4 text-base-content/50 shrink-0"></i>
+                            <input type="email" name="email" id="emailInput" class="grow bg-transparent" placeholder="name@example.com" value="{{ old('email') }}" required autofocus autocomplete="username">
+                        </label>
+                    </fieldset>
+
+                    <!-- Password Input -->
+                    <fieldset class="fieldset">
+                        <legend class="fieldset-legend text-xs font-bold uppercase tracking-wider text-base-content/70">Password <span class="text-error">*</span></legend>
+                        <label class="input input-bordered flex items-center gap-2 w-full @error('password') input-error @enderror">
+                            <i data-lucide="lock" class="w-4 h-4 text-base-content/50 shrink-0"></i>
+                            <input type="password" name="password" id="passwordInput" class="grow bg-transparent" placeholder="••••••••" required autocomplete="current-password">
+                        </label>
+                    </fieldset>
+
+                    <!-- Remember Me & Forgot Password -->
+                    <div class="flex items-center justify-between pt-1">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="remember" id="rememberMe" class="checkbox checkbox-primary checkbox-sm">
+                            <span class="text-xs text-base-content/80 font-medium">Remember me</span>
+                        </label>
+                        @if (Route::has('password.request'))
+                            <a href="{{ route('password.request') }}" class="text-xs text-primary font-semibold hover:underline">
+                                Forgot password?
+                            </a>
+                        @endif
                     </div>
 
-                    <!-- Session Status -->
-                    @if (session('status'))
-                        <div class="alert alert-success border-0 shadow-sm mb-4 d-flex align-items-center gap-2" role="alert">
-                            <i data-lucide="check-circle" style="width: 20px; height: 20px;"></i>
-                            <div>{{ session('status') }}</div>
-                        </div>
-                    @endif
-
-                    <form method="POST" action="{{ route('login') }}" class="needs-validation">
-                        @csrf
-
-                        <!-- Email Input -->
-                        <div class="form-floating mb-3">
-                            <input type="email" name="email" class="form-control bg-body text-body @error('email') is-invalid @enderror" id="emailInput" placeholder="name@example.com" value="{{ old('email') }}" required autofocus autocomplete="username">
-                            <label for="emailInput">Email Address</label>
-                            @error('email')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <!-- Password Input -->
-                        <div class="form-floating mb-3">
-                            <input type="password" name="password" class="form-control bg-body text-body @error('password') is-invalid @enderror" id="passwordInput" placeholder="Password" required autocomplete="current-password">
-                            <label for="passwordInput">Password</label>
-                            @error('password')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <!-- Remember Me & Forgot Password -->
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="remember" id="rememberMe">
-                                <label class="form-check-label text-body-secondary small" for="rememberMe">
-                                    Remember me
-                                </label>
-                            </div>
-                            @if (Route::has('password.request'))
-                                <a href="{{ route('password.request') }}" class="text-primary text-decoration-none small fw-medium">
-                                    Forgot password?
-                                </a>
-                            @endif
-                        </div>
-
-                        <!-- Submit Button -->
-                        <button type="submit" class="btn btn-primary btn-lg w-100 fw-semibold shadow-sm d-flex align-items-center justify-content-center gap-2">
-                            <i data-lucide="log-in" style="width: 20px; height: 20px;"></i>
+                    <!-- Submit Button -->
+                    <div class="pt-2">
+                        <button type="submit" class="btn btn-primary btn-block gap-2 shadow-xs">
+                            <i data-lucide="log-in" class="w-4 h-4"></i>
                             <span>Log In to Dashboard</span>
                         </button>
+                    </div>
 
-                        <div class="mt-4 pt-3 border-top border-secondary-subtle text-center text-body-secondary small">
-                            Default Admin Login: <strong class="text-body-emphasis">admin@example.com</strong> / <strong class="text-body-emphasis">password</strong>
-                        </div>
-                    </form>
-                </div>
+                    <div class="pt-4 mt-6 border-t border-base-200 text-center text-xs text-base-content/60">
+                        Default Admin Login: <strong class="text-base-content">admin@example.com</strong> / <strong class="text-base-content">password</strong>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

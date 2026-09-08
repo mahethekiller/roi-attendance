@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-bs-theme="dark">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-theme="dark" data-bs-theme="dark">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,6 +10,7 @@
     <script>
         (function() {
             const savedTheme = localStorage.getItem('roi_theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
             document.documentElement.setAttribute('data-bs-theme', savedTheme);
         })();
     </script>
@@ -19,179 +20,149 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-    @vite(['resources/js/app.js'])
-
-    <style>
-        :root {
-            --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-        }
-        body {
-            font-family: var(--font-sans);
-            min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
-            letter-spacing: -0.01em;
-        }
-        h1, h2, h3, h4, h5, h6 {
-            letter-spacing: -0.025em;
-        }
-        .hero-gradient {
-            background: radial-gradient(circle at 50% 10%, rgba(99, 102, 241, 0.15), transparent 70%);
-        }
-        .feature-card {
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .feature-card:hover {
-            transform: translateY(-4px);
-        }
-        @media (prefers-reduced-motion: reduce) {
-            .feature-card, .btn {
-                transition: none !important;
-                transform: none !important;
-            }
-        }
-    </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-body text-body d-flex flex-column min-h-screen">
+<body class="bg-base-100 text-base-content min-h-screen flex flex-col antialiased selection:bg-primary selection:text-white">
+
     <!-- Navigation Header -->
-    <header class="border-bottom bg-body sticky-top shadow-sm py-3">
-        <div class="container d-flex align-items-center justify-content-between">
-            <a href="{{ url('/') }}" class="d-flex align-items-center gap-2 text-decoration-none text-body-emphasis fw-bold fs-5">
-                <div class="rounded-3 bg-primary bg-opacity-10 p-2 text-primary d-flex align-items-center justify-content-center">
-                    <i data-lucide="shield-check" style="width: 24px; height: 24px;"></i>
+    <header class="navbar bg-base-100/90 backdrop-blur-md border-b border-base-200/60 sticky top-0 z-50 px-4 sm:px-8">
+        <div class="navbar-start">
+            <a href="{{ url('/') }}" class="flex items-center gap-2 text-base-content font-bold text-lg">
+                <div class="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                    <i data-lucide="shield-check" class="w-5 h-5"></i>
                 </div>
-                <span>ROI Attendance</span>
+                <span class="tracking-tight">ROI Attendance</span>
             </a>
+        </div>
 
-            <div class="d-flex align-items-center gap-3">
-                <!-- Theme Toggle Button -->
-                <button class="btn btn-outline-secondary btn-sm rounded-circle p-2 d-flex align-items-center justify-content-center" id="themeToggleBtn" type="button" aria-label="Toggle Theme Mode" title="Toggle Theme" style="width: 38px; height: 38px;">
-                    <i data-lucide="sun" id="themeIcon" style="width: 18px; height: 18px;"></i>
-                </button>
+        <div class="navbar-end flex items-center gap-3">
+            <!-- Theme Toggle Button -->
+            <button class="btn btn-circle btn-ghost btn-sm sm:btn-md btn-outline border-base-content/20 hover:border-primary shadow-xs" id="themeToggleBtn" type="button" aria-label="Toggle Theme Mode" title="Toggle Theme">
+                <i data-lucide="sun" id="themeIcon" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+            </button>
 
-                @if (Route::has('login'))
-                    @auth
-                        <a href="{{ route('admin.dashboard') }}" class="btn btn-primary btn-sm px-3 shadow-sm d-flex align-items-center gap-2">
-                            <i data-lucide="layout-dashboard" style="width: 16px; height: 16px;"></i>
-                            <span>Admin Dashboard</span>
-                        </a>
-                    @else
-                        <a href="{{ route('login') }}" class="btn btn-primary btn-sm px-4 shadow-sm d-flex align-items-center gap-2">
-                            <i data-lucide="log-in" style="width: 16px; height: 16px;"></i>
-                            <span>Admin Login</span>
-                        </a>
-                    @endauth
-                @endif
-            </div>
+            @if (Route::has('login'))
+                @auth
+                    <a href="{{ route('admin.dashboard') }}" class="btn btn-primary btn-sm sm:btn-md gap-2 shadow-xs">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                        <span>Admin Dashboard</span>
+                    </a>
+                @else
+                    <a href="{{ route('login') }}" class="btn btn-primary btn-sm sm:btn-md gap-2 shadow-xs">
+                        <i data-lucide="log-in" class="w-4 h-4"></i>
+                        <span>Admin Login</span>
+                    </a>
+                @endauth
+            @endif
         </div>
     </header>
 
     <!-- Main Landing Surface -->
-    <main class="flex-grow-1 hero-gradient py-5">
-        <div class="container py-lg-5">
-            <!-- Hero Title & Lead -->
-            <div class="text-center max-w-3xl mx-auto mb-5">
-                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill mb-3 d-inline-flex align-items-center gap-2">
-                    <i data-lucide="sparkles" style="width: 16px; height: 16px;"></i>
+    <main class="grow">
+        <!-- Hero Section -->
+        <section class="relative py-16 sm:py-24 px-4 sm:px-8 overflow-hidden bg-radial from-primary/10 via-base-100 to-base-100">
+            <div class="max-w-4xl mx-auto text-center">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/15 border border-primary/30 text-primary text-xs font-semibold uppercase tracking-wider mb-6">
+                    <i data-lucide="sparkles" class="w-4 h-4"></i>
                     <span>Enterprise Attendance & Biometric Infrastructure</span>
-                </span>
-                <h1 class="display-4 fw-bold text-body-emphasis mb-3">
+                </div>
+
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-base-content leading-tight mb-6">
                     Modern Biometric Tracking & Developer-First HR Platform
                 </h1>
-                <p class="lead text-body-secondary mb-4 mx-auto" style="max-width: 700px;">
+
+                <p class="text-base sm:text-lg text-base-content/70 max-w-2xl mx-auto leading-relaxed mb-8">
                     Effortlessly synchronize RFID cards, monitor biometric punch entries, manage Spatie RBAC permissions, and automate HR payroll feeds with secure REST APIs.
                 </p>
 
-                <div class="d-flex flex-wrap justify-content-center gap-3">
+                <div class="flex flex-wrap items-center justify-center gap-3">
                     @auth
-                        <a href="{{ route('admin.dashboard') }}" class="btn btn-primary btn-lg px-4 shadow-sm d-inline-flex align-items-center gap-2">
-                            <i data-lucide="layout-dashboard" style="width: 20px; height: 20px;"></i>
+                        <a href="{{ route('admin.dashboard') }}" class="btn btn-primary btn-md sm:btn-lg gap-2 shadow-xs">
+                            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
                             <span>Open Admin Dashboard</span>
                         </a>
-                        <a href="{{ route('admin.api-docs.index') }}" class="btn btn-outline-secondary btn-lg px-4 shadow-sm d-inline-flex align-items-center gap-2">
-                            <i data-lucide="book-open" style="width: 20px; height: 20px;"></i>
+                        <a href="{{ route('admin.api-docs.index') }}" class="btn btn-outline btn-md sm:btn-lg gap-2 shadow-xs">
+                            <i data-lucide="book-open" class="w-5 h-5"></i>
                             <span>API Documentation</span>
                         </a>
                     @else
-                        <a href="{{ route('login') }}" class="btn btn-primary btn-lg px-4 shadow-sm d-inline-flex align-items-center gap-2">
-                            <i data-lucide="log-in" style="width: 20px; height: 20px;"></i>
+                        <a href="{{ route('login') }}" class="btn btn-primary btn-md sm:btn-lg gap-2 shadow-xs">
+                            <i data-lucide="log-in" class="w-5 h-5"></i>
                             <span>Log In to Dashboard</span>
                         </a>
-                        <a href="{{ route('login') }}" class="btn btn-outline-secondary btn-lg px-4 shadow-sm d-inline-flex align-items-center gap-2">
-                            <i data-lucide="shield-check" style="width: 20px; height: 20px;"></i>
+                        <a href="{{ route('login') }}" class="btn btn-outline btn-md sm:btn-lg gap-2 shadow-xs">
+                            <i data-lucide="shield-check" class="w-5 h-5"></i>
                             <span>Explore Features</span>
                         </a>
                     @endauth
                 </div>
             </div>
+        </section>
 
-            <!-- Features Grid -->
-            <div class="row g-4 mt-4">
-                <div class="col-md-6 col-lg-3">
-                    <div class="card border-0 shadow-sm bg-body text-body h-100 p-3 feature-card">
-                        <div class="card-body">
-                            <div class="rounded-circle bg-primary-subtle text-primary p-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 48px; height: 48px;">
-                                <i data-lucide="credit-card" style="width: 24px; height: 24px;"></i>
-                            </div>
-                            <h5 class="fw-bold text-body-emphasis mb-2">RFID Card Mapping</h5>
-                            <p class="text-body-secondary small mb-0">
-                                Link employee records to unique biometric badge and smart card IDs with instant validation.
-                            </p>
+        <!-- Features Grid -->
+        <section class="max-w-6xl mx-auto px-4 sm:px-8 py-12">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Feature 1 -->
+                <div class="card bg-base-100 border border-base-200/60 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-200">
+                    <div class="card-body p-6">
+                        <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4">
+                            <i data-lucide="credit-card" class="w-6 h-6"></i>
                         </div>
+                        <h3 class="font-bold text-base-content text-base mb-1">RFID Card Mapping</h3>
+                        <p class="text-xs text-base-content/70 leading-relaxed">
+                            Link employee records to unique biometric badge and smart card IDs with instant validation.
+                        </p>
                     </div>
                 </div>
 
-                <div class="col-md-6 col-lg-3">
-                    <div class="card border-0 shadow-sm bg-body text-body h-100 p-3 feature-card">
-                        <div class="card-body">
-                            <div class="rounded-circle bg-success-subtle text-success p-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 48px; height: 48px;">
-                                <i data-lucide="refresh-cw" style="width: 24px; height: 24px;"></i>
-                            </div>
-                            <h5 class="fw-bold text-body-emphasis mb-2">Live Biometric Sync</h5>
-                            <p class="text-body-secondary small mb-0">
-                                Automated cron schedules, manual dashboard triggers, and secure webhook synchronization.
-                            </p>
+                <!-- Feature 2 -->
+                <div class="card bg-base-100 border border-base-200/60 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-200">
+                    <div class="card-body p-6">
+                        <div class="w-12 h-12 rounded-xl bg-success/10 text-success flex items-center justify-center mb-4">
+                            <i data-lucide="refresh-cw" class="w-6 h-6"></i>
                         </div>
+                        <h3 class="font-bold text-base-content text-base mb-1">Live Biometric Sync</h3>
+                        <p class="text-xs text-base-content/70 leading-relaxed">
+                            Automated cron schedules, manual dashboard triggers, and secure webhook synchronization.
+                        </p>
                     </div>
                 </div>
 
-                <div class="col-md-6 col-lg-3">
-                    <div class="card border-0 shadow-sm bg-body text-body h-100 p-3 feature-card">
-                        <div class="card-body">
-                            <div class="rounded-circle bg-info-subtle text-info p-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 48px; height: 48px;">
-                                <i data-lucide="code-2" style="width: 24px; height: 24px;"></i>
-                            </div>
-                            <h5 class="fw-bold text-body-emphasis mb-2">REST API & Tokens</h5>
-                            <p class="text-body-secondary small mb-0">
-                                Token-based REST API with rate-limiting, live traffic audit logs, and downloadable specs.
-                            </p>
+                <!-- Feature 3 -->
+                <div class="card bg-base-100 border border-base-200/60 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-200">
+                    <div class="card-body p-6">
+                        <div class="w-12 h-12 rounded-xl bg-info/10 text-info flex items-center justify-center mb-4">
+                            <i data-lucide="code-2" class="w-6 h-6"></i>
                         </div>
+                        <h3 class="font-bold text-base-content text-base mb-1">REST API & Tokens</h3>
+                        <p class="text-xs text-base-content/70 leading-relaxed">
+                            Token-based REST API with rate-limiting, live traffic audit logs, and downloadable specs.
+                        </p>
                     </div>
                 </div>
 
-                <div class="col-md-6 col-lg-3">
-                    <div class="card border-0 shadow-sm bg-body text-body h-100 p-3 feature-card">
-                        <div class="card-body">
-                            <div class="rounded-circle bg-warning-subtle text-warning p-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 48px; height: 48px;">
-                                <i data-lucide="lock" style="width: 24px; height: 24px;"></i>
-                            </div>
-                            <h5 class="fw-bold text-body-emphasis mb-2">Spatie RBAC</h5>
-                            <p class="text-body-secondary small mb-0">
-                                Enterprise role-based access control safeguarding administrative operations and audit trails.
-                            </p>
+                <!-- Feature 4 -->
+                <div class="card bg-base-100 border border-base-200/60 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-200">
+                    <div class="card-body p-6">
+                        <div class="w-12 h-12 rounded-xl bg-warning/10 text-warning flex items-center justify-center mb-4">
+                            <i data-lucide="lock" class="w-6 h-6"></i>
                         </div>
+                        <h3 class="font-bold text-base-content text-base mb-1">Spatie RBAC</h3>
+                        <p class="text-xs text-base-content/70 leading-relaxed">
+                            Enterprise role-based access control safeguarding administrative operations and audit trails.
+                        </p>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
     </main>
 
     <!-- Footer -->
-    <footer class="border-top py-4 bg-body text-body-secondary small mt-auto">
-        <div class="container d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
+    <footer class="border-t border-base-200/60 py-6 bg-base-100 text-xs text-base-content/60">
+        <div class="max-w-6xl mx-auto px-4 sm:px-8 flex flex-col sm:flex-row justify-between items-center gap-3">
             <span>&copy; {{ date('Y') }} ROI Attendance. All rights reserved.</span>
-            <div class="d-flex align-items-center gap-3">
-                <span class="badge bg-body-tertiary text-body border">Version 1.0.0</span>
+            <div class="flex items-center gap-3">
+                <span class="badge badge-neutral badge-soft font-mono">v2.0 daisyUI</span>
                 <span>PHP 8.2 & Laravel 12</span>
             </div>
         </div>

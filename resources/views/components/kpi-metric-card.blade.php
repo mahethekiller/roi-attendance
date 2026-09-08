@@ -14,25 +14,24 @@
     $hasPercent = str_contains($value, '%');
 @endphp
 
-<div {{ $attributes->merge(['class' => 'card border-0 shadow-sm stat-card bg-body text-body h-100']) }}>
-    <div class="card-body p-3">
-        <div class="d-flex align-items-center justify-content-between mb-2">
-            <span class="text-body-secondary small fw-semibold text-uppercase tracking-wider" style="font-size: 0.75rem; letter-spacing: 0.04em;">
+<div {{ $attributes->merge(['class' => 'card bg-base-100 shadow-sm border border-base-200 stat-card h-full']) }}>
+    <div class="card-body p-4">
+        <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-semibold uppercase tracking-wider text-base-content/70">
                 {{ $title }}
             </span>
-            <div class="rounded-circle p-2 bg-{{ $color }}-subtle text-{{ $color }} d-flex align-items-center justify-content-center kpi-icon-pill" style="width: 38px; height: 38px; transition: transform var(--duration-normal) var(--ease-out-expo);">
+            <div class="rounded-full p-2 bg-{{ $color }}/10 text-{{ $color }} flex items-center justify-center kpi-icon-pill" style="width: 38px; height: 38px; transition: transform var(--duration-normal) var(--ease-out-expo);">
                 <i data-lucide="{{ $icon }}" style="width: 18px; height: 18px;"></i>
             </div>
         </div>
-        <div class="d-flex align-items-baseline justify-content-between">
-            <h3 class="mb-0 fw-bold text-body-emphasis font-monospace counter-value" 
+        <div class="flex items-baseline justify-between">
+            <h3 class="text-2xl font-bold text-base-content font-mono counter-value" 
                 data-counter-target="{{ $numericVal }}" 
-                data-counter-suffix="{{ $hasPercent ? '%' : '' }}"
-                style="font-size: 1.75rem;">
+                data-counter-suffix="{{ $hasPercent ? '%' : '' }}">
                 {{ $value }}
             </h3>
             @if($trend)
-                <span class="badge bg-{{ $trendType }}-subtle text-{{ $trendType }} border border-{{ $trendType }}-subtle d-inline-flex align-items-center gap-1 fw-semibold" style="font-size: 0.75rem;">
+                <span class="badge badge-sm badge-{{ $trendType }} badge-soft font-semibold flex items-center gap-1 font-mono">
                     @if($trendIcon)
                         <i data-lucide="{{ $trendIcon }}" style="width: 13px; height: 13px;"></i>
                     @endif
@@ -41,7 +40,7 @@
             @endif
         </div>
         @if($subtitle)
-            <div class="mt-2 text-body-secondary small" style="font-size: 0.78rem;">
+            <div class="mt-2 text-xs text-base-content/60">
                 {{ $subtitle }}
             </div>
         @endif

@@ -1,34 +1,34 @@
 <x-admin-layout>
-    <div class="mb-4">
-        <h2 class="fw-bold text-body-emphasis mb-1">User Workspace</h2>
-        <p class="text-body-secondary mb-0">Welcome to ROI Attendance, {{ Auth::user()->name }}.</p>
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-base-content tracking-tight">User Workspace</h1>
+        <p class="text-sm text-base-content/70 mt-0.5">Welcome to ROI Attendance, {{ Auth::user()->name }}.</p>
     </div>
 
-    <div class="card border-0 shadow-sm bg-body text-body mb-4">
-        <div class="card-body p-4 p-md-5">
-            <div class="d-flex align-items-center gap-3 mb-3">
-                <div class="rounded-circle bg-success-subtle text-success p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
-                    <i data-lucide="check-circle" style="width: 24px; height: 24px;"></i>
+    <div class="card bg-base-100 border border-base-200/60 shadow-xs mb-6">
+        <div class="card-body p-6 sm:p-8">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 rounded-xl bg-success/10 text-success flex items-center justify-center">
+                    <i data-lucide="check-circle" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <h4 class="fw-bold mb-0 text-body-emphasis">Successfully Authenticated</h4>
-                    <span class="text-body-secondary small">Logged in as {{ Auth::user()->email }}</span>
+                    <h3 class="text-lg font-bold text-base-content">Successfully Authenticated</h3>
+                    <span class="text-xs text-base-content/60">Logged in as {{ Auth::user()->email }}</span>
                 </div>
             </div>
 
-            <p class="text-body-secondary mb-4">
-                You are currently signed in with role <span class="badge bg-primary-subtle text-primary border border-primary-subtle">{{ Auth::user()->getRoleNames()->first() ?? 'Staff' }}</span>.
+            <p class="text-sm text-base-content/70 mb-6">
+                You are currently signed in with role <span class="badge badge-primary badge-soft font-medium">{{ Auth::user()->getRoleNames()->first() ?? 'Staff' }}</span>.
             </p>
 
-            <div class="d-flex flex-wrap gap-2">
+            <div class="flex flex-wrap items-center gap-3">
                 @hasanyrole('super-admin|admin')
-                    <a href="{{ route('admin.dashboard') }}" class="btn btn-primary d-flex align-items-center gap-2">
-                        <i data-lucide="layout-dashboard" style="width: 16px; height: 16px;"></i>
+                    <a href="{{ route('admin.dashboard') }}" class="btn btn-primary gap-2 shadow-xs">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
                         <span>Go to Admin Dashboard</span>
                     </a>
                 @endhasanyrole
-                <a href="{{ route('profile.edit') }}" class="btn btn-outline-secondary d-flex align-items-center gap-2">
-                    <i data-lucide="user" style="width: 16px; height: 16px;"></i>
+                <a href="{{ route('profile.edit') }}" class="btn btn-outline gap-2 shadow-xs">
+                    <i data-lucide="user" class="w-4 h-4"></i>
                     <span>Manage Account Profile</span>
                 </a>
             </div>

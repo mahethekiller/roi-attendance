@@ -1,11 +1,9 @@
 import './bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import * as bootstrap from 'bootstrap';
 import { createIcons, icons } from 'lucide';
 import Chart from 'chart.js/auto';
 
-window.bootstrap = bootstrap;
 window.Chart = Chart;
+window.bootstrap = window.bootstrap || {};
 
 // Initialize Lucide Icons globally
 export function renderLucideIcons() {
@@ -19,6 +17,7 @@ export function setupThemeController() {
     const themeToggleBtn = document.getElementById('themeToggleBtn');
     
     function updateThemeUI(theme) {
+        htmlElement.setAttribute('data-theme', theme);
         htmlElement.setAttribute('data-bs-theme', theme);
         localStorage.setItem('roi_theme', theme);
         
@@ -34,13 +33,14 @@ export function setupThemeController() {
         window.dispatchEvent(new CustomEvent('roi-theme-changed', { detail: { theme } }));
     }
 
-    const currentTheme = localStorage.getItem('roi_theme') || htmlElement.getAttribute('data-bs-theme') || 'dark';
+    const currentTheme = localStorage.getItem('roi_theme') || htmlElement.getAttribute('data-theme') || htmlElement.getAttribute('data-bs-theme') || 'dark';
     updateThemeUI(currentTheme);
 
     if (themeToggleBtn && !themeToggleBtn.dataset.themeBound) {
         themeToggleBtn.dataset.themeBound = 'true';
         themeToggleBtn.addEventListener('click', () => {
-            const nextTheme = htmlElement.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+            const current = htmlElement.getAttribute('data-theme') || htmlElement.getAttribute('data-bs-theme') || 'dark';
+            const nextTheme = current === 'dark' ? 'light' : 'dark';
             updateThemeUI(nextTheme);
         });
     }

@@ -1,213 +1,226 @@
 <x-admin-layout>
     <!-- Page Header & Action Bar -->
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div>
-            <div class="d-flex align-items-center gap-2 mb-1">
-                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 small fw-medium">Developer Hub</span>
-                <span class="text-body-secondary small">&bull;</span>
-                <span class="text-body-secondary small font-monospace">REST API v1.0 & HRsale Spec</span>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="badge badge-primary badge-soft px-2 py-0.5 text-xs font-semibold">Developer Hub</span>
+                <span class="text-base-content/40 text-xs">&bull;</span>
+                <span class="text-base-content/60 text-xs font-mono">REST API v1.0 & HRsale Spec</span>
             </div>
-            <h2 class="fw-bold text-body-emphasis mb-1">REST API Reference & Documentation</h2>
-            <p class="text-body-secondary mb-0">Complete endpoint specifications, request parameters, interactive multi-language code snippets, and authentication guides.</p>
+            <h1 class="text-2xl font-bold text-base-content tracking-tight">REST API Reference & Documentation</h1>
+            <p class="text-sm text-base-content/70 mt-0.5">Complete endpoint specifications, request parameters, interactive multi-language code snippets, and authentication guides.</p>
         </div>
-        <div class="d-flex flex-wrap gap-2">
-            <a href="{{ route('admin.api-tokens.index') }}" class="btn btn-outline-secondary btn-sm px-3 shadow-sm d-flex align-items-center gap-2">
-                <i data-lucide="key" style="width: 16px; height: 16px;"></i>
+        <div class="flex flex-wrap items-center gap-2">
+            <a href="{{ route('admin.api-tokens.index') }}" class="btn btn-outline btn-sm sm:btn-md gap-2 shadow-xs">
+                <i data-lucide="key" class="w-4 h-4"></i>
                 <span>API Tokens</span>
             </a>
-            <!-- Split Button with Full Spec and Individual Endpoint Downloads -->
-            <div class="btn-group shadow-sm">
-                <a href="{{ route('admin.api-docs.export-txt') }}" class="btn btn-primary btn-sm px-3 d-flex align-items-center gap-2">
-                    <i data-lucide="file-text" style="width: 16px; height: 16px;"></i>
+
+            <!-- Split Dropdown with Full Spec and Individual Endpoint Downloads -->
+            <div class="join shadow-xs">
+                <a href="{{ route('admin.api-docs.export-txt') }}" class="btn btn-primary btn-sm sm:btn-md join-item gap-2">
+                    <i data-lucide="file-text" class="w-4 h-4"></i>
                     <span>Download Full Spec (.txt)</span>
                 </a>
-                <button type="button" class="btn btn-primary btn-sm dropdown-toggle dropdown-toggle-split px-2" data-bs-toggle="dropdown" aria-expanded="false">
-                    <span class="visually-hidden">Toggle Individual Endpoint Downloads</span>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-2" style="min-width: 270px;">
-                    <li class="dropdown-header text-uppercase small fw-semibold text-muted tracking-wider px-3" style="font-size: 0.75rem;">Individual Endpoint Specs</li>
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center justify-content-between py-2 px-3 small" href="{{ route('admin.api-docs.export-endpoint', 'hrsale-attendance') }}">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="badge bg-success text-white font-monospace px-1 py-0" style="font-size: 0.68rem;">POST</span>
-                                <span class="font-monospace text-truncate" style="max-width: 160px;">/api/attendance</span>
-                            </div>
-                            <i data-lucide="download" style="width: 13px; height: 13px;" class="text-muted"></i>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center justify-content-between py-2 px-3 small" href="{{ route('admin.api-docs.export-endpoint', 'auth-token') }}">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="badge bg-success text-white font-monospace px-1 py-0" style="font-size: 0.68rem;">POST</span>
-                                <span class="font-monospace text-truncate" style="max-width: 160px;">/v1/auth/token</span>
-                            </div>
-                            <i data-lucide="download" style="width: 13px; height: 13px;" class="text-muted"></i>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center justify-content-between py-2 px-3 small" href="{{ route('admin.api-docs.export-endpoint', 'attendances-list') }}">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="badge bg-primary text-white font-monospace px-1 py-0" style="font-size: 0.68rem;">GET</span>
-                                <span class="font-monospace text-truncate" style="max-width: 160px;">/v1/attendances</span>
-                            </div>
-                            <i data-lucide="download" style="width: 13px; height: 13px;" class="text-muted"></i>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center justify-content-between py-2 px-3 small" href="{{ route('admin.api-docs.export-endpoint', 'daily-summary') }}">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="badge bg-primary text-white font-monospace px-1 py-0" style="font-size: 0.68rem;">GET</span>
-                                <span class="font-monospace text-truncate" style="max-width: 160px;">/daily-summary</span>
-                            </div>
-                            <i data-lucide="download" style="width: 13px; height: 13px;" class="text-muted"></i>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center justify-content-between py-2 px-3 small" href="{{ route('admin.api-docs.export-endpoint', 'attendance-single') }}">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="badge bg-primary text-white font-monospace px-1 py-0" style="font-size: 0.68rem;">GET</span>
-                                <span class="font-monospace text-truncate" style="max-width: 160px;">/v1/attendances/{id}</span>
-                            </div>
-                            <i data-lucide="download" style="width: 13px; height: 13px;" class="text-muted"></i>
-                        </a>
-                    </li>
-                    <li><hr class="dropdown-divider my-2"></li>
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3 text-primary small fw-semibold" href="{{ route('admin.api-docs.export-txt') }}">
-                            <i data-lucide="file-text" style="width: 14px; height: 14px;"></i>
-                            <span>Complete Specification (.txt)</span>
-                        </a>
-                    </li>
-                </ul>
+                <div class="dropdown dropdown-end">
+                    <button tabindex="0" type="button" class="btn btn-primary btn-sm sm:btn-md join-item px-2 border-l border-primary-content/20" aria-label="Toggle Individual Endpoint Downloads">
+                        <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                    </button>
+                    <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-50 w-72 p-2 shadow-xl border border-base-200">
+                        <li class="menu-title text-[11px] font-bold uppercase tracking-wider text-base-content/50 px-3">Individual Endpoint Specs</li>
+                        <li>
+                            <a class="flex items-center justify-between py-2 text-xs text-base-content" href="{{ route('admin.api-docs.export-endpoint', 'hrsale-attendance') }}">
+                                <div class="flex items-center gap-2">
+                                    <span class="badge badge-success badge-xs font-mono font-bold">POST</span>
+                                    <span class="font-mono truncate max-w-[150px]">/api/attendance</span>
+                                </div>
+                                <i data-lucide="download" class="w-3.5 h-3.5 text-base-content/50"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="flex items-center justify-between py-2 text-xs text-base-content" href="{{ route('admin.api-docs.export-endpoint', 'auth-token') }}">
+                                <div class="flex items-center gap-2">
+                                    <span class="badge badge-success badge-xs font-mono font-bold">POST</span>
+                                    <span class="font-mono truncate max-w-[150px]">/v1/auth/token</span>
+                                </div>
+                                <i data-lucide="download" class="w-3.5 h-3.5 text-base-content/50"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="flex items-center justify-between py-2 text-xs text-base-content" href="{{ route('admin.api-docs.export-endpoint', 'attendances-list') }}">
+                                <div class="flex items-center gap-2">
+                                    <span class="badge badge-primary badge-xs font-mono font-bold">GET</span>
+                                    <span class="font-mono truncate max-w-[150px]">/v1/attendances</span>
+                                </div>
+                                <i data-lucide="download" class="w-3.5 h-3.5 text-base-content/50"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="flex items-center justify-between py-2 text-xs text-base-content" href="{{ route('admin.api-docs.export-endpoint', 'daily-summary') }}">
+                                <div class="flex items-center gap-2">
+                                    <span class="badge badge-primary badge-xs font-mono font-bold">GET</span>
+                                    <span class="font-mono truncate max-w-[150px]">/daily-summary</span>
+                                </div>
+                                <i data-lucide="download" class="w-3.5 h-3.5 text-base-content/50"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="flex items-center justify-between py-2 text-xs text-base-content" href="{{ route('admin.api-docs.export-endpoint', 'attendance-single') }}">
+                                <div class="flex items-center gap-2">
+                                    <span class="badge badge-primary badge-xs font-mono font-bold">GET</span>
+                                    <span class="font-mono truncate max-w-[150px]">/v1/attendances/{id}</span>
+                                </div>
+                                <i data-lucide="download" class="w-3.5 h-3.5 text-base-content/50"></i>
+                            </a>
+                        </li>
+                        <li class="border-t border-base-200 mt-1 pt-1">
+                            <a class="flex items-center gap-2 py-2 text-xs font-semibold text-primary" href="{{ route('admin.api-docs.export-txt') }}">
+                                <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                                <span>Complete Specification (.txt)</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Layout Grid: Quick Nav Sidebar + Content -->
-    <div class="row g-4">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         <!-- Left Column: Quick Navigation Sticky Card (Desktop) -->
-        <div class="col-xl-3 col-lg-4">
-            <div class="position-sticky" style="top: 85px;">
-                <!-- Base URL Card -->
-                <div class="card border-0 shadow-sm bg-body text-body mb-3">
-                    <div class="card-body p-3">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <span class="small fw-bold text-body-emphasis text-uppercase" style="letter-spacing: 0.05em;">Base URL</span>
-                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-0">Online</span>
-                        </div>
-                        <div class="input-group input-group-sm">
-                            <input type="text" class="form-control font-monospace bg-body-tertiary text-body border" value="{{ $apiRootUrl }}" id="baseUrlInput" readonly>
-                            <button class="btn btn-outline-secondary copy-btn" type="button" data-copy-target="#baseUrlInput" title="Copy Base URL">
-                                <i data-lucide="copy" style="width: 14px; height: 14px;"></i>
-                            </button>
-                        </div>
+        <div class="lg:col-span-4 xl:col-span-3 lg:sticky lg:top-20 space-y-4">
+            <!-- Base URL Card -->
+            <div class="card bg-base-100 border border-base-200/60 shadow-xs">
+                <div class="card-body p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-base-content/70">Base URL</span>
+                        <span class="badge badge-success badge-soft font-mono text-[10px]">Online</span>
+                    </div>
+                    <div class="join w-full">
+                        <input type="text" class="input input-bordered input-sm join-item w-full font-mono text-xs bg-base-200/40 text-base-content" value="{{ $apiRootUrl }}" id="baseUrlInput" readonly>
+                        <button class="btn btn-outline btn-sm join-item copy-btn shrink-0" type="button" data-copy-target="#baseUrlInput" title="Copy Base URL">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                        </button>
                     </div>
                 </div>
+            </div>
 
-                <!-- Section Quick Navigation -->
-                <div class="card border-0 shadow-sm bg-body text-body">
-                    <div class="card-header bg-body border-bottom p-3">
-                        <h6 class="fw-bold text-body-emphasis mb-0 d-flex align-items-center gap-2 small text-uppercase" style="letter-spacing: 0.05em;">
-                            <i data-lucide="list" style="width: 16px; height: 16px;" class="text-primary"></i>
-                            <span>API Endpoints</span>
-                        </h6>
-                    </div>
-                    <div class="list-group list-group-flush small">
-                        <a href="#section-overview" class="list-group-item list-group-item-action bg-transparent text-body d-flex align-items-center justify-content-between py-2 px-3">
-                            <span>Overview & Auth</span>
-                            <i data-lucide="chevron-right" style="width: 14px; height: 14px;" class="text-body-secondary"></i>
-                        </a>
-                        <a href="#endpoint-hrsale-attendance" class="list-group-item list-group-item-action bg-transparent text-body d-flex align-items-center justify-content-between py-2 px-3">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="badge bg-success text-white fw-bold px-1 py-0 font-monospace" style="font-size: 0.7rem;">POST</span>
-                                <span class="text-truncate font-monospace" style="max-width: 130px;">/attendance</span>
-                            </div>
-                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.65rem;">HRsale</span>
-                        </a>
-                        <a href="#endpoint-auth-token" class="list-group-item list-group-item-action bg-transparent text-body d-flex align-items-center justify-content-between py-2 px-3">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="badge bg-success text-white fw-bold px-1 py-0 font-monospace" style="font-size: 0.7rem;">POST</span>
-                                <span class="text-truncate font-monospace" style="max-width: 140px;">/v1/auth/token</span>
-                            </div>
-                        </a>
-                        <a href="#endpoint-attendances-list" class="list-group-item list-group-item-action bg-transparent text-body d-flex align-items-center justify-content-between py-2 px-3">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="badge bg-primary text-white fw-bold px-1 py-0 font-monospace" style="font-size: 0.7rem;">GET</span>
-                                <span class="text-truncate font-monospace" style="max-width: 140px;">/v1/attendances</span>
-                            </div>
-                        </a>
-                        <a href="#endpoint-daily-summary" class="list-group-item list-group-item-action bg-transparent text-body d-flex align-items-center justify-content-between py-2 px-3">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="badge bg-primary text-white fw-bold px-1 py-0 font-monospace" style="font-size: 0.7rem;">GET</span>
-                                <span class="text-truncate font-monospace" style="max-width: 140px;">/daily-summary</span>
-                            </div>
-                        </a>
-                        <a href="#endpoint-attendance-single" class="list-group-item list-group-item-action bg-transparent text-body d-flex align-items-center justify-content-between py-2 px-3">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="badge bg-primary text-white fw-bold px-1 py-0 font-monospace" style="font-size: 0.7rem;">GET</span>
-                                <span class="text-truncate font-monospace" style="max-width: 140px;">/v1/attendances/{id}</span>
-                            </div>
-                        </a>
-                    </div>
+            <!-- Section Quick Navigation -->
+            <div class="card bg-base-100 border border-base-200/60 shadow-xs overflow-hidden">
+                <div class="p-3.5 border-b border-base-200/60 flex items-center gap-2">
+                    <i data-lucide="list" class="w-4 h-4 text-primary"></i>
+                    <span class="text-xs font-bold uppercase tracking-wider text-base-content">API Endpoints</span>
                 </div>
-
-                <!-- API Help Callout -->
-                <div class="card border-0 shadow-sm bg-body-tertiary text-body mt-3">
-                    <div class="card-body p-3">
-                        <div class="d-flex align-items-start gap-2">
-                            <i data-lucide="shield-check" style="width: 18px; height: 18px;" class="text-success mt-1 flex-shrink-0"></i>
-                            <div>
-                                <h6 class="fw-bold text-body-emphasis small mb-1">Sanctum Token Auth</h6>
-                                <p class="text-body-secondary small mb-0">Use your personal access token in the <code>Authorization: Bearer</code> header for all secured calls.</p>
+                <ul class="menu menu-sm p-2 w-full gap-0.5">
+                    <li>
+                        <a href="#section-overview" class="flex items-center justify-between py-2 text-base-content/80 hover:bg-base-200 rounded-lg">
+                            <span class="font-medium text-xs">Overview & Auth</span>
+                            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-base-content/40"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#endpoint-hrsale-attendance" class="flex items-center justify-between py-2 text-base-content/80 hover:bg-base-200 rounded-lg">
+                            <div class="flex items-center gap-2">
+                                <span class="badge badge-success badge-xs font-mono font-bold">POST</span>
+                                <span class="font-mono text-xs truncate max-w-[120px]">/attendance</span>
                             </div>
-                        </div>
-                    </div>
+                            <span class="badge badge-primary badge-soft font-mono text-[10px]">HRsale</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#endpoint-auth-token" class="flex items-center justify-between py-2 text-base-content/80 hover:bg-base-200 rounded-lg">
+                            <div class="flex items-center gap-2">
+                                <span class="badge badge-success badge-xs font-mono font-bold">POST</span>
+                                <span class="font-mono text-xs truncate max-w-[130px]">/v1/auth/token</span>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#endpoint-attendances-list" class="flex items-center justify-between py-2 text-base-content/80 hover:bg-base-200 rounded-lg">
+                            <div class="flex items-center gap-2">
+                                <span class="badge badge-primary badge-xs font-mono font-bold">GET</span>
+                                <span class="font-mono text-xs truncate max-w-[130px]">/v1/attendances</span>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#endpoint-daily-summary" class="flex items-center justify-between py-2 text-base-content/80 hover:bg-base-200 rounded-lg">
+                            <div class="flex items-center gap-2">
+                                <span class="badge badge-primary badge-xs font-mono font-bold">GET</span>
+                                <span class="font-mono text-xs truncate max-w-[130px]">/daily-summary</span>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#endpoint-attendance-single" class="flex items-center justify-between py-2 text-base-content/80 hover:bg-base-200 rounded-lg">
+                            <div class="flex items-center gap-2">
+                                <span class="badge badge-primary badge-xs font-mono font-bold">GET</span>
+                                <span class="font-mono text-xs truncate max-w-[130px]">/attendances/{id}</span>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- API Help Callout -->
+            <div class="p-4 rounded-xl bg-base-200/50 border border-base-200 text-base-content flex items-start gap-3">
+                <i data-lucide="shield-check" class="w-5 h-5 text-success shrink-0 mt-0.5"></i>
+                <div class="text-xs">
+                    <div class="font-bold text-base-content mb-0.5">Sanctum Token Auth</div>
+                    <p class="text-base-content/70 leading-relaxed">
+                        Use your personal access token in the <code class="badge badge-neutral badge-xs">Authorization: Bearer</code> header for all secured calls.
+                    </p>
                 </div>
             </div>
         </div>
 
         <!-- Right Column: API Documentation Content -->
-        <div class="col-xl-9 col-lg-8">
+        <div class="lg:col-span-8 xl:col-span-9 space-y-6">
 
             <!-- Section 1: Overview & Authentication -->
-            <div class="card border-0 shadow-sm bg-body text-body mb-4" id="section-overview">
-                <div class="card-body p-4">
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-3">
-                        <div>
-                            <h4 class="fw-bold text-body-emphasis mb-1">Overview & Authentication</h4>
-                            <p class="text-body-secondary small mb-0">How to authenticate and format requests against the ROI Attendance API.</p>
-                        </div>
-                        <div class="d-flex gap-2">
-                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle font-monospace">Rate Limit: 60 req/min</span>
-                        </div>
+            <div class="card bg-base-100 border border-base-200/60 shadow-xs overflow-hidden" id="section-overview">
+                <div class="p-5 sm:p-6 border-b border-base-200/60 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
+                        <h2 class="text-lg font-bold text-base-content tracking-tight">Overview & Authentication</h2>
+                        <p class="text-xs text-base-content/70 mt-0.5">How to authenticate and format requests against the ROI Attendance API.</p>
                     </div>
+                    <span class="badge badge-neutral badge-soft font-mono text-xs">Rate Limit: 60 req/min</span>
+                </div>
 
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <div class="p-3 bg-body-tertiary rounded-3 border h-100">
-                                <h6 class="fw-bold text-body-emphasis small mb-2 d-flex align-items-center gap-2">
-                                    <i data-lucide="send" style="width: 15px; height: 15px;" class="text-primary"></i>
-                                    <span>Required HTTP Headers</span>
-                                </h6>
-                                <div class="font-monospace small text-body d-flex flex-column gap-1">
-                                    <div class="p-2 bg-body rounded border"><span class="text-primary fw-semibold">Authorization:</span> Bearer &lt;ACCESS_TOKEN&gt;</div>
-                                    <div class="p-2 bg-body rounded border"><span class="text-primary fw-semibold">Content-Type:</span> application/json</div>
-                                    <div class="p-2 bg-body rounded border"><span class="text-primary fw-semibold">Accept:</span> application/json</div>
+                <div class="card-body p-5 sm:p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 bg-base-200/40 rounded-xl border border-base-200">
+                            <h3 class="font-bold text-xs uppercase tracking-wider text-base-content flex items-center gap-2 mb-3">
+                                <i data-lucide="send" class="w-4 h-4 text-primary"></i>
+                                <span>Required HTTP Headers</span>
+                            </h3>
+                            <div class="space-y-2 font-mono text-xs">
+                                <div class="p-2.5 bg-base-100 rounded-lg border border-base-200 text-base-content">
+                                    <span class="text-primary font-bold">Authorization:</span> Bearer &lt;ACCESS_TOKEN&gt;
+                                </div>
+                                <div class="p-2.5 bg-base-100 rounded-lg border border-base-200 text-base-content">
+                                    <span class="text-primary font-bold">Content-Type:</span> application/json
+                                </div>
+                                <div class="p-2.5 bg-base-100 rounded-lg border border-base-200 text-base-content">
+                                    <span class="text-primary font-bold">Accept:</span> application/json
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="p-3 bg-body-tertiary rounded-3 border h-100">
-                                <h6 class="fw-bold text-body-emphasis small mb-2 d-flex align-items-center gap-2">
-                                    <i data-lucide="code" style="width: 15px; height: 15px;" class="text-success"></i>
+
+                        <div class="p-4 bg-base-200/40 rounded-xl border border-base-200 flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-bold text-xs uppercase tracking-wider text-base-content flex items-center gap-2 mb-3">
+                                    <i data-lucide="code" class="w-4 h-4 text-success"></i>
                                     <span>Authentication Flow</span>
-                                </h6>
-                                <p class="text-body-secondary small mb-2">Create an API token from the admin panel under <a href="{{ route('admin.api-tokens.index') }}" class="text-primary text-decoration-none fw-semibold">API Tokens</a> or request one programmatically via <code>POST /api/v1/auth/token</code>.</p>
-                                <div class="alert alert-info py-2 px-3 small mb-0 d-flex align-items-center gap-2">
-                                    <i data-lucide="info" style="width: 16px; height: 16px;" class="flex-shrink-0"></i>
-                                    <span>Tokens inherit read permissions for employee and attendance records.</span>
-                                </div>
+                                </h3>
+                                <p class="text-xs text-base-content/70 leading-relaxed mb-3">
+                                    Create an API token from the admin panel under <a href="{{ route('admin.api-tokens.index') }}" class="link link-primary font-semibold">API Tokens</a> or request one programmatically via <code class="badge badge-neutral badge-xs font-mono">POST /api/v1/auth/token</code>.
+                                </p>
+                            </div>
+                            <div class="alert alert-info py-2 px-3 text-xs shadow-none">
+                                <i data-lucide="info" class="w-4 h-4 shrink-0"></i>
+                                <span>Tokens inherit read permissions for employee and attendance records.</span>
                             </div>
                         </div>
                     </div>
@@ -215,116 +228,111 @@
             </div>
 
             <!-- Section 2: Endpoint - HRsale Attendance (Featured) -->
-            <div class="card border-0 shadow-sm bg-body text-body mb-4" id="endpoint-hrsale-attendance">
-                <div class="card-header bg-body border-bottom p-3 p-md-4">
-                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-                        <div class="d-flex flex-wrap align-items-center gap-2">
-                            <span class="badge bg-success text-white fw-bold px-2 py-1 font-monospace fs-6">POST</span>
-                            <span class="fw-bold text-body-emphasis font-monospace fs-5">/attendance</span>
-                            <span class="badge bg-body-tertiary text-body-secondary border font-monospace small">or /v1/attendance</span>
+            <div class="card bg-base-100 border border-base-200/60 shadow-xs overflow-hidden" id="endpoint-hrsale-attendance">
+                <div class="p-5 sm:p-6 border-b border-base-200/60">
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-2">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="badge badge-success font-bold font-mono px-2 py-1 text-xs">POST</span>
+                            <span class="font-bold text-base-content font-mono text-lg">/attendance</span>
+                            <span class="badge badge-neutral badge-soft font-mono text-xs">or /v1/attendance</span>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <a href="{{ route('admin.api-docs.export-endpoint', 'hrsale-attendance') }}" class="btn btn-outline-primary btn-sm px-2 py-1 shadow-sm d-flex align-items-center gap-1 font-monospace" style="font-size: 0.75rem;" title="Download individual .txt spec">
-                                <i data-lucide="download" style="width: 13px; height: 13px;"></i>
+                        <div class="flex items-center gap-2">
+                            <a href="{{ route('admin.api-docs.export-endpoint', 'hrsale-attendance') }}" class="btn btn-outline btn-primary btn-xs sm:btn-sm gap-1.5 font-mono" title="Download individual .txt spec">
+                                <i data-lucide="download" class="w-3.5 h-3.5"></i>
                                 <span>Download Doc</span>
                             </a>
-                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 fw-semibold">HRsale Compatible</span>
-                            <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1">Bearer Auth</span>
+                            <span class="badge badge-primary badge-soft font-semibold text-xs">HRsale Compatible</span>
+                            <span class="badge badge-info badge-soft text-xs">Bearer Auth</span>
                         </div>
                     </div>
-                    <p class="text-body-secondary mt-2 mb-0 small">Retrieve, filter, and fetch today's or historical employee attendance logs conforming directly to the HRsale schema array.</p>
+                    <p class="text-xs text-base-content/70 leading-relaxed">
+                        Retrieve, filter, and fetch today's or historical employee attendance logs conforming directly to the HRsale schema array.
+                    </p>
                 </div>
 
-                <div class="card-body p-3 p-md-4">
+                <div class="card-body p-5 sm:p-6 space-y-6">
                     <!-- Request Parameters Table -->
-                    <h6 class="fw-bold text-body-emphasis small text-uppercase mb-3 d-flex align-items-center gap-2">
-                        <i data-lucide="sliders" style="width: 15px; height: 15px;" class="text-primary"></i>
-                        <span>Request Body Parameters (Optional)</span>
-                    </h6>
-                    <div class="table-responsive mb-4">
-                        <table class="table table-hover table-bordered align-middle mb-0 small">
-                            <thead class="table-body-secondary">
-                                <tr>
-                                    <th style="width: 20%;">Parameter</th>
-                                    <th style="width: 15%;">Type</th>
-                                    <th style="width: 20%;">Default</th>
-                                    <th>Description</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><code class="fw-semibold text-primary">punch_date</code></td>
-                                    <td><span class="badge bg-secondary-subtle text-secondary font-monospace">string</span></td>
-                                    <td><code>{{ date('Y-m-d') }}</code></td>
-                                    <td>Fetch attendance logs for a specific date (Format: <code>YYYY-MM-DD</code>).</td>
-                                </tr>
-                                <tr>
-                                    <td><code class="fw-semibold text-primary">start_date</code></td>
-                                    <td><span class="badge bg-secondary-subtle text-secondary font-monospace">string</span></td>
-                                    <td><em class="text-body-secondary">None</em></td>
-                                    <td>Fetch logs starting from this date (inclusive, Format: <code>YYYY-MM-DD</code>).</td>
-                                </tr>
-                                <tr>
-                                    <td><code class="fw-semibold text-primary">end_date</code></td>
-                                    <td><span class="badge bg-secondary-subtle text-secondary font-monospace">string</span></td>
-                                    <td><em class="text-body-secondary">None</em></td>
-                                    <td>Fetch logs up to this date (inclusive, Format: <code>YYYY-MM-DD</code>).</td>
-                                </tr>
-                                <tr>
-                                    <td><code class="fw-semibold text-primary">company_id</code></td>
-                                    <td><span class="badge bg-secondary-subtle text-secondary font-monospace">int | string</span></td>
-                                    <td><em class="text-body-secondary">None</em></td>
-                                    <td>Filter logs for employees belonging to this company ID or company name.</td>
-                                </tr>
-                                <tr>
-                                    <td><code class="fw-semibold text-primary">employee_id</code></td>
-                                    <td><span class="badge bg-secondary-subtle text-secondary font-monospace">int | string</span></td>
-                                    <td><em class="text-body-secondary">None</em></td>
-                                    <td>Filter logs for a specific Employee ID or Code.</td>
-                                </tr>
-                                <tr>
-                                    <td><code class="fw-semibold text-primary">card_no</code></td>
-                                    <td><span class="badge bg-secondary-subtle text-secondary font-monospace">string</span></td>
-                                    <td><em class="text-body-secondary">None</em></td>
-                                    <td>Filter logs for a specific RFID / biometric card number.</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-base-content flex items-center gap-2 mb-3">
+                            <i data-lucide="sliders" class="w-4 h-4 text-primary"></i>
+                            <span>Request Body Parameters (Optional)</span>
+                        </h3>
+                        <div class="overflow-x-auto rounded-xl border border-base-200">
+                            <table class="table table-zebra text-xs w-full">
+                                <thead class="bg-base-200/60 text-base-content/70 font-semibold">
+                                    <tr>
+                                        <th class="w-1/4">Parameter</th>
+                                        <th class="w-1/6">Type</th>
+                                        <th class="w-1/6">Default</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code class="font-bold text-primary font-mono">punch_date</code></td>
+                                        <td><span class="badge badge-neutral badge-soft font-mono text-[11px]">string</span></td>
+                                        <td><code class="font-mono text-xs">{{ date('Y-m-d') }}</code></td>
+                                        <td class="text-base-content/80">Fetch attendance logs for a specific date (Format: <code class="font-mono text-xs">YYYY-MM-DD</code>).</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code class="font-bold text-primary font-mono">start_date</code></td>
+                                        <td><span class="badge badge-neutral badge-soft font-mono text-[11px]">string</span></td>
+                                        <td class="text-base-content/50 italic">None</td>
+                                        <td class="text-base-content/80">Fetch logs starting from this date (inclusive, Format: <code class="font-mono text-xs">YYYY-MM-DD</code>).</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code class="font-bold text-primary font-mono">end_date</code></td>
+                                        <td><span class="badge badge-neutral badge-soft font-mono text-[11px]">string</span></td>
+                                        <td class="text-base-content/50 italic">None</td>
+                                        <td class="text-base-content/80">Fetch logs up to this date (inclusive, Format: <code class="font-mono text-xs">YYYY-MM-DD</code>).</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code class="font-bold text-primary font-mono">company_id</code></td>
+                                        <td><span class="badge badge-neutral badge-soft font-mono text-[11px]">int | string</span></td>
+                                        <td class="text-base-content/50 italic">None</td>
+                                        <td class="text-base-content/80">Filter logs for employees belonging to this company ID or company name.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code class="font-bold text-primary font-mono">employee_id</code></td>
+                                        <td><span class="badge badge-neutral badge-soft font-mono text-[11px]">int | string</span></td>
+                                        <td class="text-base-content/50 italic">None</td>
+                                        <td class="text-base-content/80">Filter logs for a specific Employee ID or Code.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code class="font-bold text-primary font-mono">card_no</code></td>
+                                        <td><span class="badge badge-neutral badge-soft font-mono text-[11px]">string</span></td>
+                                        <td class="text-base-content/50 italic">None</td>
+                                        <td class="text-base-content/80">Filter logs for a specific RFID / biometric card number.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
-                    <!-- Code Examples & Response Tabs -->
-                    <div class="card border bg-body-tertiary shadow-none rounded-3 mb-4">
-                        <div class="card-header bg-body border-bottom p-2 d-flex flex-wrap align-items-center justify-content-between gap-2">
-                            <ul class="nav nav-pills card-header-pills small" id="hrsaleCodeTabs" role="tablist">
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link active py-1 px-3" id="tab-curl" data-bs-toggle="tab" data-bs-target="#content-curl" type="button" role="tab">cURL</button>
-                                </li>
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link py-1 px-3" id="tab-js" data-bs-toggle="tab" data-bs-target="#content-js" type="button" role="tab">JavaScript (Fetch)</button>
-                                </li>
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link py-1 px-3" id="tab-php" data-bs-toggle="tab" data-bs-target="#content-php" type="button" role="tab">PHP (cURL)</button>
-                                </li>
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link py-1 px-3" id="tab-py" data-bs-toggle="tab" data-bs-target="#content-py" type="button" role="tab">Python</button>
-                                </li>
-                            </ul>
-                            <button class="btn btn-outline-secondary btn-sm px-2 py-1 copy-btn d-flex align-items-center gap-1 font-monospace" type="button" style="font-size: 0.75rem;" data-copy-active-tab="#hrsaleCodeTabsContent">
-                                <i data-lucide="copy" style="width: 13px; height: 13px;"></i>
+                    <!-- Code Examples & Multi-language Tabs -->
+                    <div class="card bg-base-200/30 border border-base-200 rounded-xl overflow-hidden">
+                        <div class="p-3 border-b border-base-200 bg-base-100 flex flex-wrap items-center justify-between gap-2">
+                            <div role="tablist" class="tabs tabs-box tabs-xs sm:tabs-sm" id="hrsaleCodeTabs">
+                                <button role="tab" class="tab tab-active" onclick="switchCodeTab(this, '#content-curl')">cURL</button>
+                                <button role="tab" class="tab" onclick="switchCodeTab(this, '#content-js')">JavaScript (Fetch)</button>
+                                <button role="tab" class="tab" onclick="switchCodeTab(this, '#content-php')">PHP (cURL)</button>
+                                <button role="tab" class="tab" onclick="switchCodeTab(this, '#content-py')">Python</button>
+                            </div>
+                            <button class="btn btn-outline btn-xs gap-1.5 font-mono copy-btn" type="button" data-copy-active-tab="#hrsaleCodeTabsContent">
+                                <i data-lucide="copy" class="w-3 h-3"></i>
                                 <span>Copy Code</span>
                             </button>
                         </div>
-                        <div class="card-body p-0">
-                            <div class="tab-content" id="hrsaleCodeTabsContent">
-                                <div class="tab-pane fade show active" id="content-curl" role="tabpanel">
-                                    <pre class="m-0 p-3 bg-body-secondary font-monospace small text-body" style="border-radius: 0 0 0.5rem 0.5rem; overflow-x: auto;"><code>curl -X POST {{ $apiRootUrl }}/attendance \
+                        <div id="hrsaleCodeTabsContent">
+                            <div class="tab-pane active block" id="content-curl">
+                                <pre class="m-0 p-4 bg-slate-950 text-slate-100 font-mono text-xs overflow-x-auto leading-relaxed"><code>curl -X POST {{ $apiRootUrl }}/attendance \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -H "Accept: application/json" \
   -d '{"company_id": 1, "punch_date": "{{ date('Y-m-d') }}"}'</code></pre>
-                                </div>
-                                <div class="tab-pane fade" id="content-js" role="tabpanel">
-                                    <pre class="m-0 p-3 bg-body-secondary font-monospace small text-body" style="border-radius: 0 0 0.5rem 0.5rem; overflow-x: auto;"><code>fetch('{{ $apiRootUrl }}/attendance', {
+                            </div>
+                            <div class="tab-pane hidden" id="content-js">
+                                <pre class="m-0 p-4 bg-slate-950 text-slate-100 font-mono text-xs overflow-x-auto leading-relaxed"><code>fetch('{{ $apiRootUrl }}/attendance', {
   method: 'POST',
   headers: {
     'Authorization': 'Bearer YOUR_ACCESS_TOKEN',
@@ -339,9 +347,9 @@
   .then(response => response.json())
   .then(data => console.log(data))
   .catch(error => console.error('Error:', error));</code></pre>
-                                </div>
-                                <div class="tab-pane fade" id="content-php" role="tabpanel">
-                                    <pre class="m-0 p-3 bg-body-secondary font-monospace small text-body" style="border-radius: 0 0 0.5rem 0.5rem; overflow-x: auto;"><code>&lt;?php
+                            </div>
+                            <div class="tab-pane hidden" id="content-php">
+                                <pre class="m-0 p-4 bg-slate-950 text-slate-100 font-mono text-xs overflow-x-auto leading-relaxed"><code>&lt;?php
 $curl = curl_init();
 curl_setopt_array($curl, [
   CURLOPT_URL => '{{ $apiRootUrl }}/attendance',
@@ -360,9 +368,9 @@ curl_setopt_array($curl, [
 $response = curl_exec($curl);
 curl_close($curl);
 echo $response;</code></pre>
-                                </div>
-                                <div class="tab-pane fade" id="content-py" role="tabpanel">
-                                    <pre class="m-0 p-3 bg-body-secondary font-monospace small text-body" style="border-radius: 0 0 0.5rem 0.5rem; overflow-x: auto;"><code>import requests
+                            </div>
+                            <div class="tab-pane hidden" id="content-py">
+                                <pre class="m-0 p-4 bg-slate-950 text-slate-100 font-mono text-xs overflow-x-auto leading-relaxed"><code>import requests
 
 url = "{{ $apiRootUrl }}/attendance"
 headers = {
@@ -377,25 +385,23 @@ payload = {
 
 response = requests.post(url, json=payload, headers=headers)
 print(response.json())</code></pre>
-                                </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Expected Response Preview -->
-                    <div class="card border shadow-none rounded-3">
-                        <div class="card-header bg-body border-bottom p-3 d-flex align-items-center justify-content-between">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="badge bg-success font-monospace px-2 py-1">200 OK</span>
-                                <span class="fw-bold text-body-emphasis small font-monospace">application/json</span>
+                    <div class="card bg-base-100 border border-base-200 rounded-xl overflow-hidden">
+                        <div class="p-3.5 border-b border-base-200 bg-base-200/40 flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="badge badge-success font-mono font-bold text-xs">200 OK</span>
+                                <span class="font-mono text-xs text-base-content/70">application/json</span>
                             </div>
-                            <button class="btn btn-outline-secondary btn-sm px-2 py-1 copy-btn d-flex align-items-center gap-1 font-monospace" type="button" style="font-size: 0.75rem;" data-copy-target="#hrsaleResponsePreview">
-                                <i data-lucide="copy" style="width: 13px; height: 13px;"></i>
+                            <button class="btn btn-outline btn-xs gap-1.5 font-mono copy-btn" type="button" data-copy-target="#hrsaleResponsePreview">
+                                <i data-lucide="copy" class="w-3 h-3"></i>
                                 <span>Copy Response</span>
                             </button>
                         </div>
-                        <div class="card-body p-0">
-                            <pre class="m-0 p-3 bg-body-secondary font-monospace small text-body" id="hrsaleResponsePreview" style="border-radius: 0 0 0.5rem 0.5rem; max-height: 320px; overflow-y: auto;"><code>[
+                        <pre class="m-0 p-4 bg-slate-950 text-emerald-400 font-mono text-xs max-h-80 overflow-y-auto leading-relaxed" id="hrsaleResponsePreview"><code>[
   {
     "time_attendance_id": "12",
     "card_no": "1002",
@@ -408,52 +414,53 @@ print(response.json())</code></pre>
     "company_name": "Demo Company"
   }
 ]</code></pre>
-                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Section 3: Endpoint - Auth Token Generation -->
-            <div class="card border-0 shadow-sm bg-body text-body mb-4" id="endpoint-auth-token">
-                <div class="card-header bg-body border-bottom p-3 p-md-4">
-                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-success text-white fw-bold px-2 py-1 font-monospace fs-6">POST</span>
-                            <span class="fw-bold text-body-emphasis font-monospace fs-5">/v1/auth/token</span>
+            <div class="card bg-base-100 border border-base-200/60 shadow-xs overflow-hidden" id="endpoint-auth-token">
+                <div class="p-5 sm:p-6 border-b border-base-200/60">
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="badge badge-success font-bold font-mono px-2 py-1 text-xs">POST</span>
+                            <span class="font-bold text-base-content font-mono text-lg">/v1/auth/token</span>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <a href="{{ route('admin.api-docs.export-endpoint', 'auth-token') }}" class="btn btn-outline-primary btn-sm px-2 py-1 shadow-sm d-flex align-items-center gap-1 font-monospace" style="font-size: 0.75rem;" title="Download individual .txt spec">
-                                <i data-lucide="download" style="width: 13px; height: 13px;"></i>
+                        <div class="flex items-center gap-2">
+                            <a href="{{ route('admin.api-docs.export-endpoint', 'auth-token') }}" class="btn btn-outline btn-primary btn-xs sm:btn-sm gap-1.5 font-mono" title="Download individual .txt spec">
+                                <i data-lucide="download" class="w-3.5 h-3.5"></i>
                                 <span>Download Doc</span>
                             </a>
-                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1">Public (10 req/min)</span>
+                            <span class="badge badge-neutral badge-soft text-xs">Public (10 req/min)</span>
                         </div>
                     </div>
-                    <p class="text-body-secondary mt-2 mb-0 small">Exchange admin credentials for a personal Bearer access token.</p>
+                    <p class="text-xs text-base-content/70 leading-relaxed">
+                        Exchange admin credentials for a personal Bearer access token.
+                    </p>
                 </div>
-                <div class="card-body p-3 p-md-4">
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-6">
-                            <div class="d-flex align-items-center justify-content-between mb-2">
-                                <h6 class="fw-bold text-body-emphasis small text-uppercase mb-0">Request Body (JSON)</h6>
-                                <button class="btn btn-outline-secondary btn-sm px-2 py-0 copy-btn font-monospace" type="button" style="font-size: 0.75rem;" data-copy-target="#authTokenReq">
-                                    <i data-lucide="copy" style="width: 12px; height: 12px;"></i> Copy
+                <div class="card-body p-5 sm:p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold uppercase tracking-wider text-base-content">Request Body (JSON)</span>
+                                <button class="btn btn-outline btn-xs gap-1 font-mono copy-btn" type="button" data-copy-target="#authTokenReq">
+                                    <i data-lucide="copy" class="w-3 h-3"></i> Copy
                                 </button>
                             </div>
-                            <pre class="bg-body-secondary p-3 rounded-3 border font-monospace small text-body mb-0" id="authTokenReq"><code>{
+                            <pre class="bg-slate-950 text-slate-100 p-4 rounded-xl font-mono text-xs border border-base-300 leading-relaxed" id="authTokenReq"><code>{
   "email": "admin@example.com",
   "password": "your_secure_password",
   "token_name": "hrsale_service"
 }</code></pre>
                         </div>
-                        <div class="col-md-6">
-                            <div class="d-flex align-items-center justify-content-between mb-2">
-                                <h6 class="fw-bold text-body-emphasis small text-uppercase mb-0">Response (200 OK)</h6>
-                                <button class="btn btn-outline-secondary btn-sm px-2 py-0 copy-btn font-monospace" type="button" style="font-size: 0.75rem;" data-copy-target="#authTokenRes">
-                                    <i data-lucide="copy" style="width: 12px; height: 12px;"></i> Copy
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold uppercase tracking-wider text-base-content">Response (200 OK)</span>
+                                <button class="btn btn-outline btn-xs gap-1 font-mono copy-btn" type="button" data-copy-target="#authTokenRes">
+                                    <i data-lucide="copy" class="w-3 h-3"></i> Copy
                                 </button>
                             </div>
-                            <pre class="bg-body-secondary p-3 rounded-3 border font-monospace small text-body mb-0" id="authTokenRes"><code>{
+                            <pre class="bg-slate-950 text-emerald-400 p-4 rounded-xl font-mono text-xs border border-base-300 leading-relaxed" id="authTokenRes"><code>{
   "success": true,
   "message": "Token generated successfully.",
   "token": "1|qWeRtYuIoP123456789...",
@@ -470,91 +477,96 @@ print(response.json())</code></pre>
             </div>
 
             <!-- Section 4: Endpoint - Paginated Attendances (v1) -->
-            <div class="card border-0 shadow-sm bg-body text-body mb-4" id="endpoint-attendances-list">
-                <div class="card-header bg-body border-bottom p-3 p-md-4">
-                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-primary text-white fw-bold px-2 py-1 font-monospace fs-6">GET</span>
-                            <span class="fw-bold text-body-emphasis font-monospace fs-5">/v1/attendances</span>
+            <div class="card bg-base-100 border border-base-200/60 shadow-xs overflow-hidden" id="endpoint-attendances-list">
+                <div class="p-5 sm:p-6 border-b border-base-200/60">
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="badge badge-primary font-bold font-mono px-2 py-1 text-xs">GET</span>
+                            <span class="font-bold text-base-content font-mono text-lg">/v1/attendances</span>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <a href="{{ route('admin.api-docs.export-endpoint', 'attendances-list') }}" class="btn btn-outline-primary btn-sm px-2 py-1 shadow-sm d-flex align-items-center gap-1 font-monospace" style="font-size: 0.75rem;" title="Download individual .txt spec">
-                                <i data-lucide="download" style="width: 13px; height: 13px;"></i>
+                        <div class="flex items-center gap-2">
+                            <a href="{{ route('admin.api-docs.export-endpoint', 'attendances-list') }}" class="btn btn-outline btn-primary btn-xs sm:btn-sm gap-1.5 font-mono" title="Download individual .txt spec">
+                                <i data-lucide="download" class="w-3.5 h-3.5"></i>
                                 <span>Download Doc</span>
                             </a>
-                            <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1">Bearer Auth (60 req/min)</span>
+                            <span class="badge badge-info badge-soft text-xs">Bearer Auth (60 req/min)</span>
                         </div>
                     </div>
-                    <p class="text-body-secondary mt-2 mb-0 small">Query paginated attendance punch records with comprehensive search and metadata filters.</p>
+                    <p class="text-xs text-base-content/70 leading-relaxed">
+                        Query paginated attendance punch records with comprehensive search and metadata filters.
+                    </p>
                 </div>
-                <div class="card-body p-3 p-md-4">
-                    <h6 class="fw-bold text-body-emphasis small text-uppercase mb-3">Query Parameters</h6>
-                    <div class="table-responsive mb-4">
-                        <table class="table table-hover table-bordered align-middle mb-0 small">
-                            <thead class="table-body-secondary">
-                                <tr>
-                                    <th style="width: 20%;">Parameter</th>
-                                    <th style="width: 20%;">Type</th>
-                                    <th>Description</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><code>start_date</code></td>
-                                    <td><span class="badge bg-secondary-subtle text-secondary font-monospace">String (YYYY-MM-DD)</span></td>
-                                    <td>Filter records on or after this date.</td>
-                                </tr>
-                                <tr>
-                                    <td><code>end_date</code></td>
-                                    <td><span class="badge bg-secondary-subtle text-secondary font-monospace">String (YYYY-MM-DD)</span></td>
-                                    <td>Filter records on or before this date.</td>
-                                </tr>
-                                <tr>
-                                    <td><code>employee_id</code></td>
-                                    <td><span class="badge bg-secondary-subtle text-secondary font-monospace">String</span></td>
-                                    <td>Filter by Employee ID code (e.g. <code>EMP-1001</code>).</td>
-                                </tr>
-                                <tr>
-                                    <td><code>card_no</code></td>
-                                    <td><span class="badge bg-secondary-subtle text-secondary font-monospace">String</span></td>
-                                    <td>Filter by RFID / Biometric Card number (e.g. <code>7701</code>).</td>
-                                </tr>
-                                <tr>
-                                    <td><code>company</code></td>
-                                    <td><span class="badge bg-secondary-subtle text-secondary font-monospace">String</span></td>
-                                    <td>Filter by Company Name.</td>
-                                </tr>
-                                <tr>
-                                    <td><code>status</code></td>
-                                    <td><span class="badge bg-secondary-subtle text-secondary font-monospace">String</span></td>
-                                    <td>Filter by status (<code>present</code> or <code>late</code>).</td>
-                                </tr>
-                                <tr>
-                                    <td><code>per_page</code></td>
-                                    <td><span class="badge bg-secondary-subtle text-secondary font-monospace">Integer</span></td>
-                                    <td>Records per page (1 to 100, default: 25).</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <div class="card-body p-5 sm:p-6 space-y-6">
+                    <div>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-base-content mb-3">Query Parameters</h3>
+                        <div class="overflow-x-auto rounded-xl border border-base-200">
+                            <table class="table table-zebra text-xs w-full">
+                                <thead class="bg-base-200/60 text-base-content/70 font-semibold">
+                                    <tr>
+                                        <th class="w-1/4">Parameter</th>
+                                        <th class="w-1/4">Type</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code class="font-bold text-primary font-mono">start_date</code></td>
+                                        <td><span class="badge badge-neutral badge-soft font-mono text-[11px]">String (YYYY-MM-DD)</span></td>
+                                        <td class="text-base-content/80">Filter records on or after this date.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code class="font-bold text-primary font-mono">end_date</code></td>
+                                        <td><span class="badge badge-neutral badge-soft font-mono text-[11px]">String (YYYY-MM-DD)</span></td>
+                                        <td class="text-base-content/80">Filter records on or before this date.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code class="font-bold text-primary font-mono">employee_id</code></td>
+                                        <td><span class="badge badge-neutral badge-soft font-mono text-[11px]">String</span></td>
+                                        <td class="text-base-content/80">Filter by Employee ID code (e.g. <code class="font-mono text-xs">EMP-1001</code>).</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code class="font-bold text-primary font-mono">card_no</code></td>
+                                        <td><span class="badge badge-neutral badge-soft font-mono text-[11px]">String</span></td>
+                                        <td class="text-base-content/80">Filter by RFID / Biometric Card number (e.g. <code class="font-mono text-xs">7701</code>).</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code class="font-bold text-primary font-mono">company</code></td>
+                                        <td><span class="badge badge-neutral badge-soft font-mono text-[11px]">String</span></td>
+                                        <td class="text-base-content/80">Filter by Company Name.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code class="font-bold text-primary font-mono">status</code></td>
+                                        <td><span class="badge badge-neutral badge-soft font-mono text-[11px]">String</span></td>
+                                        <td class="text-base-content/80">Filter by status (<code class="font-mono text-xs">present</code> or <code class="font-mono text-xs">late</code>).</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code class="font-bold text-primary font-mono">per_page</code></td>
+                                        <td><span class="badge badge-neutral badge-soft font-mono text-[11px]">Integer</span></td>
+                                        <td class="text-base-content/80">Records per page (1 to 100, default: 25).</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <h6 class="fw-bold text-body-emphasis small text-uppercase mb-0">Example cURL Request</h6>
-                        <button class="btn btn-outline-secondary btn-sm px-2 py-0 copy-btn font-monospace" type="button" style="font-size: 0.75rem;" data-copy-target="#getAttendancesCurl">
-                            <i data-lucide="copy" style="width: 12px; height: 12px;"></i> Copy
-                        </button>
-                    </div>
-                    <pre class="bg-body-secondary p-3 rounded-3 border font-monospace small text-body mb-3" id="getAttendancesCurl"><code>curl -X GET "{{ $baseUrl }}/attendances?start_date={{ date('Y-m-d') }}&status=present" \
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-base-content">Example cURL Request</span>
+                            <button class="btn btn-outline btn-xs gap-1 font-mono copy-btn" type="button" data-copy-target="#getAttendancesCurl">
+                                <i data-lucide="copy" class="w-3 h-3"></i> Copy
+                            </button>
+                        </div>
+                        <pre class="bg-slate-950 text-slate-100 p-4 rounded-xl font-mono text-xs border border-base-300 leading-relaxed mb-4" id="getAttendancesCurl"><code>curl -X GET "{{ $baseUrl }}/attendances?start_date={{ date('Y-m-d') }}&status=present" \
   -H "Authorization: Bearer YOUR_API_TOKEN" \
   -H "Accept: application/json"</code></pre>
 
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <h6 class="fw-bold text-body-emphasis small text-uppercase mb-0">Paginated Response Sample</h6>
-                        <button class="btn btn-outline-secondary btn-sm px-2 py-0 copy-btn font-monospace" type="button" style="font-size: 0.75rem;" data-copy-target="#getAttendancesRes">
-                            <i data-lucide="copy" style="width: 12px; height: 12px;"></i> Copy
-                        </button>
-                    </div>
-                    <pre class="bg-body-secondary p-3 rounded-3 border font-monospace small text-body mb-0" id="getAttendancesRes" style="max-height: 240px; overflow-y: auto;"><code>{
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-base-content">Paginated Response Sample</span>
+                            <button class="btn btn-outline btn-xs gap-1 font-mono copy-btn" type="button" data-copy-target="#getAttendancesRes">
+                                <i data-lucide="copy" class="w-3 h-3"></i> Copy
+                            </button>
+                        </div>
+                        <pre class="bg-slate-950 text-emerald-400 p-4 rounded-xl font-mono text-xs border border-base-300 max-h-60 overflow-y-auto leading-relaxed" id="getAttendancesRes"><code>{
   "success": true,
   "message": "Attendance records retrieved successfully.",
   "data": [
@@ -580,50 +592,53 @@ print(response.json())</code></pre>
     "total": 1
   }
 }</code></pre>
+                    </div>
                 </div>
             </div>
 
             <!-- Section 5: Endpoint - Daily Summary -->
-            <div class="card border-0 shadow-sm bg-body text-body mb-4" id="endpoint-daily-summary">
-                <div class="card-header bg-body border-bottom p-3 p-md-4">
-                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-primary text-white fw-bold px-2 py-1 font-monospace fs-6">GET</span>
-                            <span class="fw-bold text-body-emphasis font-monospace fs-5">/v1/attendances/daily-summary</span>
+            <div class="card bg-base-100 border border-base-200/60 shadow-xs overflow-hidden" id="endpoint-daily-summary">
+                <div class="p-5 sm:p-6 border-b border-base-200/60">
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="badge badge-primary font-bold font-mono px-2 py-1 text-xs">GET</span>
+                            <span class="font-bold text-base-content font-mono text-lg">/v1/attendances/daily-summary</span>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <a href="{{ route('admin.api-docs.export-endpoint', 'daily-summary') }}" class="btn btn-outline-primary btn-sm px-2 py-1 shadow-sm d-flex align-items-center gap-1 font-monospace" style="font-size: 0.75rem;" title="Download individual .txt spec">
-                                <i data-lucide="download" style="width: 13px; height: 13px;"></i>
+                        <div class="flex items-center gap-2">
+                            <a href="{{ route('admin.api-docs.export-endpoint', 'daily-summary') }}" class="btn btn-outline btn-primary btn-xs sm:btn-sm gap-1.5 font-mono" title="Download individual .txt spec">
+                                <i data-lucide="download" class="w-3.5 h-3.5"></i>
                                 <span>Download Doc</span>
                             </a>
-                            <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1">Bearer Auth</span>
+                            <span class="badge badge-info badge-soft text-xs">Bearer Auth</span>
                         </div>
                     </div>
-                    <p class="text-body-secondary mt-2 mb-0 small">Retrieve high-level daily attendance metrics (total punches, present count, late count).</p>
+                    <p class="text-xs text-base-content/70 leading-relaxed">
+                        Retrieve high-level daily attendance metrics (total punches, present count, late count).
+                    </p>
                 </div>
-                <div class="card-body p-3 p-md-4">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <h6 class="fw-bold text-body-emphasis small text-uppercase mb-2">Query Parameters</h6>
-                            <p class="small text-body-secondary"><code>date</code> &mdash; (Optional, <code>YYYY-MM-DD</code>, defaults to today's date: <code>{{ date('Y-m-d') }}</code>).</p>
+                <div class="card-body p-5 sm:p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-base-content block mb-1">Query Parameters</span>
+                            <p class="text-xs text-base-content/70 mb-3"><code class="font-mono text-primary font-bold">date</code> &mdash; (Optional, <code class="font-mono">YYYY-MM-DD</code>, defaults to today: <code class="font-mono">{{ date('Y-m-d') }}</code>).</p>
                             
-                            <div class="d-flex align-items-center justify-content-between mb-2 mt-3">
-                                <h6 class="fw-bold text-body-emphasis small text-uppercase mb-0">cURL Request</h6>
-                                <button class="btn btn-outline-secondary btn-sm px-2 py-0 copy-btn font-monospace" type="button" style="font-size: 0.75rem;" data-copy-target="#dailySummaryCurl">
-                                    <i data-lucide="copy" style="width: 12px; height: 12px;"></i> Copy
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold uppercase tracking-wider text-base-content">cURL Request</span>
+                                <button class="btn btn-outline btn-xs gap-1 font-mono copy-btn" type="button" data-copy-target="#dailySummaryCurl">
+                                    <i data-lucide="copy" class="w-3 h-3"></i> Copy
                                 </button>
                             </div>
-                            <pre class="bg-body-secondary p-3 rounded-3 border font-monospace small text-body mb-0" id="dailySummaryCurl"><code>curl -X GET "{{ $baseUrl }}/attendances/daily-summary?date={{ date('Y-m-d') }}" \
+                            <pre class="bg-slate-950 text-slate-100 p-4 rounded-xl font-mono text-xs border border-base-300 leading-relaxed" id="dailySummaryCurl"><code>curl -X GET "{{ $baseUrl }}/attendances/daily-summary?date={{ date('Y-m-d') }}" \
   -H "Authorization: Bearer YOUR_API_TOKEN"</code></pre>
                         </div>
-                        <div class="col-md-6">
-                            <div class="d-flex align-items-center justify-content-between mb-2">
-                                <h6 class="fw-bold text-body-emphasis small text-uppercase mb-0">Sample Response (200 OK)</h6>
-                                <button class="btn btn-outline-secondary btn-sm px-2 py-0 copy-btn font-monospace" type="button" style="font-size: 0.75rem;" data-copy-target="#dailySummaryRes">
-                                    <i data-lucide="copy" style="width: 12px; height: 12px;"></i> Copy
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold uppercase tracking-wider text-base-content">Sample Response (200 OK)</span>
+                                <button class="btn btn-outline btn-xs gap-1 font-mono copy-btn" type="button" data-copy-target="#dailySummaryRes">
+                                    <i data-lucide="copy" class="w-3 h-3"></i> Copy
                                 </button>
                             </div>
-                            <pre class="bg-body-secondary p-3 rounded-3 border font-monospace small text-body mb-0" id="dailySummaryRes"><code>{
+                            <pre class="bg-slate-950 text-emerald-400 p-4 rounded-xl font-mono text-xs border border-base-300 leading-relaxed" id="dailySummaryRes"><code>{
   "success": true,
   "date": "{{ date('Y-m-d') }}",
   "summary": {
@@ -637,49 +652,50 @@ print(response.json())</code></pre>
                 </div>
             </div>
 
-
             <!-- Section 6: Endpoint - Single Attendance Record -->
-            <div class="card border-0 shadow-sm bg-body text-body mb-4" id="endpoint-attendance-single">
-                <div class="card-header bg-body border-bottom p-3 p-md-4">
-                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-primary text-white fw-bold px-2 py-1 font-monospace fs-6">GET</span>
-                            <span class="fw-bold text-body-emphasis font-monospace fs-5">/v1/attendances/{id}</span>
+            <div class="card bg-base-100 border border-base-200/60 shadow-xs overflow-hidden" id="endpoint-attendance-single">
+                <div class="p-5 sm:p-6 border-b border-base-200/60">
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="badge badge-primary font-bold font-mono px-2 py-1 text-xs">GET</span>
+                            <span class="font-bold text-base-content font-mono text-lg">/v1/attendances/{id}</span>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <a href="{{ route('admin.api-docs.export-endpoint', 'attendance-single') }}" class="btn btn-outline-primary btn-sm px-2 py-1 shadow-sm d-flex align-items-center gap-1 font-monospace" style="font-size: 0.75rem;" title="Download individual .txt spec">
-                                <i data-lucide="download" style="width: 13px; height: 13px;"></i>
+                        <div class="flex items-center gap-2">
+                            <a href="{{ route('admin.api-docs.export-endpoint', 'attendance-single') }}" class="btn btn-outline btn-primary btn-xs sm:btn-sm gap-1.5 font-mono" title="Download individual .txt spec">
+                                <i data-lucide="download" class="w-3.5 h-3.5"></i>
                                 <span>Download Doc</span>
                             </a>
-                            <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1">Bearer Auth</span>
+                            <span class="badge badge-info badge-soft text-xs">Bearer Auth</span>
                         </div>
                     </div>
-                    <p class="text-body-secondary mt-2 mb-0 small">Retrieve complete record details for a specific attendance entry by its ID.</p>
+                    <p class="text-xs text-base-content/70 leading-relaxed">
+                        Retrieve complete record details for a specific attendance entry by its ID.
+                    </p>
                 </div>
-                <div class="card-body p-3 p-md-4">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <h6 class="fw-bold text-body-emphasis small text-uppercase mb-2">URI Parameters</h6>
-                            <p class="small text-body-secondary"><code>id</code> &mdash; (Required, Integer, ID of the attendance record).</p>
+                <div class="card-body p-5 sm:p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-base-content block mb-1">URI Parameters</span>
+                            <p class="text-xs text-base-content/70 mb-3"><code class="font-mono text-primary font-bold">id</code> &mdash; (Required, Integer, ID of the attendance record).</p>
                             
-                            <div class="d-flex align-items-center justify-content-between mb-2 mt-3">
-                                <h6 class="fw-bold text-body-emphasis small text-uppercase mb-0">cURL Request</h6>
-                                <button class="btn btn-outline-secondary btn-sm px-2 py-0 copy-btn font-monospace" type="button" style="font-size: 0.75rem;" data-copy-target="#singleAttendanceCurl">
-                                    <i data-lucide="copy" style="width: 12px; height: 12px;"></i> Copy
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold uppercase tracking-wider text-base-content">cURL Request</span>
+                                <button class="btn btn-outline btn-xs gap-1 font-mono copy-btn" type="button" data-copy-target="#singleAttendanceCurl">
+                                    <i data-lucide="copy" class="w-3 h-3"></i> Copy
                                 </button>
                             </div>
-                            <pre class="bg-body-secondary p-3 rounded-3 border font-monospace small text-body mb-0" id="singleAttendanceCurl"><code>curl -X GET "{{ $baseUrl }}/attendances/1" \
+                            <pre class="bg-slate-950 text-slate-100 p-4 rounded-xl font-mono text-xs border border-base-300 leading-relaxed" id="singleAttendanceCurl"><code>curl -X GET "{{ $baseUrl }}/attendances/1" \
   -H "Authorization: Bearer YOUR_API_TOKEN" \
   -H "Accept: application/json"</code></pre>
                         </div>
-                        <div class="col-md-6">
-                            <div class="d-flex align-items-center justify-content-between mb-2">
-                                <h6 class="fw-bold text-body-emphasis small text-uppercase mb-0">Sample Response (200 OK)</h6>
-                                <button class="btn btn-outline-secondary btn-sm px-2 py-0 copy-btn font-monospace" type="button" style="font-size: 0.75rem;" data-copy-target="#singleAttendanceRes">
-                                    <i data-lucide="copy" style="width: 12px; height: 12px;"></i> Copy
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold uppercase tracking-wider text-base-content">Sample Response (200 OK)</span>
+                                <button class="btn btn-outline btn-xs gap-1 font-mono copy-btn" type="button" data-copy-target="#singleAttendanceRes">
+                                    <i data-lucide="copy" class="w-3 h-3"></i> Copy
                                 </button>
                             </div>
-                            <pre class="bg-body-secondary p-3 rounded-3 border font-monospace small text-body mb-0" id="singleAttendanceRes"><code>{
+                            <pre class="bg-slate-950 text-emerald-400 p-4 rounded-xl font-mono text-xs border border-base-300 leading-relaxed" id="singleAttendanceRes"><code>{
   "success": true,
   "data": {
     "id": 1,
@@ -703,8 +719,29 @@ print(response.json())</code></pre>
         </div>
     </div>
 
-    <!-- Client Script for Interactive Copy Buttons -->
+    <!-- Client Script for Interactive Copy Buttons & Code Tab Switching -->
     <script>
+        function switchCodeTab(tabElement, targetPaneId) {
+            const tabsContainer = tabElement.closest('#hrsaleCodeTabs');
+            if (tabsContainer) {
+                tabsContainer.querySelectorAll('.tab').forEach(t => t.classList.remove('tab-active'));
+            }
+            tabElement.classList.add('tab-active');
+
+            const panesContainer = document.getElementById('hrsaleCodeTabsContent');
+            if (panesContainer) {
+                panesContainer.querySelectorAll('.tab-pane').forEach(p => {
+                    p.classList.add('hidden');
+                    p.classList.remove('block', 'active');
+                });
+                const target = document.querySelector(targetPaneId);
+                if (target) {
+                    target.classList.remove('hidden');
+                    target.classList.add('block', 'active');
+                }
+            }
+        }
+
         (function() {
             function copyTextToClipboard(text, btnElement) {
                 if (!text) return;
@@ -712,19 +749,18 @@ print(response.json())</code></pre>
                 function showSuccess() {
                     if (!btnElement) return;
                     const originalHTML = btnElement.innerHTML;
-                    btnElement.innerHTML = '<i data-lucide="check" style="width: 13px; height: 13px;" class="text-success"></i> <span class="text-success fw-bold">Copied!</span>';
-                    if (window.lucide) {
-                        try { lucide.createIcons(); } catch(e) {}
+                    btnElement.innerHTML = '<i data-lucide="check" class="w-3 h-3 text-success"></i> <span class="text-success font-bold">Copied!</span>';
+                    if (window.renderLucideIcons) {
+                        try { window.renderLucideIcons(); } catch(e) {}
                     }
                     setTimeout(function() {
                         btnElement.innerHTML = originalHTML;
-                        if (window.lucide) {
-                            try { lucide.createIcons(); } catch(e) {}
+                        if (window.renderLucideIcons) {
+                            try { window.renderLucideIcons(); } catch(e) {}
                         }
                     }, 2000);
                 }
 
-                // Try modern navigator.clipboard first if available
                 if (navigator.clipboard && window.isSecureContext) {
                     navigator.clipboard.writeText(text).then(showSuccess).catch(function() {
                         fallbackCopy(text, showSuccess);
@@ -756,7 +792,7 @@ print(response.json())</code></pre>
                 }
             }
 
-            // Global delegated event listener for all .copy-btn buttons
+            // Delegated click handler for copy buttons
             document.addEventListener('click', function(e) {
                 const btn = e.target.closest('.copy-btn');
                 if (!btn) return;

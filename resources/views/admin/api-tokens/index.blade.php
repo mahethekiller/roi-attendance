@@ -1,18 +1,18 @@
 <x-admin-layout>
     <!-- Page Header & Action Buttons -->
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div>
-            <h2 class="fw-bold text-body-emphasis mb-1">API Access Tokens</h2>
-            <p class="text-body-secondary mb-0">Generate, monitor, and revoke personal access Bearer tokens for external REST API clients.</p>
+            <h1 class="text-2xl font-bold text-base-content tracking-tight">API Access Tokens</h1>
+            <p class="text-sm text-base-content/70 mt-0.5">Generate, monitor, and revoke personal access Bearer tokens for external REST API clients.</p>
         </div>
-        <div class="d-flex gap-2">
-            <a href="{{ route('admin.api-docs.index') }}" class="btn btn-outline-secondary btn-sm px-3 shadow-sm d-flex align-items-center gap-2">
-                <i data-lucide="book-open" style="width: 16px; height: 16px;"></i>
+        <div class="flex flex-wrap items-center gap-2">
+            <a href="{{ route('admin.api-docs.index') }}" class="btn btn-outline btn-sm sm:btn-md gap-2 shadow-xs">
+                <i data-lucide="book-open" class="w-4 h-4"></i>
                 <span>View API Documentation</span>
             </a>
             <x-authorized permission="api.tokens.manage">
-                <button type="button" class="btn btn-primary btn-sm px-3 shadow-sm d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#createTokenModal">
-                    <i data-lucide="plus-circle" style="width: 16px; height: 16px;"></i>
+                <button type="button" class="btn btn-primary btn-sm sm:btn-md gap-2 shadow-xs" onclick="document.getElementById('createTokenModal').showModal()">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
                     <span>Generate New Token</span>
                 </button>
             </x-authorized>
@@ -21,35 +21,35 @@
 
     <!-- Feedback Alerts -->
     @if(session('success'))
-        <div class="alert alert-success border-0 shadow-sm mb-4 d-flex align-items-center gap-2" role="alert">
-            <i data-lucide="check-circle" style="width: 20px; height: 20px;"></i>
-            <div>{{ session('success') }}</div>
+        <div class="alert alert-success shadow-xs mb-6" role="alert">
+            <i data-lucide="check-circle" class="w-5 h-5 shrink-0"></i>
+            <span>{{ session('success') }}</span>
         </div>
     @endif
 
     @if(session('error'))
-        <div class="alert alert-danger border-0 shadow-sm mb-4 d-flex align-items-center gap-2" role="alert">
-            <i data-lucide="alert-circle" style="width: 20px; height: 20px;"></i>
-            <div>{{ session('error') }}</div>
+        <div class="alert alert-error shadow-xs mb-6" role="alert">
+            <i data-lucide="alert-circle" class="w-5 h-5 shrink-0"></i>
+            <span>{{ session('error') }}</span>
         </div>
     @endif
 
     <!-- Plaintext Token Reveal Banner -->
     @if(session('newToken'))
-        <div class="card border-primary mb-4 shadow-sm" style="border-width: 2px;">
-            <div class="card-header bg-primary bg-opacity-10 border-primary d-flex align-items-center gap-2 text-primary fw-bold">
-                <i data-lucide="key" style="width: 20px; height: 20px;"></i>
+        <div class="card bg-base-100 border-2 border-primary shadow-md mb-6 overflow-hidden">
+            <div class="p-4 bg-primary/10 border-b border-primary/20 flex items-center gap-2 text-primary font-bold">
+                <i data-lucide="key" class="w-5 h-5"></i>
                 <span>Your New API Token for '{{ session('tokenName') }}'</span>
             </div>
-            <div class="card-body">
-                <div class="alert alert-warning border-0 d-flex align-items-center gap-2 mb-3">
-                    <i data-lucide="alert-triangle" style="width: 18px; height: 18px;"></i>
-                    <small>Please copy this token now. For security purposes, it will never be displayed again.</small>
+            <div class="card-body p-5">
+                <div class="alert alert-warning shadow-xs mb-4">
+                    <i data-lucide="alert-triangle" class="w-5 h-5 shrink-0"></i>
+                    <span class="text-xs sm:text-sm">Please copy this token now. For security purposes, it will never be displayed again.</span>
                 </div>
-                <div class="input-group">
-                    <input type="text" id="plainTokenInput" class="form-control font-monospace bg-body-tertiary text-body fw-bold" value="{{ session('newToken') }}" readonly>
-                    <button class="btn btn-primary d-flex align-items-center gap-1" onclick="copyToken()">
-                        <i data-lucide="copy" style="width: 16px; height: 16px;"></i>
+                <div class="join w-full">
+                    <input type="text" id="plainTokenInput" class="input input-bordered join-item w-full font-mono text-sm font-bold bg-base-200/50 text-base-content" value="{{ session('newToken') }}" readonly>
+                    <button class="btn btn-primary join-item gap-2 shrink-0" onclick="copyToken()">
+                        <i data-lucide="copy" class="w-4 h-4"></i>
                         <span id="copyBtnText">Copy Token</span>
                     </button>
                 </div>
@@ -58,58 +58,59 @@
     @endif
 
     <!-- Active Tokens Card -->
-    <div class="card border-0 shadow-sm bg-body text-body">
-        <div class="card-header bg-body border-bottom p-3 d-flex align-items-center justify-content-between">
-            <h6 class="fw-bold mb-0 text-body-emphasis">Active API Tokens ({{ $tokens->count() }})</h6>
+    <div class="card bg-base-100 border border-base-200/60 shadow-xs overflow-hidden">
+        <div class="p-4 border-b border-base-200/60 flex items-center justify-between">
+            <h2 class="font-semibold text-base-content">Active API Tokens ({{ $tokens->count() }})</h2>
         </div>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light text-body-secondary">
-                    <tr>
+        <div class="overflow-x-auto">
+            <table class="table table-zebra w-full">
+                <thead>
+                    <tr class="bg-base-200/50 text-base-content/70">
                         <th>Token Name</th>
                         <th>Abilities</th>
                         <th>Last Used</th>
                         <th>Created At</th>
                         <x-authorized permission="api.tokens.manage">
-                            <th class="text-end">Actions</th>
+                            <th class="text-right">Actions</th>
                         </x-authorized>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($tokens as $token)
-                        <tr>
+                        <tr class="hover:bg-base-200/40 transition-colors">
                             <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="rounded-circle bg-primary bg-opacity-10 text-primary p-2">
-                                        <i data-lucide="key" style="width: 16px; height: 16px;"></i>
+                                <div class="flex items-center gap-3">
+                                    <div class="p-2 rounded-lg bg-primary/10 text-primary">
+                                        <i data-lucide="key" class="w-4 h-4"></i>
                                     </div>
                                     <div>
-                                        <div class="fw-semibold text-body-emphasis">{{ $token->name }}</div>
-                                        <span class="text-body-secondary small">ID: #{{ $token->id }}</span>
+                                        <div class="font-semibold text-base-content">{{ $token->name }}</div>
+                                        <span class="text-xs text-base-content/60 font-mono">ID: #{{ $token->id }}</span>
                                     </div>
                                 </div>
                             </td>
                             <td>
-                                @foreach($token->abilities as $ability)
-                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle fw-mono">{{ $ability }}</span>
-                                @endforeach
+                                <div class="flex flex-wrap gap-1">
+                                    @foreach($token->abilities as $ability)
+                                        <span class="badge badge-neutral badge-soft font-mono text-xs">{{ $ability }}</span>
+                                    @endforeach
+                                </div>
                             </td>
                             <td>
                                 @if($token->last_used_at)
-                                    <span class="text-body-emphasis small">{{ $token->last_used_at->diffForHumans() }}</span>
+                                    <span class="text-xs text-base-content/80">{{ $token->last_used_at->diffForHumans() }}</span>
                                 @else
-                                    <span class="badge bg-body-tertiary text-body-secondary border">Never used</span>
+                                    <span class="badge badge-ghost badge-soft text-base-content/50 text-xs">Never used</span>
                                 @endif
                             </td>
-                            <td class="text-body-secondary small">{{ $token->created_at->format('M d, Y h:i A') }}</td>
+                            <td class="text-xs text-base-content/70">{{ $token->created_at->format('M d, Y h:i A') }}</td>
                             <x-authorized permission="api.tokens.manage">
-                                <td class="text-end">
-                                    <form method="POST" action="{{ route('admin.api-tokens.destroy', $token->id) }}" class="d-inline" onsubmit="return confirm('Revoke token \'{{ $token->name }}\'? External clients using it will immediately lose access.');">
+                                <td class="text-right">
+                                    <form method="POST" action="{{ route('admin.api-tokens.destroy', $token->id) }}" class="inline" onsubmit="return confirm('Revoke token \'{{ $token->name }}\'? External clients using it will immediately lose access.');">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 p-2" aria-label="Revoke API token {{ $token->name }}" title="Revoke Token">
-                                            <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
-                                            <span>Revoke</span>
+                                        <button type="submit" class="btn btn-sm btn-ghost btn-square text-error hover:bg-error/10" aria-label="Revoke API token {{ $token->name }}" title="Revoke Token">
+                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
                                         </button>
                                     </form>
                                 </td>
@@ -117,8 +118,8 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="text-center py-5 text-body-secondary">
-                                <i data-lucide="key" class="mb-2 d-block mx-auto text-body-tertiary" style="width: 36px; height: 36px;"></i>
+                            <td colspan="5" class="text-center py-10 text-base-content/60">
+                                <i data-lucide="key" class="mb-2 mx-auto text-base-content/30 w-9 h-9"></i>
                                 <span>No API access tokens created yet. Click "Generate New Token" above.</span>
                             </td>
                         </tr>
@@ -130,45 +131,44 @@
 
     <!-- Create Token Modal -->
     <x-authorized permission="api.tokens.manage">
-        <div class="modal fade" id="createTokenModal" tabindex="-1" aria-labelledby="createTokenModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content bg-body border-0 shadow">
-                    <form method="POST" action="{{ route('admin.api-tokens.store') }}">
-                        @csrf
-                        <div class="modal-header border-bottom">
-                            <h5 class="modal-title fw-bold text-body-emphasis" id="createTokenModalLabel">
-                                <i data-lucide="plus-circle" class="text-primary me-2" style="width: 20px; height: 20px;"></i>
-                                Generate API Access Token
-                            </h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body text-body">
-                            <div class="mb-3">
-                                <label for="token_name" class="form-label fw-semibold text-body-emphasis">Token Name / Client Identifier <span class="text-danger">*</span></label>
-                                <input type="text" name="token_name" id="token_name" class="form-control bg-body-tertiary text-body @error('token_name') is-invalid @enderror" placeholder="e.g. HR Payroll App, Mobile Scanner, External BI" required>
-                                <div class="form-text text-body-secondary">Give this token a descriptive name so you remember where it is being used.</div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold text-body-emphasis">Token Scopes / Abilities</label>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="abilities[]" value="attendance:read" id="scopeAttendanceRead" checked>
-                                    <label class="form-check-label text-body-emphasis" for="scopeAttendanceRead">
-                                        <strong>attendance:read</strong> &mdash; Read attendance punch logs & summaries
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer border-top">
-                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-primary d-flex align-items-center gap-2">
-                                <i data-lucide="key" style="width: 16px; height: 16px;"></i>
-                                <span>Generate Token</span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
+        <dialog id="createTokenModal" class="modal">
+            <div class="modal-box bg-base-100 max-w-md border border-base-200">
+                <form method="dialog">
+                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                </form>
+                <form method="POST" action="{{ route('admin.api-tokens.store') }}">
+                    @csrf
+                    <h3 class="font-bold text-lg text-base-content flex items-center gap-2 mb-4">
+                        <i data-lucide="plus-circle" class="w-5 h-5 text-primary"></i>
+                        Generate API Access Token
+                    </h3>
+                    <fieldset class="fieldset mb-4">
+                        <legend class="fieldset-legend text-xs font-bold uppercase tracking-wider text-base-content/70">Token Name / Client Identifier <span class="text-error">*</span></legend>
+                        <input type="text" name="token_name" id="token_name" class="input input-bordered w-full text-sm @error('token_name') input-error @enderror" placeholder="e.g. HR Payroll App, Mobile Scanner, External BI" required>
+                        <p class="fieldset-label text-xs text-base-content/60">Give this token a descriptive name so you remember where it is being used.</p>
+                    </fieldset>
+                    <div class="mb-6">
+                        <span class="text-xs font-bold uppercase tracking-wider text-base-content/70 block mb-2">Token Scopes / Abilities</span>
+                        <label class="flex items-center gap-3 p-3 rounded-lg border border-base-200 bg-base-200/40 cursor-pointer">
+                            <input type="checkbox" name="abilities[]" value="attendance:read" id="scopeAttendanceRead" class="checkbox checkbox-primary checkbox-sm" checked>
+                            <span class="text-sm text-base-content">
+                                <strong class="font-mono">attendance:read</strong> &mdash; Read attendance punch logs & summaries
+                            </span>
+                        </label>
+                    </div>
+                    <div class="modal-action">
+                        <button type="button" class="btn btn-ghost" onclick="document.getElementById('createTokenModal').close()">Cancel</button>
+                        <button type="submit" class="btn btn-primary gap-2">
+                            <i data-lucide="key" class="w-4 h-4"></i>
+                            <span>Generate Token</span>
+                        </button>
+                    </div>
+                </form>
             </div>
-        </div>
+            <form method="dialog" class="modal-backdrop">
+                <button>close</button>
+            </form>
+        </dialog>
     </x-authorized>
 
     <script>

@@ -1,134 +1,120 @@
 <x-admin-layout>
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-            <h2 class="fw-bold text-body-emphasis mb-1">Add New Employee</h2>
-            <p class="text-body-secondary mb-0">Enter employee particulars and RFID smart card credentials.</p>
+            <h1 class="text-2xl font-bold text-base-content tracking-tight">Add New Employee</h1>
+            <p class="text-sm text-base-content/70 mt-0.5">Enter employee particulars and RFID smart card credentials.</p>
         </div>
         <div>
-            <a href="{{ route('admin.employees.index') }}" class="btn btn-outline-secondary d-flex align-items-center gap-1 shadow-sm">
-                <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+            <a href="{{ route('admin.employees.index') }}" class="btn btn-outline btn-sm gap-2">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
                 <span>Back to Employees</span>
             </a>
         </div>
     </div>
 
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm bg-body text-body">
-                <div class="card-body p-4">
-                    <form method="POST" action="{{ route('admin.employees.store') }}">
+    <div class="flex justify-center">
+        <div class="w-full max-w-3xl">
+            <div class="card bg-base-100 border border-base-200/60 shadow-xs">
+                <div class="card-body p-6 sm:p-8">
+                    <form method="POST" action="{{ route('admin.employees.store') }}" class="space-y-5">
                         @csrf
 
-                        <div class="row g-3 mb-3">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <!-- First Name -->
-                            <div class="col-md-6">
-                                <label for="first_name" class="form-label fw-semibold text-body-emphasis">First Name <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-body-tertiary text-body-secondary border-end-0">
-                                        <i data-lucide="user" style="width: 18px; height: 18px;"></i>
-                                    </span>
-                                    <input type="text" name="first_name" id="first_name" class="form-control bg-body-tertiary border-start-0 text-body @error('first_name') is-invalid @enderror" placeholder="e.g. Alexander" value="{{ old('first_name') }}" required>
-                                </div>
+                            <fieldset class="fieldset">
+                                <legend class="fieldset-legend text-xs font-bold uppercase tracking-wider text-base-content/70">First Name <span class="text-error">*</span></legend>
+                                <label class="input input-bordered flex items-center gap-2 w-full @error('first_name') input-error @enderror">
+                                    <i data-lucide="user" class="w-4 h-4 text-base-content/50 shrink-0"></i>
+                                    <input type="text" name="first_name" id="first_name" class="grow bg-transparent" placeholder="e.g. Alexander" value="{{ old('first_name') }}" required>
+                                </label>
                                 @error('first_name')
-                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                    <p class="fieldset-label text-error">{{ $message }}</p>
                                 @enderror
-                            </div>
+                            </fieldset>
 
                             <!-- Last Name -->
-                            <div class="col-md-6">
-                                <label for="last_name" class="form-label fw-semibold text-body-emphasis">Last Name <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-body-tertiary text-body-secondary border-end-0">
-                                        <i data-lucide="user" style="width: 18px; height: 18px;"></i>
-                                    </span>
-                                    <input type="text" name="last_name" id="last_name" class="form-control bg-body-tertiary border-start-0 text-body @error('last_name') is-invalid @enderror" placeholder="e.g. Pierce" value="{{ old('last_name') }}" required>
-                                </div>
+                            <fieldset class="fieldset">
+                                <legend class="fieldset-legend text-xs font-bold uppercase tracking-wider text-base-content/70">Last Name <span class="text-error">*</span></legend>
+                                <label class="input input-bordered flex items-center gap-2 w-full @error('last_name') input-error @enderror">
+                                    <i data-lucide="user" class="w-4 h-4 text-base-content/50 shrink-0"></i>
+                                    <input type="text" name="last_name" id="last_name" class="grow bg-transparent" placeholder="e.g. Pierce" value="{{ old('last_name') }}" required>
+                                </label>
                                 @error('last_name')
-                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                    <p class="fieldset-label text-error">{{ $message }}</p>
                                 @enderror
-                            </div>
+                            </fieldset>
                         </div>
 
-                        <div class="row g-3 mb-3">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <!-- Employee ID -->
-                            <div class="col-md-6">
-                                <label for="employee_id" class="form-label fw-semibold text-body-emphasis">Employee ID <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-body-tertiary text-body-secondary border-end-0">
-                                        <i data-lucide="badge-check" style="width: 18px; height: 18px;"></i>
-                                    </span>
-                                    <input type="text" name="employee_id" id="employee_id" class="form-control bg-body-tertiary border-start-0 text-body @error('employee_id') is-invalid @enderror" placeholder="e.g. EMP-1001" value="{{ old('employee_id') }}" required>
-                                </div>
+                            <fieldset class="fieldset">
+                                <legend class="fieldset-legend text-xs font-bold uppercase tracking-wider text-base-content/70">Employee ID <span class="text-error">*</span></legend>
+                                <label class="input input-bordered flex items-center gap-2 w-full @error('employee_id') input-error @enderror">
+                                    <i data-lucide="badge-check" class="w-4 h-4 text-base-content/50 shrink-0"></i>
+                                    <input type="text" name="employee_id" id="employee_id" class="grow bg-transparent font-mono" placeholder="e.g. EMP-1001" value="{{ old('employee_id') }}" required>
+                                </label>
                                 @error('employee_id')
-                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                    <p class="fieldset-label text-error">{{ $message }}</p>
                                 @enderror
-                            </div>
+                            </fieldset>
 
                             <!-- Card No -->
-                            <div class="col-md-6">
-                                <label for="card_no" class="form-label fw-semibold text-body-emphasis">Card No (RFID / Smart Card)</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-body-tertiary text-body-secondary border-end-0">
-                                        <i data-lucide="credit-card" style="width: 18px; height: 18px;"></i>
-                                    </span>
-                                    <input type="text" name="card_no" id="card_no" class="form-control bg-body-tertiary border-start-0 text-body @error('card_no') is-invalid @enderror" placeholder="e.g. CRD-88902" value="{{ old('card_no') }}">
-                                </div>
+                            <fieldset class="fieldset">
+                                <legend class="fieldset-legend text-xs font-bold uppercase tracking-wider text-base-content/70">Card No (RFID / Smart Card)</legend>
+                                <label class="input input-bordered flex items-center gap-2 w-full @error('card_no') input-error @enderror">
+                                    <i data-lucide="credit-card" class="w-4 h-4 text-base-content/50 shrink-0"></i>
+                                    <input type="text" name="card_no" id="card_no" class="grow bg-transparent font-mono" placeholder="e.g. CRD-88902" value="{{ old('card_no') }}">
+                                </label>
                                 @error('card_no')
-                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                    <p class="fieldset-label text-error">{{ $message }}</p>
                                 @enderror
-                            </div>
+                            </fieldset>
                         </div>
 
-                        <div class="row g-3 mb-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <!-- Email Address -->
-                            <div class="col-md-6">
-                                <label for="email" class="form-label fw-semibold text-body-emphasis">Work Email Address <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-body-tertiary text-body-secondary border-end-0">
-                                        <i data-lucide="mail" style="width: 18px; height: 18px;"></i>
-                                    </span>
-                                    <input type="email" name="email" id="email" class="form-control bg-body-tertiary border-start-0 text-body @error('email') is-invalid @enderror" placeholder="e.g. alex.pierce@example.com" value="{{ old('email') }}" required>
-                                </div>
+                            <fieldset class="fieldset">
+                                <legend class="fieldset-legend text-xs font-bold uppercase tracking-wider text-base-content/70">Work Email Address <span class="text-error">*</span></legend>
+                                <label class="input input-bordered flex items-center gap-2 w-full @error('email') input-error @enderror">
+                                    <i data-lucide="mail" class="w-4 h-4 text-base-content/50 shrink-0"></i>
+                                    <input type="email" name="email" id="email" class="grow bg-transparent" placeholder="e.g. alex.pierce@example.com" value="{{ old('email') }}" required>
+                                </label>
                                 @error('email')
-                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                    <p class="fieldset-label text-error">{{ $message }}</p>
                                 @enderror
-                            </div>
+                            </fieldset>
 
                             <!-- Company -->
-                            <div class="col-md-6">
-                                <label for="company" class="form-label fw-semibold text-body-emphasis">Company Name</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-body-tertiary text-body-secondary border-end-0">
-                                        <i data-lucide="building-2" style="width: 18px; height: 18px;"></i>
-                                    </span>
-                                    <input type="text" name="company" id="company" class="form-control bg-body-tertiary border-start-0 text-body @error('company') is-invalid @enderror" placeholder="e.g. ROI Technologies" value="{{ old('company') }}">
-                                </div>
+                            <fieldset class="fieldset">
+                                <legend class="fieldset-legend text-xs font-bold uppercase tracking-wider text-base-content/70">Company Name</legend>
+                                <label class="input input-bordered flex items-center gap-2 w-full @error('company') input-error @enderror">
+                                    <i data-lucide="building-2" class="w-4 h-4 text-base-content/50 shrink-0"></i>
+                                    <input type="text" name="company" id="company" class="grow bg-transparent" placeholder="e.g. ROI Technologies" value="{{ old('company') }}">
+                                </label>
                                 @error('company')
-                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                    <p class="fieldset-label text-error">{{ $message }}</p>
                                 @enderror
-                            </div>
+                            </fieldset>
                         </div>
 
                         <!-- Password (Optional override) -->
-                        <div class="mb-4">
-                            <label for="password" class="form-label fw-semibold text-body-emphasis">Default Portal Password</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-body-tertiary text-body-secondary border-end-0">
-                                    <i data-lucide="lock" style="width: 18px; height: 18px;"></i>
-                                </span>
-                                <input type="password" name="password" id="password" class="form-control bg-body-tertiary border-start-0 text-body @error('password') is-invalid @enderror" placeholder="Leave empty for default 'password123'">
-                            </div>
-                            <div class="text-body-secondary small mt-1">Default password if left blank will be <code>password123</code>.</div>
+                        <fieldset class="fieldset">
+                            <legend class="fieldset-legend text-xs font-bold uppercase tracking-wider text-base-content/70">Default Portal Password</legend>
+                            <label class="input input-bordered flex items-center gap-2 w-full @error('password') input-error @enderror">
+                                <i data-lucide="lock" class="w-4 h-4 text-base-content/50 shrink-0"></i>
+                                <input type="password" name="password" id="password" class="grow bg-transparent" placeholder="Leave empty for default 'password123'">
+                            </label>
+                            <p class="fieldset-label text-xs text-base-content/60">Default password if left blank will be <code class="badge badge-neutral badge-xs">password123</code>.</p>
                             @error('password')
-                                <div class="text-danger small mt-1">{{ $message }}</div>
+                                <p class="fieldset-label text-error">{{ $message }}</p>
                             @enderror
-                        </div>
+                        </fieldset>
 
                         <!-- Form Action Buttons -->
-                        <div class="d-flex justify-content-end gap-2">
-                            <a href="{{ route('admin.employees.index') }}" class="btn btn-outline-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-primary px-4 d-flex align-items-center gap-2">
-                                <i data-lucide="save" style="width: 18px; height: 18px;"></i>
+                        <div class="flex items-center justify-end gap-3 pt-4 border-t border-base-200/60">
+                            <a href="{{ route('admin.employees.index') }}" class="btn btn-ghost">Cancel</a>
+                            <button type="submit" class="btn btn-primary px-6 gap-2">
+                                <i data-lucide="save" class="w-4 h-4"></i>
                                 <span>Save Employee</span>
                             </button>
                         </div>
