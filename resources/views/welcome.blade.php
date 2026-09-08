@@ -4,7 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>{{ config('app.name', 'ROI Attendance') }} - Enterprise Biometric Platform</title>
+    <title>{{ config('app.name', 'ROI Attendance') }} - Enterprise Biometric Workforce Platform</title>
+    <meta name="description" content="ROI Mantra Attendance is an enterprise biometric attendance and workforce telemetry platform providing real-time punch logs, automated sync pipelines, and HR analytics.">
+    <meta name="author" content="ROI Mantra">
+    <meta property="og:title" content="ROI Mantra Attendance - Enterprise Biometric Platform">
+    <meta property="og:description" content="Real-time biometric attendance telemetry, automated sync pipelines, and workforce management by ROI Mantra.">
+    <meta property="og:image" content="https://www.roimantra.com/wp-content/uploads/2024/09/roi-logo.jpg">
 
     <!-- Pre-hydration theme script to prevent FOUC -->
     <script>

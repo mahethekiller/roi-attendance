@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }} - Admin Dashboard</title>
+    <title>@yield('title', 'Admin Dashboard') | {{ config('app.name', 'ROI Attendance') }}</title>
+    <meta name="description" content="@yield('meta_description', 'ROI Mantra enterprise biometric attendance management system, telemetry monitor, and workforce analytics portal.')">
+    <meta name="author" content="ROI Mantra">
+    <meta name="robots" content="noindex, nofollow">
 
     <!-- Pre-hydration theme script to prevent FOUC -->
     <script>

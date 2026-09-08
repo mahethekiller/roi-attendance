@@ -5,7 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'ROI Mantra') }} - Attendance Portal Login</title>
+    <title>Login | ROI Mantra - Attendance & Workforce OS</title>
+    <meta name="description" content="Secure administrative login portal for ROI Mantra workforce management, real-time biometric telemetry, and attendance logs.">
+    <meta name="author" content="ROI Mantra">
+    <meta name="robots" content="noindex, nofollow">
+    <meta property="og:title" content="Login | ROI Mantra Attendance Portal">
+    <meta property="og:description" content="Secure administrative login portal for ROI Mantra workforce management and attendance logs.">
+    <meta property="og:image" content="https://www.roimantra.com/wp-content/uploads/2024/09/roi-logo.jpg">
 
     <!-- Pre-hydration theme script to prevent FOUC -->
     <script>
