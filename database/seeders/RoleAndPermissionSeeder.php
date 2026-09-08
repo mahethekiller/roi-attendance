@@ -33,10 +33,11 @@ class RoleAndPermissionSeeder extends Seeder
             'employees.delete',
             'employees.import',
 
-            // Attendances
+            // Attendances & Overrides
             'attendances.view',
             'attendances.sync',
             'attendances.export',
+            'attendance.overrides.manage',
 
             // Users
             'users.view',
@@ -116,5 +117,23 @@ class RoleAndPermissionSeeder extends Seeder
         );
 
         $admin->syncRoles([$superAdminRole]);
+        
+        // Seed default initial override rule if table exists
+        if (\Illuminate\Support\Facades\Schema::hasTable('attendance_overrides')) {
+            \App\Models\AttendanceOverride::firstOrCreate(
+                ['employee_id' => 'I2K2-0340', 'card_no' => '1234'],
+                [
+                    'employee_name' => 'Target Employee (Default Override)',
+                    'check_in_window_start' => '10:00:00',
+                    'check_in_window_end' => '10:20:00',
+                    'adjusted_in_min_minute' => 20,
+                    'adjusted_in_max_minute' => 35,
+                    'min_duration_hours' => 9.00,
+                    'is_active' => true,
+                    'notes' => 'Pre-configured biometric sync override rule for HRSale alignment.',
+                    'created_by' => $admin->id,
+                ]
+            );
+        }
     }
 }

@@ -193,6 +193,9 @@ class AttendanceApiController extends Controller
 
         $attendances = $query->orderBy('punch_date', 'asc')->orderBy('check_in_time', 'asc')->get();
 
+        $overrideService = app(\App\Services\AttendanceOverrideService::class);
+        $attendances = $overrideService->adjustAttendanceList($attendances);
+
         return response()->json(HRsaleAttendanceResource::collection($attendances)->resolve(), 200);
     }
 }

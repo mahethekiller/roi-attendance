@@ -138,9 +138,10 @@
                             <x-admin-nav-item route="admin.api-logs.index" activePattern="admin.api-logs.*" icon="activity" label="API Traffic Logs" permission="api.logs.view" />
                         </x-authorized>
 
-                        <x-authorized :permission="['sync-logs.view', 'roles.manage', 'settings.manage']">
+                        <x-authorized :permission="['sync-logs.view', 'attendance.overrides.manage', 'roles.manage', 'settings.manage']">
                             <li class="menu-title text-[11px] font-bold uppercase tracking-wider text-base-content/50 mt-4 px-3">Administration</li>
                             <x-admin-nav-item route="admin.sync-logs.index" activePattern="admin.sync-logs.*" icon="history" label="Sync History Logs" permission="sync-logs.view" />
+                            <x-admin-nav-item route="admin.attendance-overrides.index" activePattern="admin.attendance-overrides.*" icon="sliders" label="Attendance Overrides" permission="attendance.overrides.manage" />
                             <x-admin-nav-item url="#" icon="shield-alert" label="Roles & Spatie RBAC" permission="roles.manage" />
                             <x-admin-nav-item url="#" icon="settings" label="System Settings" permission="settings.manage" />
                         </x-authorized>

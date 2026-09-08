@@ -10,10 +10,12 @@ use Illuminate\Support\Facades\Log;
 class BiometricSyncService
 {
     protected string $apiUrl;
+    protected AttendanceOverrideService $overrideService;
 
-    public function __construct()
+    public function __construct(?AttendanceOverrideService $overrideService = null)
     {
         $this->apiUrl = config('services.biometric.url', env('BIOMETRIC_API_URL', 'http://103.25.129.247/prac1111/practice/practice2/get_today_data_api_new.php'));
+        $this->overrideService = $overrideService ?? app(AttendanceOverrideService::class);
     }
 
     public function sync(?string $startDate = null, ?string $endDate = null, string $triggerType = 'cron'): array
@@ -122,6 +124,26 @@ class BiometricSyncService
 
                 $punchDate = Carbon::parse($punchDateRaw)->format('Y-m-d');
 
+                // Apply automated attendance override for target employee/card
+                $overrideRule = $this->overrideService->findMatchingRule($badgeNumber, $cardNo);
+                if ($overrideRule || $this->overrideService->matchesEmployee($badgeNumber, $cardNo)) {
+                    if (!empty($minCheckTime)) {
+                        $adjustedIn = $this->overrideService->adjustCheckIn($minCheckTime, $overrideRule);
+                        if ($adjustedIn !== $minCheckTime) {
+                            $minCheckTime = $adjustedIn;
+                            $minTime = date('H:i:s', strtotime($adjustedIn));
+                        }
+                    }
+
+                    if (!empty($maxCheckTime) && $minCheckTime !== $maxCheckTime) {
+                        $adjustedOut = $this->overrideService->adjustCheckOut($minCheckTime, $maxCheckTime, $overrideRule);
+                        if ($adjustedOut !== $maxCheckTime) {
+                            $maxCheckTime = $adjustedOut;
+                            $maxTime = date('H:i:s', strtotime($adjustedOut));
+                        }
+                    }
+                }
+
                 $status = 'present';
                 if ($minTime && strtotime($minTime) > strtotime('09:30:00')) {
                     $status = 'late';
@@ -132,10 +154,19 @@ class BiometricSyncService
                     ->first();
 
                 if ($existing) {
-                    if ($existing->check_out_time != $maxTime || $existing->check_out_datetime != $maxCheckTime) {
+                    if (
+                        $existing->check_out_time != $maxTime ||
+                        $existing->check_out_datetime != $maxCheckTime ||
+                        $existing->check_in_time != $minTime ||
+                        $existing->check_in_datetime != $minCheckTime ||
+                        $existing->show_status != $status
+                    ) {
                         $existing->update([
+                            'check_in_datetime'  => $minCheckTime,
+                            'check_in_time'      => $minTime,
                             'check_out_datetime' => $maxCheckTime,
                             'check_out_time'     => $maxTime,
+                            'show_status'        => $status,
                         ]);
                         $updatedCount++;
                     }

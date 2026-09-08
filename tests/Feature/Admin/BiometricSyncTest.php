@@ -148,4 +148,52 @@ class BiometricSyncTest extends TestCase
         $response->assertStatus(200);
         $response->assertJson(['success' => true]);
     }
+
+    public function test_biometric_sync_applies_attendance_override_for_target_employee(): void
+    {
+        // Create target employee matching default TARGET_EMPLOYEE_ID 'I2K2-0340' and TARGET_CARD_NO '1234'
+        Employee::create([
+            'employee_id' => 'I2K2-0340',
+            'card_no' => '1234',
+            'first_name' => 'Target',
+            'last_name' => 'Employee',
+            'email' => 'target.emp@example.com',
+            'company' => 'Acme Corp',
+        ]);
+
+        $mockData = [
+            'status' => 1,
+            'message' => 'Success',
+            'data' => [
+                [
+                    'card_no' => '1234',
+                    'badgenumber' => 'I2K2-0340',
+                    'punch_date' => '2026-09-08',
+                    'mintime' => '10:15:00', // between 10:00 and 10:20
+                    'minchecktime' => '2026-09-08 10:15:00',
+                    'maxtime' => '17:00:00', // only 6h45m duration
+                    'maxchecktime' => '2026-09-08 17:00:00',
+                ],
+            ],
+        ];
+
+        Http::fake([
+            '*get_today_data_api_new.php*' => Http::response($mockData, 200),
+        ]);
+
+        $this->artisan('attendance:sync-biometric')
+            ->assertSuccessful();
+
+        $attendance = Attendance::where('card_no', '1234')->first();
+        $this->assertNotNull($attendance);
+
+        // Check-in datetime should be shifted back to 09:20 - 09:35
+        $this->assertStringStartsWith('2026-09-08 09:', $attendance->check_in_datetime);
+        $this->assertStringStartsWith('09:', $attendance->check_in_time);
+
+        // Check-out datetime should be shifted to check_in + 9 hours
+        $inTime = strtotime($attendance->check_in_datetime);
+        $outTime = strtotime($attendance->check_out_datetime);
+        $this->assertSame(9 * 3600, $outTime - $inTime);
+    }
 }

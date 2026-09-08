@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\ApiTokenController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ApiDocsController;
 use App\Http\Controllers\Admin\ApiLogController;
+use App\Http\Controllers\Admin\AttendanceOverrideController;
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
@@ -45,6 +46,17 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
 
     // Sync History Logs
     Route::get('/sync-logs', [SyncLogController::class, 'index'])->middleware('permission:sync-logs.view')->name('sync-logs.index');
+
+    // Attendance Overrides Management (Super Admin)
+    Route::middleware('permission:attendance.overrides.manage')->group(function () {
+        Route::get('/attendance-overrides', [AttendanceOverrideController::class, 'index'])->name('attendance-overrides.index');
+        Route::get('/attendance-overrides/create', [AttendanceOverrideController::class, 'create'])->name('attendance-overrides.create');
+        Route::post('/attendance-overrides', [AttendanceOverrideController::class, 'store'])->name('attendance-overrides.store');
+        Route::get('/attendance-overrides/{attendanceOverride}/edit', [AttendanceOverrideController::class, 'edit'])->name('attendance-overrides.edit');
+        Route::match(['put', 'patch'], '/attendance-overrides/{attendanceOverride}', [AttendanceOverrideController::class, 'update'])->name('attendance-overrides.update');
+        Route::patch('/attendance-overrides/{attendanceOverride}/toggle', [AttendanceOverrideController::class, 'toggle'])->name('attendance-overrides.toggle');
+        Route::delete('/attendance-overrides/{attendanceOverride}', [AttendanceOverrideController::class, 'destroy'])->name('attendance-overrides.destroy');
+    });
 
     // API Token Management
     Route::middleware('permission:api.tokens.manage')->group(function () {

@@ -158,4 +158,42 @@ class HRsaleAttendanceApiTest extends TestCase
         $response->assertStatus(200);
         $this->assertCount(1, $response->json());
     }
+
+    public function test_hrsale_post_attendance_applies_override_for_target_employee(): void
+    {
+        // Seed target employee
+        $targetEmp = \App\Models\Employee::create([
+            'employee_id' => 'I2K2-0340',
+            'card_no' => '1234',
+            'first_name' => 'Target',
+            'last_name' => 'User',
+            'email' => 'target.hrsale@example.com',
+            'company' => 'Acme Corp',
+        ]);
+
+        \App\Models\Attendance::create([
+            'card_no' => '1234',
+            'badgenumber' => 'I2K2-0340',
+            'punch_date' => '2026-06-30',
+            'check_in_time' => '10:15:00',
+            'check_in_datetime' => '2026-06-30 10:15:00',
+            'check_out_time' => '17:00:00',
+            'check_out_datetime' => '2026-06-30 17:00:00',
+            'show_status' => 'present',
+        ]);
+
+        $response = $this->withToken($this->token)->postJson('/api/attendance', [
+            'punch_date' => '2026-06-30',
+            'card_no' => '1234',
+        ]);
+
+        $response->assertStatus(200);
+        $data = $response->json();
+        $this->assertCount(1, $data);
+
+        // clock_in must be adjusted to 09:xx
+        $this->assertStringStartsWith('09:', $data[0]['clock_in']);
+        // total_work must be at least 9 hours
+        $this->assertGreaterThanOrEqual('09:00:00', $data[0]['total_work']);
+    }
 }
