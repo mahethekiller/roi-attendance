@@ -6,18 +6,22 @@
             <p class="text-body-secondary mb-0">Manage employee records, RFID card mappings, and bulk import data.</p>
         </div>
         <div class="d-flex flex-wrap gap-2">
-            <a href="{{ route('admin.employees.sample-csv') }}" class="btn btn-outline-secondary shadow-sm d-flex align-items-center gap-2">
-                <i data-lucide="file-spreadsheet" style="width: 18px; height: 18px;"></i>
-                <span>Sample CSV</span>
-            </a>
-            <button type="button" class="btn btn-outline-primary shadow-sm d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#importCsvModal">
-                <i data-lucide="upload" style="width: 18px; height: 18px;"></i>
-                <span>Import CSV</span>
-            </button>
-            <a href="{{ route('admin.employees.create') }}" class="btn btn-primary px-3 shadow-sm d-flex align-items-center gap-2">
-                <i data-lucide="user-plus" style="width: 18px; height: 18px;"></i>
-                <span>Add Employee</span>
-            </a>
+            <x-authorized permission="employees.import">
+                <a href="{{ route('admin.employees.sample-csv') }}" class="btn btn-outline-secondary shadow-sm d-flex align-items-center gap-2">
+                    <i data-lucide="file-spreadsheet" style="width: 18px; height: 18px;"></i>
+                    <span>Sample CSV</span>
+                </a>
+                <button type="button" class="btn btn-outline-primary shadow-sm d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#importCsvModal">
+                    <i data-lucide="upload" style="width: 18px; height: 18px;"></i>
+                    <span>Import CSV</span>
+                </button>
+            </x-authorized>
+            <x-authorized permission="employees.create">
+                <a href="{{ route('admin.employees.create') }}" class="btn btn-primary px-3 shadow-sm d-flex align-items-center gap-2">
+                    <i data-lucide="user-plus" style="width: 18px; height: 18px;"></i>
+                    <span>Add Employee</span>
+                </a>
+            </x-authorized>
         </div>
     </div>
 
@@ -97,7 +101,9 @@
                         <th>Email</th>
                         <th>Company</th>
                         <th>Created At</th>
-                        <th class="text-end">Actions</th>
+                        <x-authorized :permission="['employees.edit', 'employees.delete']">
+                            <th class="text-end">Actions</th>
+                        </x-authorized>
                     </tr>
                 </thead>
                 <tbody>
@@ -141,21 +147,27 @@
                                 @endif
                             </td>
                             <td class="text-body-secondary">{{ $employee->created_at->format('M d, Y') }}</td>
-                            <td class="text-end">
-                                <div class="d-inline-flex gap-1">
-                                    <a href="{{ route('admin.employees.edit', $employee) }}" class="btn btn-sm btn-outline-secondary p-2 d-inline-flex align-items-center justify-content-center" title="Edit Employee" aria-label="Edit employee {{ $employee->full_name }}">
-                                        <i data-lucide="edit-3" style="width: 16px; height: 16px;"></i>
-                                    </a>
-                                    <button type="button" class="btn btn-sm btn-outline-danger p-2 d-inline-flex align-items-center justify-content-center" title="Delete Employee"
-                                            aria-label="Delete employee {{ $employee->full_name }}"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#deleteEmployeeModal"
-                                            data-emp-name="{{ $employee->full_name }}"
-                                            data-emp-action="{{ route('admin.employees.destroy', $employee) }}">
-                                        <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
-                                    </button>
-                                </div>
-                            </td>
+                            <x-authorized :permission="['employees.edit', 'employees.delete']">
+                                <td class="text-end">
+                                    <div class="d-inline-flex gap-1">
+                                        <x-authorized permission="employees.edit">
+                                            <a href="{{ route('admin.employees.edit', $employee) }}" class="btn btn-sm btn-outline-secondary p-2 d-inline-flex align-items-center justify-content-center" title="Edit Employee" aria-label="Edit employee {{ $employee->full_name }}">
+                                                <i data-lucide="edit-3" style="width: 16px; height: 16px;"></i>
+                                            </a>
+                                        </x-authorized>
+                                        <x-authorized permission="employees.delete">
+                                            <button type="button" class="btn btn-sm btn-outline-danger p-2 d-inline-flex align-items-center justify-content-center" title="Delete Employee"
+                                                    aria-label="Delete employee {{ $employee->full_name }}"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteEmployeeModal"
+                                                    data-emp-name="{{ $employee->full_name }}"
+                                                    data-emp-action="{{ route('admin.employees.destroy', $employee) }}">
+                                                <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+                                            </button>
+                                        </x-authorized>
+                                    </div>
+                                </td>
+                            </x-authorized>
                         </tr>
                     @empty
                         <tr>
@@ -176,84 +188,90 @@
         @endif
     </div>
 
-    <!-- Import CSV Modal -->
-    <div class="modal fade" id="importCsvModal" tabindex="-1" aria-labelledby="importCsvModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content bg-body border-0 shadow">
-                <form method="POST" action="{{ route('admin.employees.import') }}" enctype="multipart/form-data">
-                    @csrf
-                    <div class="modal-header border-bottom">
-                        <h5 class="modal-title fw-bold text-body-emphasis" id="importCsvModalLabel">
-                            <i data-lucide="upload" class="text-primary me-2" style="width: 20px; height: 20px;"></i>
-                            Bulk Import Employees
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body text-body">
-                        <p class="text-body-secondary small mb-3">
-                            Upload a standard CSV file with columns: <code>employee_id, card_no, first_name, last_name, email</code>.
-                        </p>
-                        <div class="mb-3">
-                            <label for="csv_file" class="form-label fw-semibold text-body-emphasis">Select CSV File <span class="text-danger">*</span></label>
-                            <input type="file" name="csv_file" id="csv_file" class="form-control bg-body-tertiary text-body" accept=".csv,text/csv" required>
-                        </div>
-                        <div class="p-3 bg-body-tertiary rounded-3 border small text-body-secondary">
-                            <i data-lucide="info" class="me-1 text-primary" style="width: 14px; height: 14px;"></i>
-                            Need a template? <a href="{{ route('admin.employees.sample-csv') }}" class="text-primary fw-medium text-decoration-none">Download Dummy Sample CSV</a>
-                        </div>
-                    </div>
-                    <div class="modal-footer border-top">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary d-flex align-items-center gap-2">
-                            <i data-lucide="upload-cloud" style="width: 16px; height: 16px;"></i>
-                            <span>Start Import</span>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Delete Confirmation Modal -->
-    <div class="modal fade" id="deleteEmployeeModal" tabindex="-1" aria-labelledby="deleteEmployeeModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content bg-body border-0 shadow">
-                <div class="modal-header border-bottom">
-                    <h5 class="modal-title fw-bold text-body-emphasis" id="deleteEmployeeModalLabel">
-                        <i data-lucide="alert-triangle" class="text-danger me-2" style="width: 22px; height: 22px;"></i>
-                        Delete Employee
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-body">
-                    <p class="mb-2">Are you sure you want to delete employee <strong id="deleteEmpName" class="text-body-emphasis"></strong>?</p>
-                    <p class="text-body-secondary small mb-0">This will remove the employee record and their associated user account.</p>
-                </div>
-                <div class="modal-footer border-top">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <form id="deleteEmployeeForm" method="POST" action="">
+    {{-- Import CSV Modal --}}
+    <x-authorized permission="employees.import">
+        <div class="modal fade" id="importCsvModal" tabindex="-1" aria-labelledby="importCsvModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-body border-0 shadow">
+                    <form method="POST" action="{{ route('admin.employees.import') }}" enctype="multipart/form-data">
                         @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">Delete Employee</button>
+                        <div class="modal-header border-bottom">
+                            <h5 class="modal-title fw-bold text-body-emphasis" id="importCsvModalLabel">
+                                <i data-lucide="upload" class="text-primary me-2" style="width: 20px; height: 20px;"></i>
+                                Bulk Import Employees
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-body">
+                            <p class="text-body-secondary small mb-3">
+                                Upload a standard CSV file with columns: <code>employee_id, card_no, first_name, last_name, email</code>.
+                            </p>
+                            <div class="mb-3">
+                                <label for="csv_file" class="form-label fw-semibold text-body-emphasis">Select CSV File <span class="text-danger">*</span></label>
+                                <input type="file" name="csv_file" id="csv_file" class="form-control bg-body-tertiary text-body" accept=".csv,text/csv" required>
+                            </div>
+                            <div class="p-3 bg-body-tertiary rounded-3 border small text-body-secondary">
+                                <i data-lucide="info" class="me-1 text-primary" style="width: 14px; height: 14px;"></i>
+                                Need a template? <a href="{{ route('admin.employees.sample-csv') }}" class="text-primary fw-medium text-decoration-none">Download Dummy Sample CSV</a>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-top">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary d-flex align-items-center gap-2">
+                                <i data-lucide="upload-cloud" style="width: 16px; height: 16px;"></i>
+                                <span>Start Import</span>
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
-    </div>
+    </x-authorized>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const deleteModal = document.getElementById('deleteEmployeeModal');
-            if (deleteModal) {
-                deleteModal.addEventListener('show.bs.modal', (event) => {
-                    const button = event.relatedTarget;
-                    const empName = button.getAttribute('data-emp-name');
-                    const empAction = button.getAttribute('data-emp-action');
+    {{-- Delete Confirmation Modal --}}
+    <x-authorized permission="employees.delete">
+        <div class="modal fade" id="deleteEmployeeModal" tabindex="-1" aria-labelledby="deleteEmployeeModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-body border-0 shadow">
+                    <div class="modal-header border-bottom">
+                        <h5 class="modal-title fw-bold text-body-emphasis" id="deleteEmployeeModalLabel">
+                            <i data-lucide="alert-triangle" class="text-danger me-2" style="width: 22px; height: 22px;"></i>
+                            Delete Employee
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-body">
+                        <p class="mb-2">Are you sure you want to delete employee <strong id="deleteEmpName" class="text-body-emphasis"></strong>?</p>
+                        <p class="text-body-secondary small mb-0">This will remove the employee record and their associated user account.</p>
+                    </div>
+                    <div class="modal-footer border-top">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <form id="deleteEmployeeForm" method="POST" action="">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger">Delete Employee</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </x-authorized>
 
-                    document.getElementById('deleteEmpName').textContent = empName;
-                    document.getElementById('deleteEmployeeForm').setAttribute('action', empAction);
-                });
-            }
-        });
-    </script>
+    <x-authorized permission="employees.delete">
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const deleteModal = document.getElementById('deleteEmployeeModal');
+                if (deleteModal) {
+                    deleteModal.addEventListener('show.bs.modal', (event) => {
+                        const button = event.relatedTarget;
+                        const empName = button.getAttribute('data-emp-name');
+                        const empAction = button.getAttribute('data-emp-action');
+
+                        document.getElementById('deleteEmpName').textContent = empName;
+                        document.getElementById('deleteEmployeeForm').setAttribute('action', empAction);
+                    });
+                }
+            });
+        </script>
+    </x-authorized>
 </x-admin-layout>

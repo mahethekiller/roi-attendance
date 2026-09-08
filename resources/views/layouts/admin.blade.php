@@ -177,63 +177,30 @@
         <div class="offcanvas-body p-3">
             <div class="text-uppercase small fw-bold text-body-secondary mb-3 px-2">Main Menu</div>
             <ul class="nav nav-pills flex-column gap-1 mb-4">
-                <li class="nav-item">
-                    <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active bg-primary text-white' : 'text-body-secondary' }} rounded-3 px-3 py-2 d-flex align-items-center gap-2">
-                        <i data-lucide="layout-dashboard" style="width: 18px; height: 18px;"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('admin.employees.index') }}" class="nav-link {{ request()->routeIs('admin.employees.*') ? 'active bg-primary text-white' : 'text-body-secondary' }} rounded-3 px-3 py-2 d-flex align-items-center gap-2">
-                        <i data-lucide="contact-2" style="width: 18px; height: 18px;"></i>
-                        <span>Employee Directory</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active bg-primary text-white' : 'text-body-secondary' }} rounded-3 px-3 py-2 d-flex align-items-center gap-2">
-                        <i data-lucide="users" style="width: 18px; height: 18px;"></i>
-                        <span>User Accounts</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('admin.attendances.index') }}" class="nav-link {{ request()->routeIs('admin.attendances.*') ? 'active bg-primary text-white' : 'text-body-secondary' }} rounded-3 px-3 py-2 d-flex align-items-center gap-2">
-                        <i data-lucide="calendar-check" style="width: 18px; height: 18px;"></i>
-                        <span>Attendance Logs</span>
-                    </a>
-                </li>
+                <x-admin-nav-item route="admin.dashboard" icon="layout-dashboard" label="Dashboard" permission="dashboard.view" />
+                <x-admin-nav-item route="admin.employees.index" activePattern="admin.employees.*" icon="contact-2" label="Employee Directory" permission="employees.view" />
+                <x-admin-nav-item route="admin.users.index" activePattern="admin.users.*" icon="users" label="User Accounts" permission="users.view" />
+                <x-admin-nav-item route="admin.attendances.index" activePattern="admin.attendances.*" icon="calendar-check" label="Attendance Logs" permission="attendances.view" />
+                <x-admin-nav-item url="#" icon="bar-chart-3" label="Reports & Analytics" permission="reports.view" />
             </ul>
 
-            <div class="text-uppercase small fw-bold text-body-secondary mb-3 px-2">Developer & API</div>
-            <ul class="nav nav-pills flex-column gap-1 mb-4">
-                <li class="nav-item">
-                    <a href="{{ route('admin.api-docs.index') }}" class="nav-link {{ request()->routeIs('admin.api-docs.*') ? 'active bg-primary text-white' : 'text-body-secondary' }} rounded-3 px-3 py-2 d-flex align-items-center gap-2">
-                        <i data-lucide="book-open" style="width: 18px; height: 18px;"></i>
-                        <span>API Documentation</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('admin.api-tokens.index') }}" class="nav-link {{ request()->routeIs('admin.api-tokens.*') ? 'active bg-primary text-white' : 'text-body-secondary' }} rounded-3 px-3 py-2 d-flex align-items-center gap-2">
-                        <i data-lucide="key" style="width: 18px; height: 18px;"></i>
-                        <span>API Access Tokens</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('admin.api-logs.index') }}" class="nav-link {{ request()->routeIs('admin.api-logs.*') ? 'active bg-primary text-white' : 'text-body-secondary' }} rounded-3 px-3 py-2 d-flex align-items-center gap-2">
-                        <i data-lucide="activity" style="width: 18px; height: 18px;"></i>
-                        <span>API Traffic Logs</span>
-                    </a>
-                </li>
-            </ul>
+            <x-authorized :permission="['api.docs.view', 'api.tokens.manage', 'api.logs.view']">
+                <div class="text-uppercase small fw-bold text-body-secondary mb-3 px-2">Developer & API</div>
+                <ul class="nav nav-pills flex-column gap-1 mb-4">
+                    <x-admin-nav-item route="admin.api-docs.index" activePattern="admin.api-docs.*" icon="book-open" label="API Documentation" permission="api.docs.view" />
+                    <x-admin-nav-item route="admin.api-tokens.index" activePattern="admin.api-tokens.*" icon="key" label="API Access Tokens" permission="api.tokens.manage" />
+                    <x-admin-nav-item route="admin.api-logs.index" activePattern="admin.api-logs.*" icon="activity" label="API Traffic Logs" permission="api.logs.view" />
+                </ul>
+            </x-authorized>
 
-            <div class="text-uppercase small fw-bold text-body-secondary mb-3 px-2">Administration</div>
-            <ul class="nav nav-pills flex-column gap-1">
-                <li class="nav-item">
-                    <a href="{{ route('admin.sync-logs.index') }}" class="nav-link {{ request()->routeIs('admin.sync-logs.*') ? 'active bg-primary text-white' : 'text-body-secondary' }} rounded-3 px-3 py-2 d-flex align-items-center gap-2">
-                        <i data-lucide="history" style="width: 18px; height: 18px;"></i>
-                        <span>Sync History Logs</span>
-                    </a>
-                </li>
-            </ul>
+            <x-authorized :permission="['sync-logs.view', 'roles.manage', 'settings.manage']">
+                <div class="text-uppercase small fw-bold text-body-secondary mb-3 px-2">Administration</div>
+                <ul class="nav nav-pills flex-column gap-1">
+                    <x-admin-nav-item route="admin.sync-logs.index" activePattern="admin.sync-logs.*" icon="history" label="Sync History Logs" permission="sync-logs.view" />
+                    <x-admin-nav-item url="#" icon="shield-alert" label="Roles & Spatie RBAC" permission="roles.manage" />
+                    <x-admin-nav-item url="#" icon="settings" label="System Settings" permission="settings.manage" />
+                </ul>
+            </x-authorized>
         </div>
     </div>
 
@@ -243,81 +210,30 @@
             <aside class="admin-sidebar bg-body border-end d-none d-md-block p-3">
                 <div class="text-uppercase small fw-bold text-body-secondary mb-3 px-3">Main Menu</div>
                 <ul class="nav nav-pills flex-column gap-1">
-                    <li class="nav-item">
-                        <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active bg-primary text-white' : 'text-body-secondary' }} rounded-3 px-3 py-2 d-flex align-items-center gap-2">
-                            <i data-lucide="layout-dashboard" style="width: 18px; height: 18px;"></i>
-                            <span>Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('admin.employees.index') }}" class="nav-link {{ request()->routeIs('admin.employees.*') ? 'active bg-primary text-white' : 'text-body-secondary' }} rounded-3 px-3 py-2 d-flex align-items-center gap-2">
-                            <i data-lucide="contact-2" style="width: 18px; height: 18px;"></i>
-                            <span>Employee Directory</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active bg-primary text-white' : 'text-body-secondary' }} rounded-3 px-3 py-2 d-flex align-items-center gap-2">
-                            <i data-lucide="users" style="width: 18px; height: 18px;"></i>
-                            <span>User Accounts</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('admin.attendances.index') }}" class="nav-link {{ request()->routeIs('admin.attendances.*') ? 'active bg-primary text-white' : 'text-body-secondary' }} rounded-3 px-3 py-2 d-flex align-items-center gap-2">
-                            <i data-lucide="calendar-check" style="width: 18px; height: 18px;"></i>
-                            <span>Attendance Logs</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link text-body-secondary rounded-3 px-3 py-2 d-flex align-items-center gap-2">
-                            <i data-lucide="bar-chart-3" style="width: 18px; height: 18px;"></i>
-                            <span>Reports & Analytics</span>
-                        </a>
-                    </li>
+                    <x-admin-nav-item route="admin.dashboard" icon="layout-dashboard" label="Dashboard" permission="dashboard.view" />
+                    <x-admin-nav-item route="admin.employees.index" activePattern="admin.employees.*" icon="contact-2" label="Employee Directory" permission="employees.view" />
+                    <x-admin-nav-item route="admin.users.index" activePattern="admin.users.*" icon="users" label="User Accounts" permission="users.view" />
+                    <x-admin-nav-item route="admin.attendances.index" activePattern="admin.attendances.*" icon="calendar-check" label="Attendance Logs" permission="attendances.view" />
+                    <x-admin-nav-item url="#" icon="bar-chart-3" label="Reports & Analytics" permission="reports.view" />
                 </ul>
 
-                <div class="text-uppercase small fw-bold text-body-secondary mt-4 mb-3 px-3">Developer & API</div>
-                <ul class="nav nav-pills flex-column gap-1">
-                    <li class="nav-item">
-                        <a href="{{ route('admin.api-docs.index') }}" class="nav-link {{ request()->routeIs('admin.api-docs.*') ? 'active bg-primary text-white' : 'text-body-secondary' }} rounded-3 px-3 py-2 d-flex align-items-center gap-2">
-                            <i data-lucide="book-open" style="width: 18px; height: 18px;"></i>
-                            <span>API Documentation</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('admin.api-tokens.index') }}" class="nav-link {{ request()->routeIs('admin.api-tokens.*') ? 'active bg-primary text-white' : 'text-body-secondary' }} rounded-3 px-3 py-2 d-flex align-items-center gap-2">
-                            <i data-lucide="key" style="width: 18px; height: 18px;"></i>
-                            <span>API Access Tokens</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('admin.api-logs.index') }}" class="nav-link {{ request()->routeIs('admin.api-logs.*') ? 'active bg-primary text-white' : 'text-body-secondary' }} rounded-3 px-3 py-2 d-flex align-items-center gap-2">
-                            <i data-lucide="activity" style="width: 18px; height: 18px;"></i>
-                            <span>API Traffic Logs</span>
-                        </a>
-                    </li>
-                </ul>
+                <x-authorized :permission="['api.docs.view', 'api.tokens.manage', 'api.logs.view']">
+                    <div class="text-uppercase small fw-bold text-body-secondary mt-4 mb-3 px-3">Developer & API</div>
+                    <ul class="nav nav-pills flex-column gap-1">
+                        <x-admin-nav-item route="admin.api-docs.index" activePattern="admin.api-docs.*" icon="book-open" label="API Documentation" permission="api.docs.view" />
+                        <x-admin-nav-item route="admin.api-tokens.index" activePattern="admin.api-tokens.*" icon="key" label="API Access Tokens" permission="api.tokens.manage" />
+                        <x-admin-nav-item route="admin.api-logs.index" activePattern="admin.api-logs.*" icon="activity" label="API Traffic Logs" permission="api.logs.view" />
+                    </ul>
+                </x-authorized>
 
-                <div class="text-uppercase small fw-bold text-body-secondary mt-4 mb-3 px-3">Administration</div>
-                <ul class="nav nav-pills flex-column gap-1">
-                    <li class="nav-item">
-                        <a href="{{ route('admin.sync-logs.index') }}" class="nav-link {{ request()->routeIs('admin.sync-logs.*') ? 'active bg-primary text-white' : 'text-body-secondary' }} rounded-3 px-3 py-2 d-flex align-items-center gap-2">
-                            <i data-lucide="history" style="width: 18px; height: 18px;"></i>
-                            <span>Sync History Logs</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link text-body-secondary rounded-3 px-3 py-2 d-flex align-items-center gap-2">
-                            <i data-lucide="shield-alert" style="width: 18px; height: 18px;"></i>
-                            <span>Roles & Spatie RBAC</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link text-body-secondary rounded-3 px-3 py-2 d-flex align-items-center gap-2">
-                            <i data-lucide="settings" style="width: 18px; height: 18px;"></i>
-                            <span>System Settings</span>
-                        </a>
-                    </li>
-                </ul>
+                <x-authorized :permission="['sync-logs.view', 'roles.manage', 'settings.manage']">
+                    <div class="text-uppercase small fw-bold text-body-secondary mt-4 mb-3 px-3">Administration</div>
+                    <ul class="nav nav-pills flex-column gap-1">
+                        <x-admin-nav-item route="admin.sync-logs.index" activePattern="admin.sync-logs.*" icon="history" label="Sync History Logs" permission="sync-logs.view" />
+                        <x-admin-nav-item url="#" icon="shield-alert" label="Roles & Spatie RBAC" permission="roles.manage" />
+                        <x-admin-nav-item url="#" icon="settings" label="System Settings" permission="settings.manage" />
+                    </ul>
+                </x-authorized>
             </aside>
 
             <!-- Middle Main Content Area -->

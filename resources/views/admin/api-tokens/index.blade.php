@@ -10,10 +10,12 @@
                 <i data-lucide="book-open" style="width: 16px; height: 16px;"></i>
                 <span>View API Documentation</span>
             </a>
-            <button type="button" class="btn btn-primary btn-sm px-3 shadow-sm d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#createTokenModal">
-                <i data-lucide="plus-circle" style="width: 16px; height: 16px;"></i>
-                <span>Generate New Token</span>
-            </button>
+            <x-authorized permission="api.tokens.manage">
+                <button type="button" class="btn btn-primary btn-sm px-3 shadow-sm d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#createTokenModal">
+                    <i data-lucide="plus-circle" style="width: 16px; height: 16px;"></i>
+                    <span>Generate New Token</span>
+                </button>
+            </x-authorized>
         </div>
     </div>
 
@@ -68,7 +70,9 @@
                         <th>Abilities</th>
                         <th>Last Used</th>
                         <th>Created At</th>
-                        <th class="text-end">Actions</th>
+                        <x-authorized permission="api.tokens.manage">
+                            <th class="text-end">Actions</th>
+                        </x-authorized>
                     </tr>
                 </thead>
                 <tbody>
@@ -98,16 +102,18 @@
                                 @endif
                             </td>
                             <td class="text-body-secondary small">{{ $token->created_at->format('M d, Y h:i A') }}</td>
-                            <td class="text-end">
-                                <form method="POST" action="{{ route('admin.api-tokens.destroy', $token->id) }}" class="d-inline" onsubmit="return confirm('Revoke token \'{{ $token->name }}\'? External clients using it will immediately lose access.');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 p-2" aria-label="Revoke API token {{ $token->name }}" title="Revoke Token">
-                                        <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
-                                        <span>Revoke</span>
-                                    </button>
-                                </form>
-                            </td>
+                            <x-authorized permission="api.tokens.manage">
+                                <td class="text-end">
+                                    <form method="POST" action="{{ route('admin.api-tokens.destroy', $token->id) }}" class="d-inline" onsubmit="return confirm('Revoke token \'{{ $token->name }}\'? External clients using it will immediately lose access.');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 p-2" aria-label="Revoke API token {{ $token->name }}" title="Revoke Token">
+                                            <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                                            <span>Revoke</span>
+                                        </button>
+                                    </form>
+                                </td>
+                            </x-authorized>
                         </tr>
                     @empty
                         <tr>
@@ -123,45 +129,47 @@
     </div>
 
     <!-- Create Token Modal -->
-    <div class="modal fade" id="createTokenModal" tabindex="-1" aria-labelledby="createTokenModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content bg-body border-0 shadow">
-                <form method="POST" action="{{ route('admin.api-tokens.store') }}">
-                    @csrf
-                    <div class="modal-header border-bottom">
-                        <h5 class="modal-title fw-bold text-body-emphasis" id="createTokenModalLabel">
-                            <i data-lucide="plus-circle" class="text-primary me-2" style="width: 20px; height: 20px;"></i>
-                            Generate API Access Token
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body text-body">
-                        <div class="mb-3">
-                            <label for="token_name" class="form-label fw-semibold text-body-emphasis">Token Name / Client Identifier <span class="text-danger">*</span></label>
-                            <input type="text" name="token_name" id="token_name" class="form-control bg-body-tertiary text-body @error('token_name') is-invalid @enderror" placeholder="e.g. HR Payroll App, Mobile Scanner, External BI" required>
-                            <div class="form-text text-body-secondary">Give this token a descriptive name so you remember where it is being used.</div>
+    <x-authorized permission="api.tokens.manage">
+        <div class="modal fade" id="createTokenModal" tabindex="-1" aria-labelledby="createTokenModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-body border-0 shadow">
+                    <form method="POST" action="{{ route('admin.api-tokens.store') }}">
+                        @csrf
+                        <div class="modal-header border-bottom">
+                            <h5 class="modal-title fw-bold text-body-emphasis" id="createTokenModalLabel">
+                                <i data-lucide="plus-circle" class="text-primary me-2" style="width: 20px; height: 20px;"></i>
+                                Generate API Access Token
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold text-body-emphasis">Token Scopes / Abilities</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="abilities[]" value="attendance:read" id="scopeAttendanceRead" checked>
-                                <label class="form-check-label text-body-emphasis" for="scopeAttendanceRead">
-                                    <strong>attendance:read</strong> &mdash; Read attendance punch logs & summaries
-                                </label>
+                        <div class="modal-body text-body">
+                            <div class="mb-3">
+                                <label for="token_name" class="form-label fw-semibold text-body-emphasis">Token Name / Client Identifier <span class="text-danger">*</span></label>
+                                <input type="text" name="token_name" id="token_name" class="form-control bg-body-tertiary text-body @error('token_name') is-invalid @enderror" placeholder="e.g. HR Payroll App, Mobile Scanner, External BI" required>
+                                <div class="form-text text-body-secondary">Give this token a descriptive name so you remember where it is being used.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold text-body-emphasis">Token Scopes / Abilities</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="abilities[]" value="attendance:read" id="scopeAttendanceRead" checked>
+                                    <label class="form-check-label text-body-emphasis" for="scopeAttendanceRead">
+                                        <strong>attendance:read</strong> &mdash; Read attendance punch logs & summaries
+                                    </label>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="modal-footer border-top">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary d-flex align-items-center gap-2">
-                            <i data-lucide="key" style="width: 16px; height: 16px;"></i>
-                            <span>Generate Token</span>
-                        </button>
-                    </div>
-                </form>
+                        <div class="modal-footer border-top">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary d-flex align-items-center gap-2">
+                                <i data-lucide="key" style="width: 16px; height: 16px;"></i>
+                                <span>Generate Token</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
+    </x-authorized>
 
     <script>
         function copyToken() {

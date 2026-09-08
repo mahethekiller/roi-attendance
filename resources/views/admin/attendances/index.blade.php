@@ -6,21 +6,27 @@
             <p class="text-body-secondary mb-0">Biometric punch entries, check-in/out timestamps, and employee status tracking.</p>
         </div>
         <div class="d-flex flex-wrap gap-2">
-            <a href="{{ route('admin.sync-logs.index') }}" class="btn btn-outline-secondary btn-sm px-3 shadow-sm d-flex align-items-center gap-2">
-                <i data-lucide="history" style="width: 16px; height: 16px;"></i>
-                <span>View Sync History</span>
-            </a>
-            <form method="POST" action="{{ route('admin.attendances.sync') }}" class="d-inline">
-                @csrf
-                <button type="submit" class="btn btn-primary btn-sm px-3 shadow-sm d-flex align-items-center gap-2">
-                    <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i>
-                    <span>Sync Biometric Data</span>
+            <x-authorized permission="sync-logs.view">
+                <a href="{{ route('admin.sync-logs.index') }}" class="btn btn-outline-secondary btn-sm px-3 shadow-sm d-flex align-items-center gap-2">
+                    <i data-lucide="history" style="width: 16px; height: 16px;"></i>
+                    <span>View Sync History</span>
+                </a>
+            </x-authorized>
+            <x-authorized permission="attendances.sync">
+                <form method="POST" action="{{ route('admin.attendances.sync') }}" class="d-inline">
+                    @csrf
+                    <button type="submit" class="btn btn-primary btn-sm px-3 shadow-sm d-flex align-items-center gap-2">
+                        <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i>
+                        <span>Sync Biometric Data</span>
+                    </button>
+                </form>
+            </x-authorized>
+            <x-authorized permission="attendances.export">
+                <button class="btn btn-outline-secondary btn-sm px-3 shadow-sm d-flex align-items-center gap-2" onclick="window.print()">
+                    <i data-lucide="printer" style="width: 16px; height: 16px;"></i>
+                    <span>Print Daily Sheet</span>
                 </button>
-            </form>
-            <button class="btn btn-outline-secondary btn-sm px-3 shadow-sm d-flex align-items-center gap-2" onclick="window.print()">
-                <i data-lucide="printer" style="width: 16px; height: 16px;"></i>
-                <span>Print Daily Sheet</span>
-            </button>
+            </x-authorized>
         </div>
     </div>
 

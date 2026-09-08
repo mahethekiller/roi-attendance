@@ -5,12 +5,14 @@
             <h2 class="fw-bold text-body-emphasis mb-1">User Management</h2>
             <p class="text-body-secondary mb-0">Manage system users, assign Spatie roles, and configure administrative access.</p>
         </div>
-        <div class="d-flex gap-2">
-            <a href="{{ route('admin.users.create') }}" class="btn btn-primary px-3 shadow-sm d-flex align-items-center gap-2">
-                <i data-lucide="user-plus" style="width: 18px; height: 18px;"></i>
-                <span>Add New User</span>
-            </a>
-        </div>
+        <x-authorized permission="users.create">
+            <div class="d-flex gap-2">
+                <a href="{{ route('admin.users.create') }}" class="btn btn-primary px-3 shadow-sm d-flex align-items-center gap-2">
+                    <i data-lucide="user-plus" style="width: 18px; height: 18px;"></i>
+                    <span>Add New User</span>
+                </a>
+            </div>
+        </x-authorized>
     </div>
 
     <!-- Feedback Alerts -->
@@ -97,7 +99,9 @@
                         <th>Email</th>
                         <th>Spatie Roles</th>
                         <th>Joined Date</th>
-                        <th class="text-end">Actions</th>
+                        <x-authorized :permission="['users.edit', 'users.delete']">
+                            <th class="text-end">Actions</th>
+                        </x-authorized>
                     </tr>
                 </thead>
                 <tbody>
@@ -111,7 +115,7 @@
                                     <div>
                                         <div class="fw-semibold text-body-emphasis">{{ $user->name }}</div>
                                         @if(Auth::id() === $user->id)
-                                            <span class="badge bg-info-subtle text-info border border-info-subtle" style="font-size: 0.65rem;">You</span>
+                                             <span class="badge bg-info-subtle text-info border border-info-subtle" style="font-size: 0.65rem;">You</span>
                                         @endif
                                     </div>
                                 </div>
@@ -134,24 +138,30 @@
                                 @endforelse
                             </td>
                             <td class="text-body-secondary">{{ $user->created_at->format('M d, Y') }}</td>
-                            <td class="text-end">
-                                <div class="d-inline-flex gap-1">
-                                    <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-outline-secondary p-2 d-inline-flex align-items-center justify-content-center" title="Edit User" aria-label="Edit user {{ $user->name }}">
-                                        <i data-lucide="edit-3" style="width: 16px; height: 16px;"></i>
-                                    </a>
-                                    @if(Auth::id() !== $user->id)
-                                        <button type="button" class="btn btn-sm btn-outline-danger p-2 d-inline-flex align-items-center justify-content-center" title="Delete User"
-                                                aria-label="Delete user {{ $user->name }}"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#deleteUserModal"
-                                                data-user-id="{{ $user->id }}"
-                                                data-user-name="{{ $user->name }}"
-                                                data-user-action="{{ route('admin.users.destroy', $user) }}">
-                                            <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
-                                        </button>
-                                    @endif
-                                </div>
-                            </td>
+                            <x-authorized :permission="['users.edit', 'users.delete']">
+                                <td class="text-end">
+                                    <div class="d-inline-flex gap-1">
+                                        <x-authorized permission="users.edit">
+                                            <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-outline-secondary p-2 d-inline-flex align-items-center justify-content-center" title="Edit User" aria-label="Edit user {{ $user->name }}">
+                                                <i data-lucide="edit-3" style="width: 16px; height: 16px;"></i>
+                                            </a>
+                                        </x-authorized>
+                                        @if(Auth::id() !== $user->id)
+                                            <x-authorized permission="users.delete">
+                                                <button type="button" class="btn btn-sm btn-outline-danger p-2 d-inline-flex align-items-center justify-content-center" title="Delete User"
+                                                        aria-label="Delete user {{ $user->name }}"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#deleteUserModal"
+                                                        data-user-id="{{ $user->id }}"
+                                                        data-user-name="{{ $user->name }}"
+                                                        data-user-action="{{ route('admin.users.destroy', $user) }}">
+                                                    <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+                                                </button>
+                                            </x-authorized>
+                                        @endif
+                                    </div>
+                                </td>
+                            </x-authorized>
                         </tr>
                     @empty
                         <tr>

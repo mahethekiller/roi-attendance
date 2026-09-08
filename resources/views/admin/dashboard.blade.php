@@ -5,14 +5,18 @@
             <p class="text-body-secondary mb-0">Welcome back, {{ Auth::user()->name }}! Here's what's happening today.</p>
         </div>
         <div class="d-flex gap-2">
-            <a href="{{ route('admin.attendances.index') }}" class="btn btn-outline-secondary btn-sm px-3 shadow-sm d-flex align-items-center gap-1">
-                <i data-lucide="calendar-check" style="width: 16px; height: 16px;"></i>
-                <span>View Attendance Logs</span>
-            </a>
-            <a href="{{ route('admin.employees.create') }}" class="btn btn-primary btn-sm px-3 shadow-sm d-flex align-items-center gap-1">
-                <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
-                <span>Add Employee</span>
-            </a>
+            <x-authorized permission="attendances.view">
+                <a href="{{ route('admin.attendances.index') }}" class="btn btn-outline-secondary btn-sm px-3 shadow-sm d-flex align-items-center gap-1">
+                    <i data-lucide="calendar-check" style="width: 16px; height: 16px;"></i>
+                    <span>View Attendance Logs</span>
+                </a>
+            </x-authorized>
+            <x-authorized permission="employees.create">
+                <a href="{{ route('admin.employees.create') }}" class="btn btn-primary btn-sm px-3 shadow-sm d-flex align-items-center gap-1">
+                    <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+                    <span>Add Employee</span>
+                </a>
+            </x-authorized>
         </div>
     </div>
 

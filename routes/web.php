@@ -22,31 +22,54 @@ Route::get('/dashboard', function () {
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', function () {
         return view('admin.dashboard');
-    })->name('dashboard');
+    })->middleware('permission:dashboard.view')->name('dashboard');
 
-    Route::get('/employees/sample-csv', [EmployeeController::class, 'downloadSampleCsv'])->name('employees.sample-csv');
-    Route::post('/employees/import', [EmployeeController::class, 'importCsv'])->name('employees.import');
-    Route::resource('employees', EmployeeController::class);
+    // Employees
+    Route::middleware('permission:employees.import')->group(function () {
+        Route::get('/employees/sample-csv', [EmployeeController::class, 'downloadSampleCsv'])->name('employees.sample-csv');
+        Route::post('/employees/import', [EmployeeController::class, 'importCsv'])->name('employees.import');
+    });
 
-    Route::get('/attendances', [AttendanceController::class, 'index'])->name('attendances.index');
-    Route::post('/attendances/sync', [AttendanceController::class, 'sync'])->name('attendances.sync');
+    Route::get('/employees', [EmployeeController::class, 'index'])->middleware('permission:employees.view')->name('employees.index');
+    Route::get('/employees/create', [EmployeeController::class, 'create'])->middleware('permission:employees.create')->name('employees.create');
+    Route::post('/employees', [EmployeeController::class, 'store'])->middleware('permission:employees.create')->name('employees.store');
+    Route::get('/employees/{employee}', [EmployeeController::class, 'show'])->middleware('permission:employees.view')->name('employees.show');
+    Route::get('/employees/{employee}/edit', [EmployeeController::class, 'edit'])->middleware('permission:employees.edit')->name('employees.edit');
+    Route::match(['put', 'patch'], '/employees/{employee}', [EmployeeController::class, 'update'])->middleware('permission:employees.edit')->name('employees.update');
+    Route::delete('/employees/{employee}', [EmployeeController::class, 'destroy'])->middleware('permission:employees.delete')->name('employees.destroy');
 
-    Route::get('/sync-logs', [SyncLogController::class, 'index'])->name('sync-logs.index');
+    // Attendances
+    Route::get('/attendances', [AttendanceController::class, 'index'])->middleware('permission:attendances.view')->name('attendances.index');
+    Route::post('/attendances/sync', [AttendanceController::class, 'sync'])->middleware('permission:attendances.sync')->name('attendances.sync');
+
+    // Sync History Logs
+    Route::get('/sync-logs', [SyncLogController::class, 'index'])->middleware('permission:sync-logs.view')->name('sync-logs.index');
 
     // API Token Management
-    Route::get('/api-tokens', [ApiTokenController::class, 'index'])->name('api-tokens.index');
-    Route::post('/api-tokens', [ApiTokenController::class, 'store'])->name('api-tokens.store');
-    Route::delete('/api-tokens/{id}', [ApiTokenController::class, 'destroy'])->name('api-tokens.destroy');
+    Route::middleware('permission:api.tokens.manage')->group(function () {
+        Route::get('/api-tokens', [ApiTokenController::class, 'index'])->name('api-tokens.index');
+        Route::post('/api-tokens', [ApiTokenController::class, 'store'])->name('api-tokens.store');
+        Route::delete('/api-tokens/{id}', [ApiTokenController::class, 'destroy'])->name('api-tokens.destroy');
+    });
 
     // API Documentation & TXT Export
-    Route::get('/api-docs', [ApiDocsController::class, 'index'])->name('api-docs.index');
-    Route::get('/api-docs/export-txt', [ApiDocsController::class, 'exportTxt'])->name('api-docs.export-txt');
-    Route::get('/api-docs/export/{endpoint}', [ApiDocsController::class, 'exportEndpointTxt'])->name('api-docs.export-endpoint');
+    Route::middleware('permission:api.docs.view')->group(function () {
+        Route::get('/api-docs', [ApiDocsController::class, 'index'])->name('api-docs.index');
+        Route::get('/api-docs/export-txt', [ApiDocsController::class, 'exportTxt'])->name('api-docs.export-txt');
+        Route::get('/api-docs/export/{endpoint}', [ApiDocsController::class, 'exportEndpointTxt'])->name('api-docs.export-endpoint');
+    });
 
     // API Request Audit Logs
-    Route::get('/api-logs', [ApiLogController::class, 'index'])->name('api-logs.index');
+    Route::get('/api-logs', [ApiLogController::class, 'index'])->middleware('permission:api.logs.view')->name('api-logs.index');
 
-    Route::resource('users', UserController::class);
+    // User Management
+    Route::get('/users', [UserController::class, 'index'])->middleware('permission:users.view')->name('users.index');
+    Route::get('/users/create', [UserController::class, 'create'])->middleware('permission:users.create')->name('users.create');
+    Route::post('/users', [UserController::class, 'store'])->middleware('permission:users.create')->name('users.store');
+    Route::get('/users/{user}', [UserController::class, 'show'])->middleware('permission:users.view')->name('users.show');
+    Route::get('/users/{user}/edit', [UserController::class, 'edit'])->middleware('permission:users.edit')->name('users.edit');
+    Route::match(['put', 'patch'], '/users/{user}', [UserController::class, 'update'])->middleware('permission:users.edit')->name('users.update');
+    Route::delete('/users/{user}', [UserController::class, 'destroy'])->middleware('permission:users.delete')->name('users.destroy');
 });
 
 // External Cron Webhook Endpoint
