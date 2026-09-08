@@ -2,8 +2,10 @@ import './bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import * as bootstrap from 'bootstrap';
 import { createIcons, icons } from 'lucide';
+import Chart from 'chart.js/auto';
 
 window.bootstrap = bootstrap;
+window.Chart = Chart;
 
 // Initialize Lucide Icons globally
 export function renderLucideIcons() {
@@ -28,6 +30,8 @@ export function setupThemeController() {
             themeToggleBtn.innerHTML = `<i data-lucide="${iconName}" style="width: 18px; height: 18px;"></i>`;
             renderLucideIcons();
         }
+
+        window.dispatchEvent(new CustomEvent('roi-theme-changed', { detail: { theme } }));
     }
 
     const currentTheme = localStorage.getItem('roi_theme') || htmlElement.getAttribute('data-bs-theme') || 'dark';

@@ -12,17 +12,18 @@ use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\AttendanceController;
 use App\Http\Controllers\Admin\SyncLogController;
 use App\Http\Controllers\Admin\ApiTokenController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ApiDocsController;
 use App\Http\Controllers\Admin\ApiLogController;
 
-Route::get('/dashboard', function () {
-    return view('admin.dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->middleware('permission:dashboard.view')->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->middleware('permission:dashboard.view')
+        ->name('dashboard');
 
     // Employees
     Route::middleware('permission:employees.import')->group(function () {
