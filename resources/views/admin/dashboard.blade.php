@@ -69,9 +69,7 @@
                 <div class="d-flex align-items-center gap-3">
                     <div class="text-end">
                         <span class="small text-body-secondary d-block">This Month</span>
-                        <strong class="text-success">{{ $personalStats['daysPresent'] }} Present</strong>
-                        <span class="text-body-secondary">&bull;</span>
-                        <strong class="text-warning">{{ $personalStats['daysLate'] }} Late</strong>
+                        <strong class="text-success">{{ $personalStats['daysPresent'] }} Days Present</strong>
                     </div>
                     <div class="border-start ps-3">
                         <span class="small text-body-secondary d-block">Today's Punch</span>
@@ -118,19 +116,7 @@
         </div>
         <div class="col-12 col-sm-6 col-xl-3">
             <x-kpi-metric-card
-                title="Late Arrivals"
-                :value="number_format($todayLate)"
-                subtitle="Clocked in after 09:15 AM threshold"
-                icon="clock"
-                color="warning"
-                :trend="$lateRate . '% of present'"
-                :trendType="$todayLate > 0 ? 'warning' : 'success'"
-                :trendIcon="$todayLate > 0 ? 'alert-triangle' : 'check'"
-            />
-        </div>
-        <div class="col-12 col-sm-6 col-xl-3">
-            <x-kpi-metric-card
-                title="Absent / Pending"
+                title="Absent Today"
                 :value="number_format($todayAbsent)"
                 subtitle="Staff without registered punches today"
                 icon="user-x"
@@ -138,6 +124,18 @@
                 :trend="($totalEmployees > 0 ? round(($todayAbsent / $totalEmployees) * 100, 1) : 0) . '%'"
                 :trendType="$todayAbsent > 0 ? 'danger' : 'secondary'"
                 trendIcon="alert-circle"
+            />
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <x-kpi-metric-card
+                title="Attendance Rate"
+                :value="$attendanceRate . '%'"
+                :subtitle="$todayPresent . ' of ' . $totalEmployees . ' present today'"
+                icon="percent"
+                color="info"
+                :trend="$todayPresent . ' Present'"
+                trendType="info"
+                trendIcon="activity"
             />
         </div>
     </div>
@@ -151,7 +149,7 @@
                 <div class="card-header bg-body border-bottom p-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
                     <div>
                         <h6 class="fw-bold mb-0 text-body-emphasis">7-Day Attendance Trends</h6>
-                        <span class="text-body-secondary small">Daily comparison of Present, Late, and Absent personnel</span>
+                        <span class="text-body-secondary small">Daily comparison of Present and Absent personnel</span>
                     </div>
                     <span class="badge bg-body-tertiary text-body-secondary border font-monospace">
                         Last 7 Days
@@ -334,7 +332,6 @@
                 <tbody>
                     @forelse($recentPunches as $punch)
                         @php
-                            $isLate = $punch->show_status === 'Late' || (!empty($punch->check_in_time) && $punch->check_in_time > '09:15:00');
                             $empName = $punch->employee ? $punch->employee->full_name : 'Card #' . $punch->card_no;
                             $empInitials = $punch->employee ? $punch->employee->initials : 'ID';
                             $company = $punch->employee?->company ?? '—';
@@ -367,7 +364,7 @@
                                 {{ $punch->punch_date ? $punch->punch_date->format('M d, Y') : '—' }}
                             </td>
                             <td>
-                                <span class="font-monospace small fw-medium {{ $isLate ? 'text-warning' : 'text-body-emphasis' }}">
+                                <span class="font-monospace small fw-medium text-body-emphasis">
                                     {{ $punch->check_in_time ?? ($punch->check_in_datetime ? $punch->check_in_datetime->format('h:i A') : '—') }}
                                 </span>
                             </td>
@@ -381,17 +378,10 @@
                                 @endif
                             </td>
                             <td>
-                                @if($isLate)
-                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle d-inline-flex align-items-center gap-1">
-                                        <i data-lucide="clock" style="width: 12px; height: 12px;"></i>
-                                        Late
-                                    </span>
-                                @else
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle d-inline-flex align-items-center gap-1">
-                                        <i data-lucide="check" style="width: 12px; height: 12px;"></i>
-                                        Present
-                                    </span>
-                                @endif
+                                <span class="badge bg-success-subtle text-success border border-success-subtle d-inline-flex align-items-center gap-1">
+                                    <i data-lucide="check" style="width: 12px; height: 12px;"></i>
+                                    Present
+                                </span>
                             </td>
                             <td class="text-end pe-3">
                                 <x-authorized permission="attendances.view">
@@ -484,18 +474,6 @@
                                 pointBackgroundColor: '#10B981',
                                 pointBorderColor: '#fff',
                                 pointHoverRadius: 6,
-                            },
-                            {
-                                label: 'Late',
-                                data: @json($trendLate),
-                                borderColor: '#F59E0B',
-                                backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                                fill: true,
-                                tension: 0.35,
-                                borderWidth: 2,
-                                pointBackgroundColor: '#F59E0B',
-                                pointBorderColor: '#fff',
-                                pointHoverRadius: 5,
                             },
                             {
                                 label: 'Absent',

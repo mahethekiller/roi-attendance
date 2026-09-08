@@ -109,12 +109,12 @@ class DashboardTest extends TestCase
         // Check view variables
         $response->assertViewHas('totalEmployees', 3);
         $response->assertViewHas('todayPresent', 2);
-        $response->assertViewHas('todayLate', 1);
         $response->assertViewHas('todayAbsent', 1);
         $response->assertViewHas('attendanceRate', 66.7);
         $response->assertViewHas('companyBreakdown');
         $response->assertViewHas('trendLabels');
         $response->assertViewHas('trendPresent');
+        $response->assertViewHas('trendAbsent');
         $response->assertViewHas('hourlyLabels');
         $response->assertViewHas('hourlyPunches');
 
@@ -122,7 +122,8 @@ class DashboardTest extends TestCase
         $response->assertSee('Dashboard Overview');
         $response->assertSee('Total Staff');
         $response->assertSee('Present Today');
-        $response->assertSee('Late Arrivals');
+        $response->assertSee('Absent Today');
+        $response->assertSee('Attendance Rate');
         $response->assertSee('Acme Corp');
         $response->assertSee('Globex');
         $response->assertSee('attendanceTrendChart');
@@ -163,6 +164,6 @@ class DashboardTest extends TestCase
         $response->assertViewHas('personalStats');
         $response->assertSee('My Attendance Card');
         $response->assertSee('Card ID: 9999');
-        $response->assertSee('1 Present');
+        $response->assertSee('1 Days Present');
     }
 }

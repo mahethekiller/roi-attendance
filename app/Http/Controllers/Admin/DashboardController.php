@@ -31,26 +31,12 @@ class DashboardController extends Controller
 
         $presentEmployees = $todayAttendances->unique('card_no');
         $todayPresent = $presentEmployees->count();
-
-        $lateEmployees = $todayAttendances->filter(function ($att) {
-            if ($att->show_status === 'Late') {
-                return true;
-            }
-            if (!empty($att->check_in_time) && $att->check_in_time > '09:15:00') {
-                return true;
-            }
-            return false;
-        })->unique('card_no');
-        $todayLate = $lateEmployees->count();
-
         $todayAbsent = max(0, $totalEmployees - $todayPresent);
         $attendanceRate = $totalEmployees > 0 ? round(($todayPresent / $totalEmployees) * 100, 1) : 0;
-        $lateRate = $todayPresent > 0 ? round(($todayLate / $todayPresent) * 100, 1) : 0;
 
-        // 2. 7-Day Attendance Trend Line/Bar Series
+        // 2. 7-Day Attendance Trend Line/Bar Series (Present & Absent)
         $trendLabels = [];
         $trendPresent = [];
-        $trendLate = [];
         $trendAbsent = [];
 
         for ($i = 6; $i >= 0; $i--) {
@@ -61,13 +47,9 @@ class DashboardController extends Controller
 
             $dayAttendances = Attendance::whereDate('punch_date', $dateStr)->get();
             $dayPresent = $dayAttendances->unique('card_no')->count();
-            $dayLate = $dayAttendances->filter(function ($att) {
-                return $att->show_status === 'Late' || (!empty($att->check_in_time) && $att->check_in_time > '09:15:00');
-            })->unique('card_no')->count();
             $dayAbsent = max(0, $totalEmployees - $dayPresent);
 
             $trendPresent[] = $dayPresent;
-            $trendLate[] = $dayLate;
             $trendAbsent[] = $dayAbsent;
         }
 
@@ -154,7 +136,6 @@ class DashboardController extends Controller
 
             $personalStats = [
                 'daysPresent' => $personalMonthAttendances->count(),
-                'daysLate' => $personalMonthAttendances->filter(fn($a) => $a->show_status === 'Late' || (!empty($a->check_in_time) && $a->check_in_time > '09:15:00'))->count(),
                 'todayRecord' => $todayPersonalAttendance,
                 'monthlyLogs' => $personalMonthAttendances->sortByDesc('punch_date')->take(5),
             ];
@@ -164,13 +145,10 @@ class DashboardController extends Controller
             'totalEmployees',
             'totalCardsAssigned',
             'todayPresent',
-            'todayLate',
             'todayAbsent',
             'attendanceRate',
-            'lateRate',
             'trendLabels',
             'trendPresent',
-            'trendLate',
             'trendAbsent',
             'hourlyLabels',
             'hourlyPunches',
