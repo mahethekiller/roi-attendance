@@ -181,8 +181,12 @@ class AttendanceOverrideService
             $targetMinutes = (int) round($durationHours * 60);
 
             if ($totalMinutes < $targetMinutes) {
+                // Introduce realistic random variation between target (e.g. 9 hrs) and target + 30 mins (9h - 9h 30m)
+                $extraMinutes = rand(1, 30);
+                $extraSeconds = rand(0, 59);
+
                 $newOutDt = clone $inDt;
-                $newOutDt->modify("+{$targetMinutes} minutes");
+                $newOutDt->modify("+{$targetMinutes} minutes +{$extraMinutes} minutes +{$extraSeconds} seconds");
                 return $newOutDt->format('Y-m-d H:i:s');
             }
         } catch (\Exception $e) {

@@ -78,12 +78,16 @@ class AttendanceOverrideServiceTest extends TestCase
     public function test_adjust_check_out_ensures_at_least_9_hours_duration(): void
     {
         $checkIn = '2026-09-08 09:25:00';
-
-        // 7 hours duration (less than 9 hours) -> should be modified to checkIn + 9 hours
+        // 7 hours duration (less than 9 hours) -> should be modified to checkIn + 9h + random 1-30m
         $checkOutShort = '2026-09-08 16:25:00';
         $adjustedOut = $this->service->adjustCheckOut($checkIn, $checkOutShort);
 
-        $this->assertSame('2026-09-08 18:25:00', $adjustedOut);
+        $this->assertNotNull($adjustedOut);
+        $diffSeconds = strtotime($adjustedOut) - strtotime($checkIn);
+
+        // Must be between 9 hours (32400s) and 9.5 hours (34200s + 59s)
+        $this->assertGreaterThanOrEqual(9 * 3600 + 1, $diffSeconds);
+        $this->assertLessThanOrEqual(9.5 * 3600 + 59, $diffSeconds);
 
         // 9.5 hours duration (already >= 9 hours) -> should remain unchanged
         $checkOutLong = '2026-09-08 19:00:00';

@@ -191,10 +191,12 @@ class BiometricSyncTest extends TestCase
         $this->assertStringStartsWith('2026-09-08 09:', $attendance->check_in_datetime);
         $this->assertStringStartsWith('09:', $attendance->check_in_time);
 
-        // Check-out datetime should be shifted to check_in + 9 hours
+        // Check-out datetime should be shifted to check_in + 9h to 9h 30m
         $inTime = strtotime($attendance->check_in_datetime);
         $outTime = strtotime($attendance->check_out_datetime);
-        $this->assertSame(9 * 3600, $outTime - $inTime);
+        $durationSeconds = $outTime - $inTime;
+        $this->assertGreaterThanOrEqual(9 * 3600 + 1, $durationSeconds);
+        $this->assertLessThanOrEqual(9.5 * 3600 + 59, $durationSeconds);
     }
 
     public function test_repeated_sync_preserves_already_assigned_override_check_in_time(): void

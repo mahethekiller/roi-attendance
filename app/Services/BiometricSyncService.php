@@ -158,10 +158,33 @@ class BiometricSyncService
                             $maxCheckTime = $minCheckTime;
                             $maxTime = $minTime;
                         } else {
-                            $adjustedOut = $this->overrideService->adjustCheckOut($minCheckTime, $maxCheckTime, $overrideRule);
-                            if ($adjustedOut !== $maxCheckTime) {
-                                $maxCheckTime = $adjustedOut;
-                                $maxTime = date('H:i:s', strtotime($adjustedOut));
+                            // If the existing record already has an adjusted check-out that satisfies the minimum shift requirement (e.g. >= 9 hours),
+                            // preserve it so repeated sync cycles do not re-randomize checkout between 9 - 9:30 hrs!
+                            $hasExistingAdjustedOut = false;
+                            if ($existing && !empty($existing->check_out_datetime) && !empty($existing->check_in_datetime)) {
+                                $existingInTs = $existing->check_in_datetime instanceof \DateTimeInterface
+                                    ? $existing->check_in_datetime->getTimestamp()
+                                    : strtotime((string) $existing->check_in_datetime);
+                                $existingOutTs = $existing->check_out_datetime instanceof \DateTimeInterface
+                                    ? $existing->check_out_datetime->getTimestamp()
+                                    : strtotime((string) $existing->check_out_datetime);
+
+                                $minHours = $overrideRule?->min_duration_hours ?? 9.00;
+                                if ($existingOutTs > $existingInTs && ($existingOutTs - $existingInTs) >= ($minHours * 3600)) {
+                                    $hasExistingAdjustedOut = true;
+                                    $maxCheckTime = $existing->check_out_datetime instanceof \DateTimeInterface
+                                        ? $existing->check_out_datetime->format('Y-m-d H:i:s')
+                                        : (string) $existing->check_out_datetime;
+                                    $maxTime = $existing->check_out_time;
+                                }
+                            }
+
+                            if (!$hasExistingAdjustedOut) {
+                                $adjustedOut = $this->overrideService->adjustCheckOut($minCheckTime, $maxCheckTime, $overrideRule);
+                                if ($adjustedOut !== $maxCheckTime) {
+                                    $maxCheckTime = $adjustedOut;
+                                    $maxTime = date('H:i:s', strtotime($adjustedOut));
+                                }
                             }
                         }
                     }

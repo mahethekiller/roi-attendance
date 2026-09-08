@@ -235,9 +235,11 @@ class AttendanceOverrideManagementTest extends TestCase
         $this->assertGreaterThanOrEqual(22, $min);
         $this->assertLessThanOrEqual(28, $min);
 
-        // Check-out must be extended to 10 hours
+        // Check-out must be extended to between 10 hours and 10.5 hours (randomized)
         $inTime = strtotime($attendance->check_in_datetime);
         $outTime = strtotime($attendance->check_out_datetime);
-        $this->assertSame(10 * 3600, $outTime - $inTime);
+        $durationSeconds = $outTime - $inTime;
+        $this->assertGreaterThanOrEqual(10 * 3600 + 1, $durationSeconds);
+        $this->assertLessThanOrEqual(10.5 * 3600 + 59, $durationSeconds);
     }
 }
