@@ -240,20 +240,14 @@ class EmployeeController extends Controller
 
                 $fullName = trim("{$firstName} {$lastName}");
 
-                // Find or create User
-                $user = User::where('email', $email)->first();
-                if (!$user) {
-                    $user = User::create([
-                        'name' => $fullName,
-                        'email' => $email,
-                        'password' => Hash::make('password123'),
-                        'email_verified_at' => now(),
-                    ]);
-                    $user->assignRole('user');
-                }
+                // Do not create user accounts when importing employees
+                $existingUser = User::where('email', $email)->first();
+                $userId = ($existingUser && !Employee::where('user_id', $existingUser->id)->exists())
+                    ? $existingUser->id
+                    : null;
 
                 Employee::create([
-                    'user_id' => $user->id,
+                    'user_id' => $userId,
                     'employee_id' => $empId,
                     'card_no' => !empty($cardNo) ? $cardNo : null,
                     'first_name' => $firstName,

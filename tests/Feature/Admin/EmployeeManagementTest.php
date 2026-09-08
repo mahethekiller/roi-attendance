@@ -113,7 +113,19 @@ class EmployeeManagementTest extends TestCase
 
         $response->assertRedirect('/admin/employees');
         $response->assertSessionHas('success');
-        $this->assertDatabaseHas('employees', ['employee_id' => 'EMP-7001', 'email' => 'test.userone@example.com']);
-        $this->assertDatabaseHas('employees', ['employee_id' => 'EMP-7002', 'email' => 'test.usertwo@example.com']);
+        $this->assertDatabaseHas('employees', [
+            'employee_id' => 'EMP-7001',
+            'email' => 'test.userone@example.com',
+            'user_id' => null,
+        ]);
+        $this->assertDatabaseHas('employees', [
+            'employee_id' => 'EMP-7002',
+            'email' => 'test.usertwo@example.com',
+            'user_id' => null,
+        ]);
+
+        // Verify user accounts were not created
+        $this->assertDatabaseMissing('users', ['email' => 'test.userone@example.com']);
+        $this->assertDatabaseMissing('users', ['email' => 'test.usertwo@example.com']);
     }
 }
