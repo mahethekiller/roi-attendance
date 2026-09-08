@@ -196,4 +196,54 @@ class BiometricSyncTest extends TestCase
         $outTime = strtotime($attendance->check_out_datetime);
         $this->assertSame(9 * 3600, $outTime - $inTime);
     }
+
+    public function test_repeated_sync_preserves_already_assigned_override_check_in_time(): void
+    {
+        Employee::create([
+            'employee_id' => 'I2K2-0340',
+            'card_no' => '1234',
+            'first_name' => 'Persistent',
+            'last_name' => 'Check',
+            'email' => 'persist@example.com',
+            'company' => 'Acme Corp',
+        ]);
+
+        $mockData = [
+            'status' => 1,
+            'message' => 'Success',
+            'data' => [
+                [
+                    'card_no'      => '1234',
+                    'badgenumber'  => 'I2K2-0340',
+                    'punch_date'   => '2026-09-08',
+                    'mintime'      => '10:15:00',
+                    'minchecktime' => '2026-09-08 10:15:00',
+                    'maxtime'      => '17:00:00',
+                    'maxchecktime' => '2026-09-08 17:00:00',
+                ],
+            ],
+        ];
+
+        Http::fake([
+            '*get_today_data_api_new.php*' => Http::response($mockData, 200),
+        ]);
+
+        // First sync
+        $this->artisan('attendance:sync-biometric')->assertSuccessful();
+
+        $initialRecord = Attendance::where('card_no', '1234')->first();
+        $savedCheckIn = $initialRecord->check_in_datetime;
+        $savedCheckInTime = $initialRecord->check_in_time;
+        $savedCheckOut = $initialRecord->check_out_datetime;
+
+        // Second sync immediately after with same raw machine data
+        $this->artisan('attendance:sync-biometric')->assertSuccessful();
+
+        $secondRecord = Attendance::where('card_no', '1234')->first();
+
+        // Must remain exactly identical - NOT re-randomized on every sync cycle!
+        $this->assertEquals($savedCheckIn, $secondRecord->check_in_datetime);
+        $this->assertEquals($savedCheckInTime, $secondRecord->check_in_time);
+        $this->assertEquals($savedCheckOut, $secondRecord->check_out_datetime);
+    }
 }

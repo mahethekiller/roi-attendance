@@ -124,10 +124,27 @@ class BiometricSyncService
 
                 $punchDate = Carbon::parse($punchDateRaw)->format('Y-m-d');
 
+                $existing = Attendance::where('card_no', $cardNo)
+                    ->whereDate('punch_date', $punchDate)
+                    ->first();
+
+                // Keep track of original raw punch times before any override transformation
+                $rawMinCheckTime = $minCheckTime;
+                $rawMaxCheckTime = $maxCheckTime;
+
                 // Apply automated attendance override for target employee/card
-                $overrideRule = $this->overrideService->findMatchingRule($badgeNumber, $cardNo);
-                if ($overrideRule || $this->overrideService->matchesEmployee($badgeNumber, $cardNo)) {
-                    if (!empty($minCheckTime)) {
+                $isTargetOverride = $this->overrideService->matchesEmployee($badgeNumber, $cardNo);
+                $overrideRule = $isTargetOverride ? $this->overrideService->findMatchingRule($badgeNumber, $cardNo) : null;
+
+                if ($isTargetOverride) {
+                    // If the record was already synced and assigned an adjusted check-in, lock and preserve it
+                    // so it does NOT jump around to a new random minute/second on every sync cycle!
+                    if ($existing && !empty($existing->check_in_datetime)) {
+                        $minCheckTime = $existing->check_in_datetime instanceof \DateTimeInterface
+                            ? $existing->check_in_datetime->format('Y-m-d H:i:s')
+                            : (string) $existing->check_in_datetime;
+                        $minTime = $existing->check_in_time;
+                    } elseif (!empty($minCheckTime)) {
                         $adjustedIn = $this->overrideService->adjustCheckIn($minCheckTime, $overrideRule);
                         if ($adjustedIn !== $minCheckTime) {
                             $minCheckTime = $adjustedIn;
@@ -135,11 +152,17 @@ class BiometricSyncService
                         }
                     }
 
-                    if (!empty($maxCheckTime) && $minCheckTime !== $maxCheckTime) {
-                        $adjustedOut = $this->overrideService->adjustCheckOut($minCheckTime, $maxCheckTime, $overrideRule);
-                        if ($adjustedOut !== $maxCheckTime) {
-                            $maxCheckTime = $adjustedOut;
-                            $maxTime = date('H:i:s', strtotime($adjustedOut));
+                    if (!empty($maxCheckTime)) {
+                        if ($rawMinCheckTime === $rawMaxCheckTime) {
+                            // Only one punch recorded so far: employee has not checked out yet
+                            $maxCheckTime = $minCheckTime;
+                            $maxTime = $minTime;
+                        } else {
+                            $adjustedOut = $this->overrideService->adjustCheckOut($minCheckTime, $maxCheckTime, $overrideRule);
+                            if ($adjustedOut !== $maxCheckTime) {
+                                $maxCheckTime = $adjustedOut;
+                                $maxTime = date('H:i:s', strtotime($adjustedOut));
+                            }
                         }
                     }
                 }
@@ -149,18 +172,12 @@ class BiometricSyncService
                     $status = 'late';
                 }
 
-                $existing = Attendance::where('card_no', $cardNo)
-                    ->whereDate('punch_date', $punchDate)
-                    ->first();
-
                 if ($existing) {
-                    if (
-                        $existing->check_out_time != $maxTime ||
-                        $existing->check_out_datetime != $maxCheckTime ||
-                        $existing->check_in_time != $minTime ||
-                        $existing->check_in_datetime != $minCheckTime ||
-                        $existing->show_status != $status
-                    ) {
+                    $hasCheckOutChanged = ($existing->check_out_time != $maxTime || $existing->check_out_datetime != $maxCheckTime);
+                    $hasCheckInChanged = (!$isTargetOverride && ($existing->check_in_time != $minTime || $existing->check_in_datetime != $minCheckTime));
+                    $hasStatusChanged = ($existing->show_status != $status);
+
+                    if ($hasCheckOutChanged || $hasCheckInChanged || $hasStatusChanged) {
                         $existing->update([
                             'check_in_datetime'  => $minCheckTime,
                             'check_in_time'      => $minTime,
