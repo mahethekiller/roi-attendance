@@ -74,7 +74,7 @@ class AttendanceApiTest extends TestCase
             ->assertJsonStructure([
                 'success',
                 'data' => [
-                    '*' => ['id', 'card_no', 'punch_date', 'check_in_time', 'check_out_time', 'show_status', 'employee']
+                    '*' => ['id', 'card_no', 'punch_date', 'check_in_time', 'check_out_time', 'check_in_datetime', 'check_out_datetime', 'show_status', 'employee']
                 ],
                 'meta' => ['current_page', 'last_page', 'per_page', 'total']
             ]);

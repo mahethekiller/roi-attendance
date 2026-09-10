@@ -87,6 +87,8 @@ class HRsaleAttendanceApiTest extends TestCase
         $this->assertEquals('EMP-1002', $data[0]['employee_id']);
         $this->assertEquals('John Doe', $data[0]['employee_name']);
         $this->assertEquals('Demo Company', $data[0]['company_name']);
+        $this->assertEquals($today . ' 09:15:00', $data[0]['check_in_datetime']);
+        $this->assertEquals($today . ' 18:15:00', $data[0]['check_out_datetime']);
 
         // Assert removed fields are absent
         $this->assertArrayNotHasKey('attendance_status', $data[0]);
@@ -195,5 +197,39 @@ class HRsaleAttendanceApiTest extends TestCase
         $this->assertStringStartsWith('09:', $data[0]['clock_in']);
         // total_work must be at least 9 hours
         $this->assertGreaterThanOrEqual('09:00:00', $data[0]['total_work']);
+    }
+
+    public function test_attendance_returns_check_in_and_check_out_datetime_with_zero_checkout_when_not_checked_out(): void
+    {
+        $employee = \App\Models\Employee::create([
+            'employee_id' => 'EMP-SINGLE',
+            'card_no' => '5555',
+            'first_name' => 'Single',
+            'last_name' => 'Punch',
+            'email' => 'single.punch@example.com',
+            'company' => 'Acme Corp',
+        ]);
+
+        \App\Models\Attendance::create([
+            'card_no' => '5555',
+            'badgenumber' => 'EMP-SINGLE',
+            'punch_date' => '2026-09-10',
+            'check_in_time' => '09:20:38',
+            'check_in_datetime' => '2026-09-10 09:20:38',
+            'check_out_time' => null,
+            'check_out_datetime' => null,
+            'show_status' => 'present',
+        ]);
+
+        $response = $this->withToken($this->token)->postJson('/api/attendance', [
+            'punch_date' => '2026-09-10',
+            'card_no' => '5555',
+        ]);
+
+        $response->assertStatus(200);
+        $data = $response->json();
+        $this->assertCount(1, $data);
+        $this->assertEquals('2026-09-10 09:20:38', $data[0]['check_in_datetime']);
+        $this->assertEquals('2026-09-10 00:00:00', $data[0]['check_out_datetime']);
     }
 }

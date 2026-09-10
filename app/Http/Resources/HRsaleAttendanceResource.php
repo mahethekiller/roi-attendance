@@ -62,12 +62,44 @@ class HRsaleAttendanceResource extends JsonResource
         $companyName = $this->employee?->company ?: 'ROI Attendance';
         $employeeId = (string) ($this->employee?->employee_id ?: ($this->badgenumber ?: $this->card_no));
 
+        // Format check_in_datetime
+        $checkInDatetime = null;
+        if (!empty($this->check_in_datetime)) {
+            $checkInDatetime = $this->check_in_datetime instanceof \DateTimeInterface
+                ? $this->check_in_datetime->format('Y-m-d H:i:s')
+                : Carbon::parse($this->check_in_datetime)->format('Y-m-d H:i:s');
+        } elseif (!empty($clockIn)) {
+            $checkInDatetime = "{$punchDate} {$clockIn}";
+        } else {
+            $checkInDatetime = "{$punchDate} 00:00:00";
+        }
+
+        // Format check_out_datetime
+        $checkOutDatetime = null;
+        if (!empty($this->check_out_datetime)) {
+            $formattedOut = $this->check_out_datetime instanceof \DateTimeInterface
+                ? $this->check_out_datetime->format('Y-m-d H:i:s')
+                : Carbon::parse($this->check_out_datetime)->format('Y-m-d H:i:s');
+
+            if ($formattedOut === $checkInDatetime) {
+                $checkOutDatetime = "{$punchDate} 00:00:00";
+            } else {
+                $checkOutDatetime = $formattedOut;
+            }
+        } elseif (!empty($clockOut) && $clockOut !== '00:00:00' && $clockOut !== $clockIn) {
+            $checkOutDatetime = "{$punchDate} {$clockOut}";
+        } else {
+            $checkOutDatetime = "{$punchDate} 00:00:00";
+        }
+
         return [
             'time_attendance_id'  => (string) $this->id,
             'card_no'             => (string) $this->card_no,
             'punch_date'          => $punchDate,
             'clock_in'            => $clockIn,
             'clock_out'           => $clockOut,
+            'check_in_datetime'   => $checkInDatetime,
+            'check_out_datetime'  => $checkOutDatetime,
             'total_work'          => $totalWork,
             'employee_id'         => $employeeId,
             'employee_name'       => $employeeName,
