@@ -28,12 +28,40 @@ class HRsaleAttendanceResource extends JsonResource
             $clockIn = Carbon::parse($this->check_in_datetime)->format('H:i:s');
         }
 
-        // Format clock_out
+        // Format check_in_datetime
+        $checkInDatetime = null;
+        if (!empty($this->check_in_datetime)) {
+            $checkInDatetime = $this->check_in_datetime instanceof \DateTimeInterface
+                ? $this->check_in_datetime->format('Y-m-d H:i:s')
+                : Carbon::parse($this->check_in_datetime)->format('Y-m-d H:i:s');
+        } elseif (!empty($clockIn)) {
+            $checkInDatetime = "{$punchDate} {$clockIn}";
+        } else {
+            $checkInDatetime = "{$punchDate} 00:00:00";
+        }
+
+        // Format check_out_datetime (null at first until employee punches out at last)
+        $checkOutDatetime = null;
+        if (!empty($this->check_out_datetime)) {
+            $formattedOut = $this->check_out_datetime instanceof \DateTimeInterface
+                ? $this->check_out_datetime->format('Y-m-d H:i:s')
+                : Carbon::parse($this->check_out_datetime)->format('Y-m-d H:i:s');
+
+            if ($formattedOut !== $checkInDatetime) {
+                $checkOutDatetime = $formattedOut;
+            }
+        } elseif (!empty($this->check_out_time) && $this->check_out_time !== '00:00:00' && $this->check_out_time !== $this->check_in_time) {
+            $checkOutDatetime = "{$punchDate} {$this->check_out_time}";
+        }
+
+        // Format clock_out (empty until checked out)
         $clockOut = '';
-        if (!empty($this->check_out_time)) {
-            $clockOut = strlen($this->check_out_time) === 8 ? $this->check_out_time : Carbon::parse($this->check_out_time)->format('H:i:s');
-        } elseif ($this->check_out_datetime) {
-            $clockOut = Carbon::parse($this->check_out_datetime)->format('H:i:s');
+        if ($checkOutDatetime !== null) {
+            if (!empty($this->check_out_time) && $this->check_out_time !== $this->check_in_time) {
+                $clockOut = strlen($this->check_out_time) === 8 ? $this->check_out_time : Carbon::parse($this->check_out_time)->format('H:i:s');
+            } else {
+                $clockOut = Carbon::parse($checkOutDatetime)->format('H:i:s');
+            }
         }
 
         // Calculate total work duration
@@ -61,36 +89,6 @@ class HRsaleAttendanceResource extends JsonResource
 
         $companyName = $this->employee?->company ?: 'ROI Attendance';
         $employeeId = (string) ($this->employee?->employee_id ?: ($this->badgenumber ?: $this->card_no));
-
-        // Format check_in_datetime
-        $checkInDatetime = null;
-        if (!empty($this->check_in_datetime)) {
-            $checkInDatetime = $this->check_in_datetime instanceof \DateTimeInterface
-                ? $this->check_in_datetime->format('Y-m-d H:i:s')
-                : Carbon::parse($this->check_in_datetime)->format('Y-m-d H:i:s');
-        } elseif (!empty($clockIn)) {
-            $checkInDatetime = "{$punchDate} {$clockIn}";
-        } else {
-            $checkInDatetime = "{$punchDate} 00:00:00";
-        }
-
-        // Format check_out_datetime
-        $checkOutDatetime = null;
-        if (!empty($this->check_out_datetime)) {
-            $formattedOut = $this->check_out_datetime instanceof \DateTimeInterface
-                ? $this->check_out_datetime->format('Y-m-d H:i:s')
-                : Carbon::parse($this->check_out_datetime)->format('Y-m-d H:i:s');
-
-            if ($formattedOut === $checkInDatetime) {
-                $checkOutDatetime = "{$punchDate} 00:00:00";
-            } else {
-                $checkOutDatetime = $formattedOut;
-            }
-        } elseif (!empty($clockOut) && $clockOut !== '00:00:00' && $clockOut !== $clockIn) {
-            $checkOutDatetime = "{$punchDate} {$clockOut}";
-        } else {
-            $checkOutDatetime = "{$punchDate} 00:00:00";
-        }
 
         return [
             'time_attendance_id'  => (string) $this->id,

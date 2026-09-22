@@ -248,4 +248,76 @@ class BiometricSyncTest extends TestCase
         $this->assertEquals($savedCheckInTime, $secondRecord->check_in_time);
         $this->assertEquals($savedCheckOut, $secondRecord->check_out_datetime);
     }
+
+    public function test_biometric_sync_sets_checkout_null_initially_and_updates_on_later_checkout(): void
+    {
+        Employee::create([
+            'employee_id' => '2001',
+            'card_no'     => '5501',
+            'first_name'  => 'Morning',
+            'last_name'   => 'Puncher',
+            'email'       => 'morning@example.com',
+            'company'     => 'Acme Corp',
+        ]);
+
+        // 1. Initial morning punch (only 1 punch: minchecktime == maxchecktime)
+        $initialMorningData = [
+            'status'  => 1,
+            'message' => 'Success',
+            'data'    => [
+                [
+                    'card_no'      => '5501',
+                    'badgenumber'  => '2001',
+                    'punch_date'   => '2026-09-02',
+                    'mintime'      => '09:05:00',
+                    'minchecktime' => '2026-09-02 09:05:00',
+                    'maxtime'      => '09:05:00',
+                    'maxchecktime' => '2026-09-02 09:05:00',
+                ],
+            ],
+        ];
+
+        // 2. Evening checkout punch (last punch out: maxtime > mintime)
+        $eveningCheckoutData = [
+            'status'  => 1,
+            'message' => 'Success',
+            'data'    => [
+                [
+                    'card_no'      => '5501',
+                    'badgenumber'  => '2001',
+                    'punch_date'   => '2026-09-02',
+                    'mintime'      => '09:05:00',
+                    'minchecktime' => '2026-09-02 09:05:00',
+                    'maxtime'      => '18:15:00',
+                    'maxchecktime' => '2026-09-02 18:15:00',
+                ],
+            ],
+        ];
+
+        Http::fake([
+            '*get_today_data_api_new.php*' => Http::sequence()
+                ->push($initialMorningData, 200)
+                ->push($eveningCheckoutData, 200),
+        ]);
+
+        $this->artisan('attendance:sync-biometric')->assertSuccessful();
+
+        $record = Attendance::where('card_no', '5501')->first();
+        $this->assertNotNull($record);
+        $this->assertEquals('2026-09-02 09:05:00', $record->check_in_datetime->format('Y-m-d H:i:s'));
+        $this->assertEquals('09:05:00', $record->check_in_time);
+        // Initially, check_out_datetime must be null
+        $this->assertNull($record->check_out_datetime);
+        $this->assertNull($record->check_out_time);
+
+        // Second sync triggers the second response in sequence (evening checkout)
+        $this->artisan('attendance:sync-biometric')->assertSuccessful();
+
+        $updatedRecord = Attendance::where('card_no', '5501')->first();
+        $this->assertEquals('2026-09-02 09:05:00', $updatedRecord->check_in_datetime->format('Y-m-d H:i:s'));
+        // At last, check_out_datetime is updated
+        $this->assertNotNull($updatedRecord->check_out_datetime);
+        $this->assertEquals('2026-09-02 18:15:00', $updatedRecord->check_out_datetime->format('Y-m-d H:i:s'));
+        $this->assertEquals('18:15:00', $updatedRecord->check_out_time);
+    }
 }

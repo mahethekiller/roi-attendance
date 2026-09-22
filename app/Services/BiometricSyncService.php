@@ -155,8 +155,8 @@ class BiometricSyncService
                     if (!empty($maxCheckTime)) {
                         if ($rawMinCheckTime === $rawMaxCheckTime) {
                             // Only one punch recorded so far: employee has not checked out yet
-                            $maxCheckTime = $minCheckTime;
-                            $maxTime = $minTime;
+                            $maxCheckTime = null;
+                            $maxTime = null;
                         } else {
                             // If the existing record already has an adjusted check-out that satisfies the minimum shift requirement (e.g. >= 9 hours),
                             // preserve it so repeated sync cycles do not re-randomize checkout between 9 - 9:30 hrs!
@@ -187,6 +187,12 @@ class BiometricSyncService
                                 }
                             }
                         }
+                    }
+                } else {
+                    if ($rawMinCheckTime === $rawMaxCheckTime) {
+                        // Only one punch recorded so far: employee has not checked out yet
+                        $maxCheckTime = null;
+                        $maxTime = null;
                     }
                 }
 

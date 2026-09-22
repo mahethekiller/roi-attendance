@@ -26,23 +26,21 @@ class AttendanceResource extends JsonResource
             $checkInDatetime = "{$punchDate} 00:00:00";
         }
 
-        // Format check_out_datetime
+        // Format check_out_datetime (null at first until employee punches out at last)
         $checkOutDatetime = null;
         if (!empty($this->check_out_datetime)) {
             $formattedOut = $this->check_out_datetime instanceof \DateTimeInterface
                 ? $this->check_out_datetime->format('Y-m-d H:i:s')
                 : Carbon::parse($this->check_out_datetime)->format('Y-m-d H:i:s');
 
-            if ($formattedOut === $checkInDatetime) {
-                $checkOutDatetime = $punchDate ? "{$punchDate} 00:00:00" : null;
-            } else {
+            if ($formattedOut !== $checkInDatetime) {
                 $checkOutDatetime = $formattedOut;
             }
         } elseif ($punchDate && !empty($this->check_out_time) && $this->check_out_time !== '00:00:00' && $this->check_out_time !== $this->check_in_time) {
             $checkOutDatetime = "{$punchDate} {$this->check_out_time}";
-        } elseif ($punchDate) {
-            $checkOutDatetime = "{$punchDate} 00:00:00";
         }
+
+        $checkOutTime = ($checkOutDatetime !== null) ? $this->check_out_time : null;
 
         return [
             'id'                  => $this->id,
@@ -50,7 +48,7 @@ class AttendanceResource extends JsonResource
             'badgenumber'         => $this->badgenumber,
             'punch_date'          => $punchDate,
             'check_in_time'       => $this->check_in_time,
-            'check_out_time'      => $this->check_out_time,
+            'check_out_time'      => $checkOutTime,
             'check_in_datetime'   => $checkInDatetime,
             'check_out_datetime'  => $checkOutDatetime,
             'total_time'          => $this->total_time,
