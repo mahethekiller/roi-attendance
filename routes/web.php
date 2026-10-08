@@ -45,8 +45,8 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('/attendances', [AttendanceController::class, 'index'])->middleware('permission:attendances.view')->name('attendances.index');
     Route::post('/attendances/sync', [AttendanceController::class, 'sync'])->middleware('permission:attendances.sync')->name('attendances.sync');
 
-    // Biometric 9-Hour Auto-Sync Module
-    Route::middleware('permission:attendances.sync')->prefix('attendance-sync')->name('attendance-sync.')->group(function () {
+    // Biometric 9-Hour Auto-Sync Module (Super Admin Only)
+    Route::middleware('role:super-admin')->prefix('attendance-sync')->name('attendance-sync.')->group(function () {
         Route::get('/', [AttendanceSyncController::class, 'index'])->name('index');
         Route::get('/punches', [AttendanceSyncController::class, 'fetchPunches'])->name('punches');
         Route::post('/sync', [AttendanceSyncController::class, 'syncPunch'])->name('sync');

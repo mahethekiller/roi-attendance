@@ -62,6 +62,11 @@ class RoleBasedAccessTest extends TestCase
         $response->assertSee('System Settings');
         $response->assertSee('Add Employee');
         $response->assertSee('View Attendance Logs');
+        $response->assertSee('9h Auto-Sync');
+
+        // Direct access to /admin/attendance-sync allowed for Super Admin
+        $syncResponse = $this->actingAs($this->superAdmin)->get('/admin/attendance-sync');
+        $syncResponse->assertStatus(200);
     }
 
     public function test_admin_sees_operational_nav_but_not_developer_api_tokens(): void
@@ -73,12 +78,18 @@ class RoleBasedAccessTest extends TestCase
         $response->assertSee('Attendance Logs');
         // User Accounts is reserved solely for Super Admin
         $response->assertDontSee('User Accounts');
+        // 9h Auto-Sync is reserved solely for Super Admin
+        $response->assertDontSee('9h Auto-Sync');
         // Admin does not have api.tokens.manage permission
         $response->assertDontSee('API Access Tokens');
 
         // Verify direct route access to /admin/users is forbidden for regular admin
         $usersResponse = $this->actingAs($this->admin)->get('/admin/users');
         $usersResponse->assertStatus(403);
+
+        // Verify direct route access to /admin/attendance-sync is forbidden for regular admin
+        $syncResponse = $this->actingAs($this->admin)->get('/admin/attendance-sync');
+        $syncResponse->assertStatus(403);
     }
 
     public function test_manager_sees_monitoring_components_but_not_user_management(): void
@@ -88,9 +99,13 @@ class RoleBasedAccessTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Employee Directory');
         $response->assertSee('Attendance Logs');
-        // Manager does not have users.view or api.tokens.manage
+        // Manager does not have users.view or api.tokens.manage or super-admin role
         $response->assertDontSee('User Accounts');
         $response->assertDontSee('API Access Tokens');
+        $response->assertDontSee('9h Auto-Sync');
+
+        $syncResponse = $this->actingAs($this->manager)->get('/admin/attendance-sync');
+        $syncResponse->assertStatus(403);
     }
 
     public function test_standard_user_cannot_access_or_see_administrative_modules(): void
@@ -101,6 +116,7 @@ class RoleBasedAccessTest extends TestCase
         $response->assertDontSee('User Accounts');
         $response->assertDontSee('API Access Tokens');
         $response->assertDontSee('API Documentation');
+        $response->assertDontSee('9h Auto-Sync');
 
         // Direct route access should be rejected with 403 Forbidden
         $usersResponse = $this->actingAs($this->user)->get('/admin/users');
@@ -111,6 +127,9 @@ class RoleBasedAccessTest extends TestCase
 
         $employeesResponse = $this->actingAs($this->user)->get('/admin/employees');
         $employeesResponse->assertStatus(403);
+
+        $syncResponse = $this->actingAs($this->user)->get('/admin/attendance-sync');
+        $syncResponse->assertStatus(403);
     }
 
     public function test_action_buttons_are_omitted_for_users_without_permission(): void
