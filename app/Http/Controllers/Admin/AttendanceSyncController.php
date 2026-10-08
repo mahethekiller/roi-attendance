@@ -713,10 +713,18 @@ class AttendanceSyncController extends Controller
     }
 
     /**
-     * Compute Check-In timestamp using DB rule if present, or fallback.
+     * Compute Check-In timestamp: preserves original first punch if present, or fallback.
      */
     protected function calculateDbRuleCheckIn(string $date, ?string $firstTimeInput, ?AttendanceOverride $rule): string
     {
+        if (!empty($firstTimeInput)) {
+            $clean = str_replace('T', ' ', trim($firstTimeInput));
+            if (!preg_match('/^\d{4}-\d{2}-\d{2}/', $clean)) {
+                $clean = $date . ' ' . $clean;
+            }
+            return $clean;
+        }
+
         $minMinute = $rule?->adjusted_in_min_minute ?? 20;
         $maxMinute = $rule?->adjusted_in_max_minute ?? 35;
         $randomMinutes = rand((int)$minMinute, (int)$maxMinute);

@@ -119,33 +119,8 @@ class AttendanceOverrideService
      */
     public function adjustCheckIn(?string $checkInDatetime, ?AttendanceOverride $rule = null): ?string
     {
-        if (!$this->isOverrideEnabled() || empty($checkInDatetime)) {
-            return $checkInDatetime;
-        }
-
-        try {
-            $dt = new DateTime($checkInDatetime);
-            $timeStr = $dt->format('H:i:s');
-
-            $windowStart = $rule?->check_in_window_start ?? '10:00:00';
-            $windowEnd = $rule?->check_in_window_end ?? '10:20:00';
-            $minMinute = $rule?->adjusted_in_min_minute ?? 20;
-            $maxMinute = $rule?->adjusted_in_max_minute ?? 35;
-
-            // Check if check-in time is between window start and end
-            if ($timeStr > $windowStart && $timeStr < $windowEnd) {
-                $randomMinutes = rand((int) $minMinute, (int) $maxMinute);
-                $randomSeconds = rand(0, 59);
-
-                $newTime = sprintf('09:%02d:%02d', $randomMinutes, $randomSeconds);
-                $datePart = $dt->format('Y-m-d');
-
-                return $datePart . ' ' . $newTime;
-            }
-        } catch (\Exception $e) {
-            Log::warning("AttendanceOverrideService adjustCheckIn error for '{$checkInDatetime}': " . $e->getMessage());
-        }
-
+        // Per business requirement: Check-in stays as is (keeps original biometric punch time)
+        // Check-out time is adjusted to match the full time duration.
         return $checkInDatetime;
     }
 

@@ -193,8 +193,8 @@ class HRsaleAttendanceApiTest extends TestCase
         $data = $response->json();
         $this->assertCount(1, $data);
 
-        // clock_in must be adjusted to 09:xx
-        $this->assertStringStartsWith('09:', $data[0]['clock_in']);
+        // clock_in stays as is (10:15:00)
+        $this->assertSame('10:15:00', $data[0]['clock_in']);
         // total_work must be at least 9 hours
         $this->assertGreaterThanOrEqual('09:00:00', $data[0]['total_work']);
     }

@@ -137,20 +137,9 @@ class BiometricSyncService
                 $overrideRule = $isTargetOverride ? $this->overrideService->findMatchingRule($badgeNumber, $cardNo) : null;
 
                 if ($isTargetOverride) {
-                    // If the record was already synced and assigned an adjusted check-in, lock and preserve it
-                    // so it does NOT jump around to a new random minute/second on every sync cycle!
-                    if ($existing && !empty($existing->check_in_datetime)) {
-                        $minCheckTime = $existing->check_in_datetime instanceof \DateTimeInterface
-                            ? $existing->check_in_datetime->format('Y-m-d H:i:s')
-                            : (string) $existing->check_in_datetime;
-                        $minTime = $existing->check_in_time;
-                    } elseif (!empty($minCheckTime)) {
-                        $adjustedIn = $this->overrideService->adjustCheckIn($minCheckTime, $overrideRule);
-                        if ($adjustedIn !== $minCheckTime) {
-                            $minCheckTime = $adjustedIn;
-                            $minTime = date('H:i:s', strtotime($adjustedIn));
-                        }
-                    }
+                    // Check-in stays as is (keeps original biometric punch time)
+                    $minCheckTime = $rawMinCheckTime;
+                    $minTime = !empty($rawMinCheckTime) ? date('H:i:s', strtotime($rawMinCheckTime)) : $minTime;
 
                     if (!empty($maxCheckTime)) {
                         if ($rawMinCheckTime === $rawMaxCheckTime) {

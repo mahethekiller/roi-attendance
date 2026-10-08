@@ -583,9 +583,9 @@
             <div class="p-3.5 rounded-xl bg-primary/10 border border-primary/20 mb-3 text-xs">
                 <div class="font-bold text-base-content mb-1" id="confirmDbRuleTitle">Active Employee Rule Plan</div>
                 <div class="text-base-content/80 font-mono space-y-1">
-                    <div>&bull; Target Check-In: <span class="font-bold text-primary" id="confirmDbRuleIn">09:20 &ndash; 09:35</span></div>
-                    <div>&bull; Target Duration: <span class="font-bold text-success" id="confirmDbRuleDuration">&ge; 9.0 Hours (18:25 &ndash; 18:45)</span></div>
-                    <div>&bull; Action: <span class="text-base-content font-bold">Overwrites BOTH 1st and Last punch in biometric database</span></div>
+                    <div>&bull; Check-In: <span class="font-bold text-primary" id="confirmDbRuleIn">Preserves Original (As Is)</span></div>
+                    <div>&bull; Target Duration: <span class="font-bold text-success" id="confirmDbRuleDuration">&ge; 9.0 Hours (Check-Out Adjusted to Match)</span></div>
+                    <div>&bull; Action: <span class="text-base-content font-bold">Keeps check-in as is, updates check-out to match full shift duration</span></div>
                 </div>
             </div>
 
@@ -661,10 +661,8 @@
             if (rule) {
                 banner.className = 'p-3 rounded-xl bg-info/10 border border-info/30 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs';
                 titleEl.textContent = `DB Override Rule Plan Active for ${rule.employee_name || code}`;
-                const minMin = rule.adjusted_in_min_minute || 20;
-                const maxMin = rule.adjusted_in_max_minute || 35;
                 const minHours = rule.min_duration_hours || 9.0;
-                descEl.innerHTML = `Check-In Window: <strong class="text-primary font-mono">09:${String(minMin).padStart(2,'0')} - 09:${String(maxMin).padStart(2,'0')}</strong> | Target Duration: <strong class="text-success font-mono">&ge; ${minHours}h</strong>`;
+                descEl.innerHTML = `Check-In: <strong class="text-primary font-mono">Keeps Original (As Is)</strong> | Target Duration: <strong class="text-success font-mono">&ge; ${minHours}h (Check-Out Adjusted to Match)</strong>`;
                 badgeEl.textContent = `Rule #${rule.id} Active`;
                 badgeEl.className = 'badge badge-info badge-sm badge-soft font-mono';
             } else {
@@ -1644,14 +1642,12 @@
 
             if (rule) {
                 document.getElementById('confirmDbRuleTitle').textContent = `Active DB Rule #${rule.id} for ${rule.employee_name || state.empCode}`;
-                const minMin = rule.adjusted_in_min_minute || 20;
-                const maxMin = rule.adjusted_in_max_minute || 35;
                 const minH = rule.min_duration_hours || 9.0;
-                document.getElementById('confirmDbRuleIn').textContent = `09:${String(minMin).padStart(2,'0')} - 09:${String(maxMin).padStart(2,'0')}`;
-                document.getElementById('confirmDbRuleDuration').textContent = `≥ ${minH}h (${Math.round(minH)} hours duration)`;
+                document.getElementById('confirmDbRuleIn').textContent = `Keeps Original (As Is)`;
+                document.getElementById('confirmDbRuleDuration').textContent = `≥ ${minH}h (Check-Out Adjusted)`;
             } else {
                 document.getElementById('confirmDbRuleTitle').textContent = `Default 9-Hour Plan (Fallback)`;
-                document.getElementById('confirmDbRuleIn').textContent = `09:20 - 09:35 (Generated)`;
+                document.getElementById('confirmDbRuleIn').textContent = `Keeps Original (As Is)`;
                 document.getElementById('confirmDbRuleDuration').textContent = `≥ 9.0 Hours`;
             }
 

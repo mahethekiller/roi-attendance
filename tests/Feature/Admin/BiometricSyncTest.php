@@ -187,11 +187,11 @@ class BiometricSyncTest extends TestCase
         $attendance = Attendance::where('card_no', '1234')->first();
         $this->assertNotNull($attendance);
 
-        // Check-in datetime should be shifted back to 09:20 - 09:35
-        $this->assertStringStartsWith('2026-09-08 09:', $attendance->check_in_datetime);
-        $this->assertStringStartsWith('09:', $attendance->check_in_time);
+        // Check-in datetime stays as is (10:15:00)
+        $this->assertSame('2026-09-08 10:15:00', $attendance->check_in_datetime?->format('Y-m-d H:i:s'));
+        $this->assertSame('10:15:00', $attendance->check_in_time);
 
-        // Check-out datetime should be shifted to check_in + 9h to 9h 30m
+        // Check-out datetime should be shifted to match 9h duration
         $inTime = strtotime($attendance->check_in_datetime);
         $outTime = strtotime($attendance->check_out_datetime);
         $durationSeconds = $outTime - $inTime;

@@ -229,13 +229,11 @@ class AttendanceOverrideManagementTest extends TestCase
         $attendance = Attendance::where('card_no', '5555')->first();
         $this->assertNotNull($attendance);
 
-        // Check-in must be shifted back to 09:22 - 09:28
-        $this->assertStringStartsWith('2026-09-08 09:', $attendance->check_in_datetime);
-        $min = (int) substr($attendance->check_in_time, 3, 2);
-        $this->assertGreaterThanOrEqual(22, $min);
-        $this->assertLessThanOrEqual(28, $min);
+        // Check-in stays as is (10:35:00)
+        $this->assertSame('2026-09-08 10:35:00', $attendance->check_in_datetime?->format('Y-m-d H:i:s'));
+        $this->assertSame('10:35:00', $attendance->check_in_time);
 
-        // Check-out must be extended to between 10 hours and 10.5 hours (randomized)
+        // Check-out must be extended to match 10 hours duration (randomized)
         $inTime = strtotime($attendance->check_in_datetime);
         $outTime = strtotime($attendance->check_out_datetime);
         $durationSeconds = $outTime - $inTime;

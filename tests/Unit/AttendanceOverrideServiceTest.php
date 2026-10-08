@@ -41,37 +41,20 @@ class AttendanceOverrideServiceTest extends TestCase
         $this->assertSame('2026-09-08 10:10:00', $disabledService->adjustCheckIn('2026-09-08 10:10:00'));
     }
 
-    public function test_adjust_check_in_within_10_00_to_10_20_window(): void
+    public function test_check_in_within_10_00_to_10_20_stays_as_is(): void
     {
         $original = '2026-09-08 10:14:22';
         $adjusted = $this->service->adjustCheckIn($original);
 
-        $this->assertNotSame($original, $adjusted);
-        $this->assertStringStartsWith('2026-09-08 09:', $adjusted);
-
-        // Minutes must be between 20 and 35
-        $timePart = substr($adjusted, 11);
-        [$hour, $min, $sec] = explode(':', $timePart);
-
-        $this->assertSame('09', $hour);
-        $this->assertGreaterThanOrEqual(20, (int) $min);
-        $this->assertLessThanOrEqual(35, (int) $min);
-        $this->assertGreaterThanOrEqual(0, (int) $sec);
-        $this->assertLessThanOrEqual(59, (int) $sec);
+        // Check-in stays as is per user requirement
+        $this->assertSame($original, $adjusted);
     }
 
-    public function test_does_not_adjust_check_in_outside_10_00_to_10_20_window(): void
+    public function test_check_in_outside_window_also_stays_as_is(): void
     {
-        // 09:45:00 is before 10:00:00
         $this->assertSame('2026-09-08 09:45:00', $this->service->adjustCheckIn('2026-09-08 09:45:00'));
-
-        // 10:00:00 boundary
         $this->assertSame('2026-09-08 10:00:00', $this->service->adjustCheckIn('2026-09-08 10:00:00'));
-
-        // 10:20:00 boundary
         $this->assertSame('2026-09-08 10:20:00', $this->service->adjustCheckIn('2026-09-08 10:20:00'));
-
-        // 10:30:00 is after 10:20:00
         $this->assertSame('2026-09-08 10:30:00', $this->service->adjustCheckIn('2026-09-08 10:30:00'));
     }
 
@@ -120,10 +103,9 @@ class AttendanceOverrideServiceTest extends TestCase
 
         $adjusted = $this->service->adjustAttendanceList($records);
 
-        // Target record modified
-        $this->assertStringStartsWith('2026-09-08 09:', $adjusted[0]->check_in_datetime);
-        $this->assertStringStartsWith('09:', $adjusted[0]->check_in_time);
-        // Check out duration at least 9 hours from adjusted in
+        // Target record: Check-in stays as is, check-out adjusted to at least 9 hours duration
+        $this->assertSame('2026-09-08 10:12:00', $adjusted[0]->check_in_datetime);
+        $this->assertSame('10:12:00', $adjusted[0]->check_in_time);
         $inTime = strtotime($adjusted[0]->check_in_datetime);
         $outTime = strtotime($adjusted[0]->check_out_datetime);
         $this->assertGreaterThanOrEqual(9 * 3600, $outTime - $inTime);
