@@ -51,6 +51,8 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
         Route::get('/punches', [AttendanceSyncController::class, 'fetchPunches'])->name('punches');
         Route::post('/sync', [AttendanceSyncController::class, 'syncPunch'])->name('sync');
         Route::post('/bulk-sync', [AttendanceSyncController::class, 'bulkSync'])->name('bulk-sync');
+        Route::post('/sync-db-rule', [AttendanceSyncController::class, 'syncWithDbRule'])->name('sync-db-rule');
+        Route::post('/bulk-sync-db-rule', [AttendanceSyncController::class, 'bulkSyncWithDbRule'])->name('bulk-sync-db-rule');
     });
 
     // Sync History Logs

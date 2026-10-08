@@ -18,7 +18,7 @@
                 </div>
                 <div>
                     <h1 class="text-2xl font-bold text-base-content tracking-tight">Biometric 9-Hour Auto-Sync</h1>
-                    <p class="text-sm text-base-content/70 mt-0.5">Detect attendance shortfall days (&lt; 9 hours) and synchronize check-out punches to 09h 00m &ndash; 09h 15m.</p>
+                    <p class="text-sm text-base-content/70 mt-0.5">Detect attendance shortfall days (&lt; 9 hours) and synchronize punches via 9h Auto-Sync or DB Override Plan.</p>
                 </div>
             </div>
         </div>
@@ -31,6 +31,10 @@
                 </span>
                 Admin Security Guard
             </span>
+            <a href="{{ route('admin.attendance-overrides.index') }}" class="btn btn-outline btn-sm sm:btn-md gap-2 shadow-xs" title="Manage database override rules">
+                <i data-lucide="sliders" class="w-4 h-4"></i>
+                <span>DB Rules ({{ $activeRules->count() }})</span>
+            </a>
             <a href="{{ route('admin.attendances.index') }}" class="btn btn-outline btn-sm sm:btn-md gap-2 shadow-xs">
                 <i data-lucide="calendar" class="w-4 h-4"></i>
                 <span>Daily Logs</span>
@@ -48,7 +52,7 @@
             <div class="flex items-center justify-between gap-2 border-b border-base-200 pb-3 mb-4">
                 <div class="flex items-center gap-2">
                     <i data-lucide="filter" class="w-4 h-4 text-primary"></i>
-                    <h2 class="text-sm font-bold uppercase tracking-wider text-base-content/80">Query Filters & Presets</h2>
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-base-content/80">Query Filters &amp; DB Plan Settings</h2>
                 </div>
                 <div class="text-xs text-base-content/50 font-mono hidden sm:block">
                     Target API: <span class="text-primary font-semibold">get_employee_punches_api.php</span>
@@ -73,6 +77,7 @@
                                 value="{{ $defaultEmpCode }}" 
                                 placeholder="e.g. 10337" 
                                 class="input input-bordered input-sm sm:input-md join-item w-full bg-base-100 text-base-content font-mono font-semibold"
+                                oninput="handleEmployeeCodeChange()"
                                 required
                             />
                         </div>
@@ -121,6 +126,24 @@
                             <i data-lucide="refresh-cw" class="w-4 h-4" id="loadBtnIcon"></i>
                             <span id="loadBtnText">Load Attendance</span>
                         </button>
+                    </div>
+                </div>
+
+                <!-- Active DB Override Rule Plan Banner (Dynamic per selected Employee) -->
+                <div id="activeRuleBanner" class="p-3 rounded-xl bg-info/10 border border-info/30 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs">
+                    <div class="flex items-center gap-2.5">
+                        <div class="p-1.5 rounded-lg bg-info text-info-content">
+                            <i data-lucide="zap" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <span class="font-bold text-base-content" id="ruleBannerTitle">DB Override Rule Active for Employee</span>
+                            <div class="text-[11px] text-base-content/70 font-mono mt-0.5" id="ruleBannerDesc">
+                                Check-In: <strong class="text-primary">09:20 - 09:35</strong> | Check-Out: <strong class="text-success">&ge; 9.0 Hours</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="badge badge-info badge-sm badge-soft font-mono" id="ruleBannerBadge">Rule #1 Active</span>
                     </div>
                 </div>
 
@@ -208,26 +231,35 @@
             </div>
         </div>
 
-        <!-- Prominent Bulk Auto-Sync Action Bar -->
-        <div id="bulkSyncBanner" class="mt-4 p-4 rounded-xl bg-warning/10 border border-warning/30 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 transition-all duration-300">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-lg bg-warning text-warning-content flex items-center justify-center shrink-0">
-                    <i data-lucide="zap" class="w-5 h-5"></i>
+        <!-- Prominent Bulk Sync Action Bar (Two Sync Options: 9h Out vs DB Rule Both) -->
+        <div id="bulkSyncBanner" class="mt-4 p-4 rounded-xl bg-base-100 border border-base-200/90 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4 transition-all duration-300">
+            <div class="flex items-start sm:items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-warning/20 text-warning flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
+                    <i data-lucide="sparkles" class="w-5 h-5"></i>
                 </div>
                 <div>
                     <h3 class="font-bold text-sm text-base-content flex items-center gap-2">
-                        <span>Attendance Shortfall Detected</span>
-                        <span class="badge badge-warning badge-xs font-mono font-bold" id="bulkShortfallBadgeCount">0 Days</span>
+                        <span>Attendance Synchronization Available</span>
+                        <span class="badge badge-warning badge-xs font-mono font-bold" id="bulkShortfallBadgeCount">0 Shortfall Days</span>
                     </h3>
                     <p class="text-xs text-base-content/70 mt-0.5">
-                        Synchronize all shortfall dates automatically. Each check-out will be randomized strictly between <span class="font-mono font-bold text-base-content">09h 00m</span> and <span class="font-mono font-bold text-base-content">09h 15m</span>.
+                        Choose between standard <strong class="text-base-content">9h Out Sync</strong> (adjusts check-out only) or <strong class="text-primary">DB Rule Plan</strong> (synchronizes both Check-In &amp; Check-Out).
                     </p>
                 </div>
             </div>
-            <div class="shrink-0 flex items-center gap-2">
-                <button type="button" id="bulkSyncBtn" class="btn btn-warning btn-sm sm:btn-md gap-2 font-bold shadow-sm" onclick="promptBulkSyncConfirmation()">
-                    <i data-lucide="sparkles" class="w-4 h-4"></i>
-                    <span id="bulkSyncBtnText">Auto-Sync ALL Shortfall Days</span>
+
+            <!-- Dual Action Buttons -->
+            <div class="shrink-0 flex flex-wrap items-center gap-2">
+                <!-- Button 1: Standard 9h Check-Out Sync -->
+                <button type="button" id="bulkSyncBtn" class="btn btn-warning btn-sm sm:btn-md gap-2 font-bold shadow-xs" onclick="promptBulkSyncConfirmation()">
+                    <i data-lucide="clock" class="w-4 h-4"></i>
+                    <span id="bulkSyncBtnText">Auto-Sync 9h Out</span>
+                </button>
+
+                <!-- Button 2: Sync BOTH First & Last with DB Rule Plan -->
+                <button type="button" id="bulkDbRuleSyncBtn" class="btn btn-primary btn-sm sm:btn-md gap-2 font-bold shadow-xs" onclick="promptBulkDbRuleSyncConfirmation()">
+                    <i data-lucide="zap" class="w-4 h-4"></i>
+                    <span id="bulkDbRuleBtnText">Sync First &amp; Last (DB Plan)</span>
                 </button>
             </div>
         </div>
@@ -236,12 +268,12 @@
         <div id="bulkProgressContainer" class="mt-4 p-4 rounded-xl bg-base-100 border border-base-200 hidden">
             <div class="flex items-center justify-between text-xs mb-2">
                 <span class="font-bold text-base-content flex items-center gap-2">
-                    <span class="loading loading-spinner loading-xs text-warning"></span>
-                    <span id="bulkProgressStatus">Synchronizing Shortfall Dates...</span>
+                    <span class="loading loading-spinner loading-xs text-primary" id="bulkProgressSpinner"></span>
+                    <span id="bulkProgressStatus">Synchronizing Attendance Records...</span>
                 </span>
                 <span class="font-mono font-bold text-base-content/80" id="bulkProgressText">0 / 0 (0%)</span>
             </div>
-            <progress id="bulkProgressBar" class="progress progress-warning w-full h-3" value="0" max="100"></progress>
+            <progress id="bulkProgressBar" class="progress progress-primary w-full h-3" value="0" max="100"></progress>
         </div>
     </div>
 
@@ -252,13 +284,14 @@
             <div class="p-4 border-b border-base-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div class="flex items-center gap-2">
                     <i data-lucide="table-2" class="w-4 h-4 text-base-content/60"></i>
-                    <h2 class="text-sm font-bold uppercase tracking-wider text-base-content/80">Biometric Attendance Logs & Sync Matrix</h2>
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-base-content/80">Biometric Attendance Logs &amp; Sync Matrix</h2>
                     <span class="badge badge-sm badge-neutral font-mono" id="tableRowCountBadge">0 Days</span>
                 </div>
 
-                <div class="flex items-center gap-2 text-xs">
-                    <span class="text-base-content/50 font-mono">Algorithm:</span>
-                    <span class="badge badge-sm badge-ghost font-mono border-base-300">Offset = 9h + rand(0,14)m + rand(5,55)s</span>
+                <div class="flex flex-wrap items-center gap-2 text-xs">
+                    <span class="text-base-content/50 font-mono">Sync Modes:</span>
+                    <span class="badge badge-sm badge-warning badge-soft font-mono">⚡ 9h Out</span>
+                    <span class="badge badge-sm badge-primary badge-soft font-mono">🔄 Both (DB Plan)</span>
                 </div>
             </div>
 
@@ -267,7 +300,7 @@
                 <table class="table table-sm sm:table-md w-full" id="attendanceTable">
                     <thead>
                         <tr class="bg-base-200/50 text-base-content/70 text-xs uppercase tracking-wider border-b border-base-200">
-                            <th class="py-3 px-4 font-bold">Date & Day</th>
+                            <th class="py-3 px-4 font-bold">Date &amp; Day</th>
                             <th class="py-3 px-3 font-bold text-center">Logs</th>
                             <th class="py-3 px-3 font-bold">1st Entry (Check-In)</th>
                             <th class="py-3 px-3 font-bold">Last Entry (Check-Out)</th>
@@ -286,7 +319,7 @@
                                     </div>
                                     <div>
                                         <div class="font-semibold text-base text-base-content">No attendance data loaded yet</div>
-                                        <p class="text-xs text-base-content/60 mt-1">Specify employee badge & date range above, then click <strong class="text-primary font-bold">Load Attendance</strong>.</p>
+                                        <p class="text-xs text-base-content/60 mt-1">Specify employee badge &amp; date range above, then click <strong class="text-primary font-bold">Load Attendance</strong>.</p>
                                     </div>
                                     <button type="button" class="btn btn-sm btn-primary gap-2 mt-2" onclick="loadAttendanceData()">
                                         <i data-lucide="search" class="w-4 h-4"></i>
@@ -313,6 +346,10 @@
                     <span class="flex items-center gap-1.5 font-medium">
                         <span class="w-2.5 h-2.5 rounded-full bg-error"></span>
                         <span>Single Punch: Missing Check-Out</span>
+                    </span>
+                    <span class="flex items-center gap-1.5 font-medium">
+                        <span class="w-2.5 h-2.5 rounded-full bg-primary"></span>
+                        <span>DB Plan Synced: Both In &amp; Out Adjusted</span>
                     </span>
                 </div>
                 <div class="font-mono text-[11px] text-base-content/50">
@@ -394,9 +431,7 @@
 
                 <!-- Modal Actions -->
                 <div class="modal-action mt-2 gap-2">
-                    <form method="dialog">
-                        <button type="button" class="btn btn-ghost btn-sm sm:btn-md" onclick="document.getElementById('manualAdjustModal').close()">Cancel</button>
-                    </form>
+                    <button type="button" class="btn btn-ghost btn-sm sm:btn-md" onclick="document.getElementById('manualAdjustModal').close()">Cancel</button>
                     <button type="submit" id="modalSaveBtn" class="btn btn-primary btn-sm sm:btn-md gap-2">
                         <i data-lucide="save" class="w-4 h-4"></i>
                         <span>Save Changes</span>
@@ -409,7 +444,7 @@
         </form>
     </dialog>
 
-    <!-- Bulk Sync Confirmation Modal Dialog -->
+    <!-- Bulk Sync Confirmation Modal (Standard 9h Check-Out Only) -->
     <dialog id="bulkSyncConfirmModal" class="modal modal-bottom sm:modal-middle">
         <div class="modal-box bg-base-100 border border-base-200/80 shadow-2xl p-5 sm:p-6 max-w-lg">
             <div class="flex items-center gap-3 text-warning border-b border-base-200 pb-3 mb-4">
@@ -417,13 +452,13 @@
                     <i data-lucide="alert-triangle" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <h3 class="font-bold text-lg text-base-content">Confirm Bulk Auto-Sync</h3>
-                    <p class="text-xs text-base-content/60">You are about to batch synchronize multiple biometric punches</p>
+                    <h3 class="font-bold text-lg text-base-content">Confirm Auto-Sync (Check-Out Only)</h3>
+                    <p class="text-xs text-base-content/60">Adjusts check-out punch to 09h 00m &ndash; 09h 15m from existing check-in</p>
                 </div>
             </div>
 
             <p class="text-xs sm:text-sm text-base-content/80 mb-3">
-                This action will compute realistic randomized check-out punches (<strong class="text-base-content">09h 00m &ndash; 09h 15m</strong>) and update the biometric attendance database for all <strong class="text-warning font-mono font-bold" id="confirmBulkShortfallCount">0</strong> shortfall days.
+                This action will compute realistic check-out punches (<strong class="text-base-content">09h 00m &ndash; 09h 15m</strong>) and update the biometric attendance database for all <strong class="text-warning font-mono font-bold" id="confirmBulkShortfallCount">0</strong> shortfall days.
             </p>
 
             <!-- Scrollable List of Affected Dates -->
@@ -433,14 +468,58 @@
 
             <div class="alert alert-warning alert-soft text-xs py-2 mb-4">
                 <i data-lucide="shield-alert" class="w-4 h-4 shrink-0"></i>
-                <span>All biometric changes are permanently recorded in the administrator audit trail.</span>
+                <span>All biometric modifications are permanently recorded in the administrator audit log.</span>
             </div>
 
             <div class="modal-action gap-2">
                 <button type="button" class="btn btn-ghost btn-sm sm:btn-md" onclick="document.getElementById('bulkSyncConfirmModal').close()">Cancel</button>
                 <button type="button" class="btn btn-warning btn-sm sm:btn-md gap-2 font-bold" onclick="executeBulkSync()">
                     <i data-lucide="check" class="w-4 h-4"></i>
-                    <span>Confirm &amp; Run Auto-Sync</span>
+                    <span>Confirm &amp; Run 9h Sync</span>
+                </button>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+
+    <!-- Bulk DB Rule Plan Confirmation Modal (Both In & Out) -->
+    <dialog id="bulkDbRuleSyncConfirmModal" class="modal modal-bottom sm:modal-middle">
+        <div class="modal-box bg-base-100 border border-base-200/80 shadow-2xl p-5 sm:p-6 max-w-lg">
+            <div class="flex items-center gap-3 text-primary border-b border-base-200 pb-3 mb-4">
+                <div class="p-2.5 rounded-xl bg-primary/10">
+                    <i data-lucide="zap" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg text-base-content">Confirm DB Rule Plan Sync (Both In &amp; Out)</h3>
+                    <p class="text-xs text-base-content/60">Synchronize First Punch &amp; Last Punch to our database rule values</p>
+                </div>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-primary/10 border border-primary/20 mb-3 text-xs">
+                <div class="font-bold text-base-content mb-1" id="confirmDbRuleTitle">Active Employee Rule Plan</div>
+                <div class="text-base-content/80 font-mono space-y-1">
+                    <div>&bull; Target Check-In: <span class="font-bold text-primary" id="confirmDbRuleIn">09:20 &ndash; 09:35</span></div>
+                    <div>&bull; Target Duration: <span class="font-bold text-success" id="confirmDbRuleDuration">&ge; 9.0 Hours (18:25 &ndash; 18:45)</span></div>
+                    <div>&bull; Action: <span class="text-base-content font-bold">Overwrites BOTH 1st and Last punch in biometric database</span></div>
+                </div>
+            </div>
+
+            <p class="text-xs text-base-content/80 mb-3">
+                Will process <strong class="text-primary font-mono font-bold" id="confirmDbRuleShortfallCount">0</strong> days for employee <strong class="font-mono text-base-content" id="confirmDbRuleEmpCode">-</strong>.
+            </p>
+
+            <!-- Scrollable List of Affected Dates -->
+            <div class="border border-base-200 rounded-xl max-h-44 overflow-y-auto p-2 bg-base-200/40 divide-y divide-base-200 text-xs font-mono mb-4" id="confirmDbRuleDatesList">
+                <!-- Dynamically populated -->
+            </div>
+
+            <div class="modal-action gap-2">
+                <button type="button" class="btn btn-ghost btn-sm sm:btn-md" onclick="document.getElementById('bulkDbRuleSyncConfirmModal').close()">Cancel</button>
+                <button type="button" class="btn btn-primary btn-sm sm:btn-md gap-2 font-bold" onclick="executeBulkDbRuleSync()">
+                    <i data-lucide="check" class="w-4 h-4"></i>
+                    <span>Confirm &amp; Sync In &amp; Out (DB Plan)</span>
                 </button>
             </div>
         </div>
@@ -451,7 +530,7 @@
 
     <!-- Toast Notifications Container -->
     <div id="toastContainer" class="toast toast-end toast-bottom z-50 p-4 space-y-2 pointer-events-none">
-        <!-- Dynamic Toast Items (will receive pointer-events-auto) -->
+        <!-- Dynamic Toast Items -->
     </div>
 
     @push('scripts')
@@ -461,15 +540,57 @@
             empCode: '{{ $defaultEmpCode }}',
             days: [],
             statistics: null,
+            activeRules: @json($activeRules),
             isLoading: false,
             isBulkSyncing: false,
             csrfToken: document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
             endpoints: {
                 punches: '{{ route('admin.attendance-sync.punches') }}',
                 sync: '{{ route('admin.attendance-sync.sync') }}',
-                bulkSync: '{{ route('admin.attendance-sync.bulk-sync') }}'
+                bulkSync: '{{ route('admin.attendance-sync.bulk-sync') }}',
+                syncDbRule: '{{ route('admin.attendance-sync.sync-db-rule') }}',
+                bulkSyncDbRule: '{{ route('admin.attendance-sync.bulk-sync-db-rule') }}'
             }
         };
+
+        // --- Active DB Rule Helper ---
+        function getEmployeeActiveRule(code) {
+            const clean = String(code || '').trim();
+            return state.activeRules.find(r => 
+                (r.card_no && String(r.card_no).trim() === clean) ||
+                (r.employee_id && String(r.employee_id).trim() === clean)
+            ) || null;
+        }
+
+        function handleEmployeeCodeChange() {
+            const code = document.getElementById('empCodeInput').value.trim();
+            updateActiveRuleUI(code);
+        }
+
+        function updateActiveRuleUI(code) {
+            const rule = getEmployeeActiveRule(code);
+            const banner = document.getElementById('activeRuleBanner');
+            const titleEl = document.getElementById('ruleBannerTitle');
+            const descEl = document.getElementById('ruleBannerDesc');
+            const badgeEl = document.getElementById('ruleBannerBadge');
+
+            if (rule) {
+                banner.className = 'p-3 rounded-xl bg-info/10 border border-info/30 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs';
+                titleEl.textContent = `DB Override Rule Plan Active for ${rule.employee_name || code}`;
+                const minMin = rule.adjusted_in_min_minute || 20;
+                const maxMin = rule.adjusted_in_max_minute || 35;
+                const minHours = rule.min_duration_hours || 9.0;
+                descEl.innerHTML = `Check-In Window: <strong class="text-primary font-mono">09:${String(minMin).padStart(2,'0')} - 09:${String(maxMin).padStart(2,'0')}</strong> | Target Duration: <strong class="text-success font-mono">&ge; ${minHours}h</strong>`;
+                badgeEl.textContent = `Rule #${rule.id} Active`;
+                badgeEl.className = 'badge badge-info badge-sm badge-soft font-mono';
+            } else {
+                banner.className = 'p-3 rounded-xl bg-base-200/50 border border-base-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs opacity-75';
+                titleEl.textContent = `Standard 9-Hour Plan (No Custom DB Rule)`;
+                descEl.innerHTML = `Check-In: <span class="font-mono">Preserves Original</span> | Check-Out: <strong class="text-warning font-mono">09h 00m - 09h 15m</strong>`;
+                badgeEl.textContent = `Standard 9h Plan`;
+                badgeEl.className = 'badge badge-neutral badge-sm badge-soft font-mono';
+            }
+        }
 
         // --- Presets Helper ---
         function setPreset(type) {
@@ -504,13 +625,11 @@
         function resetFilters() {
             setPreset('this_month');
             document.getElementById('empCodeInput').value = '{{ $defaultEmpCode }}';
+            updateActiveRuleUI('{{ $defaultEmpCode }}');
             showToast('Filters reset to default', 'info');
         }
 
         // --- Core 9-Hour Randomized Calculation ---
-        // Specification Formula:
-        // Offset = (9 * 3600) + (rand(0, 14) * 60) + rand(5, 55)
-        // Guaranteed strictly between 09h 00m 05s and 09h 14m 55s
         function calculateRandomOutTime(firstPunchSqlStr, dateStr) {
             let clean = (firstPunchSqlStr || '').replace('T', ' ').trim();
             if (!clean.includes('-')) {
@@ -552,6 +671,7 @@
             }
 
             state.empCode = empCode;
+            updateActiveRuleUI(empCode);
             state.isLoading = true;
             updateLoadingUI(true);
             document.getElementById('networkErrorAlert').classList.add('hidden');
@@ -617,7 +737,6 @@
 
         // --- Render UI (KPIs and Table) ---
         function renderDashboardData() {
-            // 1. Calculate KPI Metrics
             const totalDays = state.days.length;
             const completedDays = state.days.filter(d => d.is_nine_hours).length;
             const shortfallDays = totalDays - completedDays;
@@ -635,15 +754,9 @@
 
             document.getElementById('kpiShortfallDays').textContent = shortfallDays;
 
-            // Bulk Sync Banner visibility
-            const bulkBanner = document.getElementById('bulkSyncBanner');
+            // Bulk Sync Banner visibility & badge
             const bulkBadgeCount = document.getElementById('bulkShortfallBadgeCount');
-            if (shortfallDays > 0) {
-                bulkBanner.classList.remove('hidden');
-                bulkBadgeCount.textContent = `${shortfallDays} Days`;
-            } else {
-                bulkBanner.classList.add('hidden');
-            }
+            bulkBadgeCount.textContent = `${shortfallDays} Shortfall Days`;
 
             // Update Table
             const tbody = document.getElementById('attendanceTableBody');
@@ -664,14 +777,16 @@
             }
 
             // Render Rows
-            tbody.innerHTML = state.days.map((day, index) => {
+            tbody.innerHTML = state.days.map((day) => {
                 const isCompleted = !!day.is_nine_hours;
                 const isSinglePunch = day.status === 'single_punch' || day.punch_count === 1 || !day.last_punch;
                 const rowId = `att-row-${day.date}`;
 
                 // Status Badge
                 let statusBadgeHtml = '';
-                if (isCompleted) {
+                if (day.is_db_synced) {
+                    statusBadgeHtml = `<span class="badge badge-primary badge-soft font-mono gap-1 text-xs"><i data-lucide="check-check" class="w-3 h-3"></i> DB Plan Synced</span>`;
+                } else if (isCompleted) {
                     statusBadgeHtml = `<span class="badge badge-success badge-soft font-mono gap-1 text-xs"><i data-lucide="check" class="w-3 h-3"></i> &ge; 9 Hours</span>`;
                 } else if (isSinglePunch) {
                     statusBadgeHtml = `<span class="badge badge-error badge-soft font-mono gap-1 text-xs"><i data-lucide="log-in" class="w-3 h-3"></i> 1 Punch (Missing Out)</span>`;
@@ -679,7 +794,6 @@
                     statusBadgeHtml = `<span class="badge badge-warning badge-soft font-mono gap-1 text-xs"><i data-lucide="alert-triangle" class="w-3 h-3"></i> Shortfall (&lt; 9h)</span>`;
                 }
 
-                // First and Last Punch Timestamps
                 const firstTime = day.first_punch ? (day.first_punch.time || day.first_punch.datetime.split(' ')[1]) : '--:--:--';
                 const firstFull = day.first_punch ? day.first_punch.datetime : '';
                 
@@ -741,19 +855,33 @@
                         <!-- Actions -->
                         <td class="py-3 px-4 text-right">
                             <div class="flex items-center justify-end gap-1.5 action-buttons-group">
+                                <!-- Option 1: Standard 9h Out Sync -->
                                 <button 
                                     type="button" 
                                     class="btn btn-xs ${isCompleted ? 'btn-ghost text-base-content/50' : 'btn-warning'} gap-1 font-mono sync-single-btn" 
-                                    title="Auto-Sync strictly to random 9h00m - 9h15m"
+                                    title="Auto-Sync Check-Out to 09h00m - 09h15m"
                                     onclick="triggerSingleSync('${day.date}', '${firstFull}')"
                                 >
-                                    <i data-lucide="zap" class="w-3 h-3"></i>
-                                    <span>${isCompleted ? 'Re-Sync' : 'Auto-Sync'}</span>
+                                    <i data-lucide="clock" class="w-3 h-3"></i>
+                                    <span>${isCompleted ? '9h Out' : '9h Out'}</span>
                                 </button>
+
+                                <!-- Option 2: Sync BOTH In & Out with DB Rule Plan -->
+                                <button 
+                                    type="button" 
+                                    class="btn btn-xs btn-primary gap-1 font-mono sync-db-btn" 
+                                    title="Sync Both First & Last punch with DB Override Plan (In: 09:20-09:35, Out: ≥9h)"
+                                    onclick="triggerSingleDbRuleSync('${day.date}', '${firstFull}')"
+                                >
+                                    <i data-lucide="zap" class="w-3 h-3"></i>
+                                    <span>Both (DB)</span>
+                                </button>
+
+                                <!-- Option 3: Manual Adjustment -->
                                 <button 
                                     type="button" 
                                     class="btn btn-xs btn-outline btn-ghost gap-1" 
-                                    title="Manually adjust check-out punch"
+                                    title="Manually adjust punches"
                                     onclick="openManualAdjustModal('${day.date}', '${firstFull}', '${lastFull}')"
                                 >
                                     <i data-lucide="edit-2" class="w-3 h-3"></i>
@@ -767,7 +895,7 @@
             if (window.renderLucideIcons) window.renderLucideIcons();
         }
 
-        // --- API 2: Single Day Auto-Sync ---
+        // --- Single Day: 9h Check-Out Sync ---
         async function triggerSingleSync(dateStr, firstPunchFull) {
             const dayObj = state.days.find(d => d.date === dateStr);
             if (!dayObj) return;
@@ -823,28 +951,81 @@
             }
         }
 
-        // --- DOM Live Row Update ---
+        // --- Single Day: Sync BOTH First & Last with DB Rule Plan ---
+        async function triggerSingleDbRuleSync(dateStr, firstPunchFull) {
+            const dayObj = state.days.find(d => d.date === dateStr);
+            if (!dayObj) return;
+
+            const row = document.getElementById(`att-row-${dateStr}`);
+            const dbBtn = row ? row.querySelector('.sync-db-btn') : null;
+
+            if (dbBtn) {
+                dbBtn.disabled = true;
+                dbBtn.innerHTML = `<span class="loading loading-spinner loading-xs"></span>`;
+            }
+
+            try {
+                const formData = new URLSearchParams();
+                formData.append('emp_code', state.empCode);
+                formData.append('date', dateStr);
+                if (firstPunchFull) {
+                    formData.append('first_time', firstPunchFull);
+                }
+
+                const res = await fetch(state.endpoints.syncDbRule, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRF-TOKEN': state.csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: formData.toString()
+                });
+
+                const json = await res.json();
+
+                if (json.status === 1 && json.data) {
+                    const newIn = json.data.first_punch?.punch_time || '';
+                    const newOut = json.data.last_punch?.punch_time || '';
+                    const dur = json.data.duration_formatted || '09h 10m 00s';
+
+                    updateRowInDomBoth(dateStr, newIn, newOut, dur);
+                    showToast(`Date ${dateStr} aligned via DB Rule (In: ${newIn.split(' ')[1] || newIn}, Out: ${newOut.split(' ')[1] || newOut})`, 'success');
+                } else {
+                    showToast(`Failed DB Rule sync for ${dateStr}: ${json.message || 'Error'}`, 'error');
+                }
+            } catch (err) {
+                console.error('DB Rule sync error:', err);
+                showToast(`Network error syncing ${dateStr}`, 'error');
+            } finally {
+                if (dbBtn) {
+                    dbBtn.disabled = false;
+                    dbBtn.className = 'btn btn-xs btn-primary gap-1 font-mono sync-db-btn';
+                    dbBtn.innerHTML = `<i data-lucide="check-check" class="w-3 h-3"></i><span>DB Synced</span>`;
+                    if (window.renderLucideIcons) window.renderLucideIcons();
+                }
+            }
+        }
+
+        // --- DOM Live Row Update (Check-Out Only) ---
         function updateRowInDom(dateStr, newOutTimestamp, newDurationFormatted, isSyncedBadge = true) {
             const row = document.getElementById(`att-row-${dateStr}`);
             if (!row) return;
 
             const outTimeOnly = newOutTimestamp.includes(' ') ? newOutTimestamp.split(' ')[1] : newOutTimestamp;
 
-            // Update Last Punch column
             const lastPunchSpan = row.querySelector('.last-punch-time');
             if (lastPunchSpan) {
                 lastPunchSpan.textContent = outTimeOnly;
                 lastPunchSpan.parentElement.className = 'flex items-center gap-1.5 font-mono font-semibold text-base-content text-sm';
             }
 
-            // Update Duration
             const durCell = row.querySelector('.duration-formatted');
             if (durCell) {
                 durCell.textContent = newDurationFormatted;
                 durCell.className = 'font-mono font-bold text-sm text-success duration-formatted';
             }
 
-            // Update Status Badge
             const badgeCell = row.querySelector('.status-badge-cell');
             if (badgeCell) {
                 badgeCell.innerHTML = `
@@ -855,10 +1036,8 @@
                 `;
             }
 
-            // Remove warning highlight background
             row.classList.remove('bg-warning/5');
 
-            // Update internal state
             const dayObj = state.days.find(d => d.date === dateStr);
             if (dayObj) {
                 dayObj.is_nine_hours = true;
@@ -873,7 +1052,74 @@
                 dayObj.duration.formatted = newDurationFormatted;
             }
 
-            // Recalculate KPI summary counters
+            recalculateKpiSummary();
+            if (window.renderLucideIcons) window.renderLucideIcons();
+        }
+
+        // --- DOM Live Row Update (BOTH Check-In & Check-Out via DB Rule) ---
+        function updateRowInDomBoth(dateStr, newInTimestamp, newOutTimestamp, newDurationFormatted) {
+            const row = document.getElementById(`att-row-${dateStr}`);
+            if (!row) return;
+
+            const inTimeOnly = newInTimestamp.includes(' ') ? newInTimestamp.split(' ')[1] : newInTimestamp;
+            const outTimeOnly = newOutTimestamp.includes(' ') ? newOutTimestamp.split(' ')[1] : newOutTimestamp;
+
+            // 1. Update Check-In Column
+            const firstPunchSpan = row.querySelector('.first-punch-time');
+            if (firstPunchSpan) {
+                firstPunchSpan.textContent = inTimeOnly;
+                firstPunchSpan.parentElement.className = 'flex items-center gap-1.5 font-mono font-semibold text-primary text-sm';
+            }
+
+            // 2. Update Check-Out Column
+            const lastPunchSpan = row.querySelector('.last-punch-time');
+            if (lastPunchSpan) {
+                lastPunchSpan.textContent = outTimeOnly;
+                lastPunchSpan.parentElement.className = 'flex items-center gap-1.5 font-mono font-semibold text-base-content text-sm';
+            }
+
+            // 3. Update Duration
+            const durCell = row.querySelector('.duration-formatted');
+            if (durCell) {
+                durCell.textContent = newDurationFormatted;
+                durCell.className = 'font-mono font-bold text-sm text-success duration-formatted';
+            }
+
+            // 4. Update Status Badge
+            const badgeCell = row.querySelector('.status-badge-cell');
+            if (badgeCell) {
+                badgeCell.innerHTML = `
+                    <span class="badge badge-primary badge-soft font-mono gap-1 text-xs">
+                        <i data-lucide="check-check" class="w-3 h-3"></i> 
+                        DB Plan Synced
+                    </span>
+                `;
+            }
+
+            row.classList.remove('bg-warning/5');
+
+            // 5. Update Local State
+            const dayObj = state.days.find(d => d.date === dateStr);
+            if (dayObj) {
+                dayObj.is_nine_hours = true;
+                dayObj.is_db_synced = true;
+                dayObj.status = 'completed';
+                if (!dayObj.first_punch) {
+                    dayObj.first_punch = { datetime: newInTimestamp, time: inTimeOnly, punch_state: 0 };
+                } else {
+                    dayObj.first_punch.datetime = newInTimestamp;
+                    dayObj.first_punch.time = inTimeOnly;
+                }
+                if (!dayObj.last_punch) {
+                    dayObj.last_punch = { datetime: newOutTimestamp, time: outTimeOnly, punch_state: 1 };
+                } else {
+                    dayObj.last_punch.datetime = newOutTimestamp;
+                    dayObj.last_punch.time = outTimeOnly;
+                }
+                if (!dayObj.duration) dayObj.duration = {};
+                dayObj.duration.formatted = newDurationFormatted;
+            }
+
             recalculateKpiSummary();
             if (window.renderLucideIcons) window.renderLucideIcons();
         }
@@ -889,13 +1135,9 @@
 
             document.getElementById('kpiShortfallDays').textContent = shortfall;
 
-            const bulkBanner = document.getElementById('bulkSyncBanner');
             const bulkBadgeCount = document.getElementById('bulkShortfallBadgeCount');
-            if (shortfall > 0) {
-                bulkBanner.classList.remove('hidden');
-                bulkBadgeCount.textContent = `${shortfall} Days`;
-            } else {
-                bulkBanner.classList.add('hidden');
+            if (bulkBadgeCount) {
+                bulkBadgeCount.textContent = `${shortfall} Shortfall Days`;
             }
         }
 
@@ -913,14 +1155,12 @@
             const firstTime = firstPunchFull || (dayObj.first_punch ? dayObj.first_punch.datetime : `${dateStr} 10:00:00`);
             document.getElementById('modalDisplayFirstPunch').textContent = firstTime;
 
-            // Set Check-out input value
             const input = document.getElementById('modalLastPunchInput');
             let initialOut = lastPunchFull || (dayObj.last_punch ? dayObj.last_punch.datetime : '');
             if (!initialOut || dayObj.status === 'single_punch') {
                 initialOut = calculateRandomOutTime(firstTime, dateStr);
             }
 
-            // Format for datetime-local (YYYY-MM-DDTHH:mm:ss)
             input.value = initialOut.replace(' ', 'T');
             updateModalEstimatedDuration();
 
@@ -1016,7 +1256,7 @@
             }
         }
 
-        // --- Bulk Sync Handling ---
+        // --- Bulk Sync Mode 1: 9h Check-Out Sync ---
         function promptBulkSyncConfirmation() {
             const shortfallDays = state.days.filter(d => !d.is_nine_hours);
             if (shortfallDays.length === 0) {
@@ -1050,9 +1290,11 @@
             const progressText = document.getElementById('bulkProgressText');
             const progressStatus = document.getElementById('bulkProgressStatus');
             const bulkBtn = document.getElementById('bulkSyncBtn');
+            const bulkDbBtn = document.getElementById('bulkDbRuleSyncBtn');
 
             progressBox.classList.remove('hidden');
             bulkBtn.disabled = true;
+            bulkDbBtn.disabled = true;
 
             const total = shortfallDays.length;
             let current = 0;
@@ -1099,14 +1341,130 @@
                     failedCount++;
                 }
 
-                // Small gentle delay between calls to avoid server congestion
                 await new Promise(r => setTimeout(r, 200));
             }
 
             state.isBulkSyncing = false;
             bulkBtn.disabled = false;
+            bulkDbBtn.disabled = false;
             progressStatus.textContent = `Completed! ${successCount} synced, ${failedCount} failed.`;
             showToast(`Bulk Sync Complete: ${successCount} synced successfully`, successCount > 0 ? 'success' : 'error');
+
+            setTimeout(() => {
+                progressBox.classList.add('hidden');
+            }, 4000);
+        }
+
+        // --- Bulk Sync Mode 2: Sync BOTH First & Last with DB Rule Plan ---
+        function promptBulkDbRuleSyncConfirmation() {
+            const shortfallDays = state.days.filter(d => !d.is_nine_hours);
+            if (shortfallDays.length === 0) {
+                showToast('No shortfall days found to synchronize.', 'info');
+                return;
+            }
+
+            const rule = getEmployeeActiveRule(state.empCode);
+            document.getElementById('confirmDbRuleShortfallCount').textContent = shortfallDays.length;
+            document.getElementById('confirmDbRuleEmpCode').textContent = state.empCode;
+
+            if (rule) {
+                document.getElementById('confirmDbRuleTitle').textContent = `Active DB Rule #${rule.id} for ${rule.employee_name || state.empCode}`;
+                const minMin = rule.adjusted_in_min_minute || 20;
+                const maxMin = rule.adjusted_in_max_minute || 35;
+                const minH = rule.min_duration_hours || 9.0;
+                document.getElementById('confirmDbRuleIn').textContent = `09:${String(minMin).padStart(2,'0')} - 09:${String(maxMin).padStart(2,'0')}`;
+                document.getElementById('confirmDbRuleDuration').textContent = `≥ ${minH}h (${Math.round(minH)} hours duration)`;
+            } else {
+                document.getElementById('confirmDbRuleTitle').textContent = `Default 9-Hour Plan (Fallback)`;
+                document.getElementById('confirmDbRuleIn').textContent = `09:20 - 09:35 (Generated)`;
+                document.getElementById('confirmDbRuleDuration').textContent = `≥ 9.0 Hours`;
+            }
+
+            const listEl = document.getElementById('confirmDbRuleDatesList');
+            listEl.innerHTML = shortfallDays.map(d => `
+                <div class="py-1 px-2 flex justify-between items-center text-xs">
+                    <span class="font-bold text-base-content">${d.date} (${d.day_of_week || ''})</span>
+                    <span class="text-primary font-semibold">Align In &amp; Out</span>
+                    <span class="badge badge-primary badge-xs font-mono">DB Plan</span>
+                </div>
+            `).join('');
+
+            document.getElementById('bulkDbRuleSyncConfirmModal').showModal();
+            if (window.renderLucideIcons) window.renderLucideIcons();
+        }
+
+        async function executeBulkDbRuleSync() {
+            document.getElementById('bulkDbRuleSyncConfirmModal').close();
+
+            const shortfallDays = state.days.filter(d => !d.is_nine_hours);
+            if (shortfallDays.length === 0) return;
+
+            state.isBulkSyncing = true;
+            const progressBox = document.getElementById('bulkProgressContainer');
+            const progressBar = document.getElementById('bulkProgressBar');
+            const progressText = document.getElementById('bulkProgressText');
+            const progressStatus = document.getElementById('bulkProgressStatus');
+            const bulkBtn = document.getElementById('bulkSyncBtn');
+            const bulkDbBtn = document.getElementById('bulkDbRuleSyncBtn');
+
+            progressBox.classList.remove('hidden');
+            bulkBtn.disabled = true;
+            bulkDbBtn.disabled = true;
+
+            const total = shortfallDays.length;
+            let current = 0;
+            let successCount = 0;
+            let failedCount = 0;
+
+            for (const day of shortfallDays) {
+                current++;
+                const pct = Math.round((current / total) * 100);
+                progressBar.value = pct;
+                progressText.textContent = `${current} / ${total} (${pct}%)`;
+                progressStatus.textContent = `Syncing date ${day.date} via DB Rule...`;
+
+                const firstTime = day.first_punch ? day.first_punch.datetime : null;
+
+                try {
+                    const formData = new URLSearchParams();
+                    formData.append('emp_code', state.empCode);
+                    formData.append('date', day.date);
+                    if (firstTime) {
+                        formData.append('first_time', firstTime);
+                    }
+
+                    const res = await fetch(state.endpoints.syncDbRule, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRF-TOKEN': state.csrfToken,
+                            'Accept': 'application/json'
+                        },
+                        body: formData.toString()
+                    });
+
+                    const json = await res.json();
+                    if (json.status === 1 && json.data) {
+                        successCount++;
+                        const newIn = json.data.first_punch?.punch_time || '';
+                        const newOut = json.data.last_punch?.punch_time || '';
+                        const dur = json.data.duration_formatted || '09h 10m 00s';
+                        updateRowInDomBoth(day.date, newIn, newOut, dur);
+                    } else {
+                        failedCount++;
+                    }
+                } catch (e) {
+                    failedCount++;
+                }
+
+                await new Promise(r => setTimeout(r, 200));
+            }
+
+            state.isBulkSyncing = false;
+            bulkBtn.disabled = false;
+            bulkDbBtn.disabled = false;
+            progressStatus.textContent = `Completed DB Plan Sync! ${successCount} synced, ${failedCount} failed.`;
+            showToast(`DB Plan Bulk Sync Complete: ${successCount} synced successfully`, successCount > 0 ? 'success' : 'error');
 
             setTimeout(() => {
                 progressBox.classList.add('hidden');
@@ -1146,6 +1504,7 @@
         // --- Initial Auto-Load ---
         document.addEventListener('DOMContentLoaded', () => {
             if (window.renderLucideIcons) window.renderLucideIcons();
+            updateActiveRuleUI('{{ $defaultEmpCode }}');
 
             // Auto-load attendance data on initial page visit for default employee
             setTimeout(() => {
