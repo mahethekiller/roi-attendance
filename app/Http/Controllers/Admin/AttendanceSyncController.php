@@ -60,7 +60,7 @@ class AttendanceSyncController extends Controller
             'view'       => 'nullable|string|in:summary,raw,both',
         ]);
 
-        $apiUrl = config('services.biometric.punches_url', 'http://103.25.129.247/prac1111/get_employee_punches_api.php');
+        $apiUrl = config('services.biometric.punches_url', 'http://103.25.129.247/prac1111/attt/get_employee_punches_api.php');
 
         $queryParams = array_filter([
             'emp_code'   => $validated['emp_code'],
@@ -135,7 +135,7 @@ class AttendanceSyncController extends Controller
             $lastTime = $this->calculateRandomOutTime($firstTime, $date);
         }
 
-        $apiUrl = config('services.biometric.update_punches_url', 'http://103.25.129.247/prac1111/update_day_punches_api.php');
+        $apiUrl = config('services.biometric.update_punches_url', 'http://103.25.129.247/prac1111/attt/update_day_punches_api.php');
 
         $postData = [
             'emp_code'       => $empCode,
@@ -225,7 +225,7 @@ class AttendanceSyncController extends Controller
 
         $empCode = $validated['emp_code'];
         $items = $validated['items'];
-        $apiUrl = config('services.biometric.update_punches_url', 'http://103.25.129.247/prac1111/update_day_punches_api.php');
+        $apiUrl = config('services.biometric.update_punches_url', 'http://103.25.129.247/prac1111/attt/update_day_punches_api.php');
 
         $successCount = 0;
         $failedCount = 0;
