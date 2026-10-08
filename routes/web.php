@@ -53,6 +53,8 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
         Route::post('/bulk-sync', [AttendanceSyncController::class, 'bulkSync'])->name('bulk-sync');
         Route::post('/sync-db-rule', [AttendanceSyncController::class, 'syncWithDbRule'])->name('sync-db-rule');
         Route::post('/bulk-sync-db-rule', [AttendanceSyncController::class, 'bulkSyncWithDbRule'])->name('bulk-sync-db-rule');
+        Route::post('/push-local-to-api', [AttendanceSyncController::class, 'pushLocalDbToApi'])->name('push-local-to-api');
+        Route::post('/save-local-attendance', [AttendanceSyncController::class, 'saveLocalAttendance'])->name('save-local-attendance');
     });
 
     // Sync History Logs

@@ -17,8 +17,8 @@
                     <i data-lucide="clock-4" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-bold text-base-content tracking-tight">Biometric 9-Hour Auto-Sync</h1>
-                    <p class="text-sm text-base-content/70 mt-0.5">Detect attendance shortfall days (&lt; 9 hours) and synchronize punches via 9h Auto-Sync or DB Override Plan.</p>
+                    <h1 class="text-2xl font-bold text-base-content tracking-tight">Biometric Attendance Sync Matrix</h1>
+                    <p class="text-sm text-base-content/70 mt-0.5">Synchronize remote biometric API database with values saved locally in our database or 9h standard plan.</p>
                 </div>
             </div>
         </div>
@@ -178,7 +178,7 @@
 
     <!-- KPI Metrics Header (Dynamic) -->
     <div id="kpiContainer" class="hidden mb-6">
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
             <!-- Total Days Worked -->
             <div class="card bg-base-100 border border-base-200/80 shadow-xs relative overflow-hidden">
                 <div class="card-body p-4 sm:p-5">
@@ -190,7 +190,7 @@
                     </div>
                     <div class="flex items-baseline gap-2 mt-2">
                         <h2 class="text-3xl font-extrabold text-base-content tracking-tight font-mono" id="kpiTotalDays">0</h2>
-                        <span class="text-xs text-base-content/60 font-mono" id="kpiTotalPunches">0 punches recorded</span>
+                        <span class="text-xs text-base-content/60 font-mono" id="kpiTotalPunches">0 punches</span>
                     </div>
                     <div class="text-[11px] text-base-content/50 mt-1">Filtered date range duration</div>
                 </div>
@@ -209,7 +209,7 @@
                         <h2 class="text-3xl font-extrabold text-success tracking-tight font-mono" id="kpiCompletedDays">0</h2>
                         <span class="badge badge-success badge-sm badge-soft font-mono" id="kpiCompletedPct">0%</span>
                     </div>
-                    <div class="text-[11px] text-base-content/50 mt-1">Met standard 9-hour shift requirement</div>
+                    <div class="text-[11px] text-base-content/50 mt-1">Met standard 9-hour shift</div>
                 </div>
             </div>
 
@@ -226,40 +226,63 @@
                         <h2 class="text-3xl font-extrabold text-warning tracking-tight font-mono" id="kpiShortfallDays">0</h2>
                         <span class="badge badge-warning badge-sm badge-soft font-mono" id="kpiShortfallNotice">Needs Sync</span>
                     </div>
-                    <div class="text-[11px] text-base-content/50 mt-1">Missing check-out or below 9.0h duration</div>
+                    <div class="text-[11px] text-base-content/50 mt-1">Below standard 9.0h duration</div>
+                </div>
+            </div>
+
+            <!-- Locally Saved in MySQL DB -->
+            <div class="card bg-base-100 border border-accent/40 shadow-xs relative overflow-hidden">
+                <div class="card-body p-4 sm:p-5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold text-accent uppercase tracking-wider">Saved in Local DB</span>
+                        <div class="w-8 h-8 rounded-lg bg-accent/10 text-accent flex items-center justify-center">
+                            <i data-lucide="database" class="w-4 h-4"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-baseline gap-2 mt-2">
+                        <h2 class="text-3xl font-extrabold text-accent tracking-tight font-mono" id="kpiLocalDbCount">0</h2>
+                        <span class="badge badge-accent badge-sm badge-soft font-mono">Ready to Push</span>
+                    </div>
+                    <div class="text-[11px] text-base-content/50 mt-1">Attendance records stored in MySQL</div>
                 </div>
             </div>
         </div>
 
-        <!-- Prominent Bulk Sync Action Bar (Two Sync Options: 9h Out vs DB Rule Both) -->
-        <div id="bulkSyncBanner" class="mt-4 p-4 rounded-xl bg-base-100 border border-base-200/90 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4 transition-all duration-300">
+        <!-- Prominent Sync Action Bar -->
+        <div id="bulkSyncBanner" class="mt-4 p-4 rounded-xl bg-base-100 border border-base-200/90 shadow-xs flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 transition-all duration-300">
             <div class="flex items-start sm:items-center gap-3">
-                <div class="w-10 h-10 rounded-lg bg-warning/20 text-warning flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
-                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+                <div class="w-10 h-10 rounded-lg bg-accent/20 text-accent flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
+                    <i data-lucide="database-zap" class="w-5 h-5"></i>
                 </div>
                 <div>
                     <h3 class="font-bold text-sm text-base-content flex items-center gap-2">
-                        <span>Attendance Synchronization Available</span>
-                        <span class="badge badge-warning badge-xs font-mono font-bold" id="bulkShortfallBadgeCount">0 Shortfall Days</span>
+                        <span>Synchronization Actions</span>
+                        <span class="badge badge-accent badge-xs font-mono font-bold" id="localDbBadgeCount">0 Ready in DB</span>
                     </h3>
                     <p class="text-xs text-base-content/70 mt-0.5">
-                        Choose between standard <strong class="text-base-content">9h Out Sync</strong> (adjusts check-out only) or <strong class="text-primary">DB Rule Plan</strong> (synchronizes both Check-In &amp; Check-Out).
+                        <strong class="text-accent font-bold">Push Local DB Values</strong> will overwrite the remote API database with the exact values saved in our local DB table.
                     </p>
                 </div>
             </div>
 
-            <!-- Dual Action Buttons -->
+            <!-- Action Buttons -->
             <div class="shrink-0 flex flex-wrap items-center gap-2">
-                <!-- Button 1: Standard 9h Check-Out Sync -->
+                <!-- Highlighted Action: Update API DB with Locally Saved Values -->
+                <button type="button" id="pushLocalDbBtn" class="btn btn-accent btn-sm sm:btn-md gap-2 font-bold shadow-xs" onclick="promptPushLocalDbConfirmation()">
+                    <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+                    <span>Push Local DB to API DB</span>
+                </button>
+
+                <!-- Standard 9h Check-Out Sync -->
                 <button type="button" id="bulkSyncBtn" class="btn btn-warning btn-sm sm:btn-md gap-2 font-bold shadow-xs" onclick="promptBulkSyncConfirmation()">
                     <i data-lucide="clock" class="w-4 h-4"></i>
                     <span id="bulkSyncBtnText">Auto-Sync 9h Out</span>
                 </button>
 
-                <!-- Button 2: Sync BOTH First & Last with DB Rule Plan -->
-                <button type="button" id="bulkDbRuleSyncBtn" class="btn btn-primary btn-sm sm:btn-md gap-2 font-bold shadow-xs" onclick="promptBulkDbRuleSyncConfirmation()">
+                <!-- Sync via DB Rule Plan -->
+                <button type="button" id="bulkDbRuleSyncBtn" class="btn btn-outline btn-primary btn-sm sm:btn-md gap-2 font-bold shadow-xs" onclick="promptBulkDbRuleSyncConfirmation()">
                     <i data-lucide="zap" class="w-4 h-4"></i>
-                    <span id="bulkDbRuleBtnText">Sync First &amp; Last (DB Plan)</span>
+                    <span id="bulkDbRuleBtnText">DB Rule Plan</span>
                 </button>
             </div>
         </div>
@@ -268,12 +291,12 @@
         <div id="bulkProgressContainer" class="mt-4 p-4 rounded-xl bg-base-100 border border-base-200 hidden">
             <div class="flex items-center justify-between text-xs mb-2">
                 <span class="font-bold text-base-content flex items-center gap-2">
-                    <span class="loading loading-spinner loading-xs text-primary" id="bulkProgressSpinner"></span>
+                    <span class="loading loading-spinner loading-xs text-accent" id="bulkProgressSpinner"></span>
                     <span id="bulkProgressStatus">Synchronizing Attendance Records...</span>
                 </span>
                 <span class="font-mono font-bold text-base-content/80" id="bulkProgressText">0 / 0 (0%)</span>
             </div>
-            <progress id="bulkProgressBar" class="progress progress-primary w-full h-3" value="0" max="100"></progress>
+            <progress id="bulkProgressBar" class="progress progress-accent w-full h-3" value="0" max="100"></progress>
         </div>
     </div>
 
@@ -284,12 +307,13 @@
             <div class="p-4 border-b border-base-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div class="flex items-center gap-2">
                     <i data-lucide="table-2" class="w-4 h-4 text-base-content/60"></i>
-                    <h2 class="text-sm font-bold uppercase tracking-wider text-base-content/80">Biometric Attendance Logs &amp; Sync Matrix</h2>
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-base-content/80">Biometric Attendance Logs &amp; Local DB Matrix</h2>
                     <span class="badge badge-sm badge-neutral font-mono" id="tableRowCountBadge">0 Days</span>
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2 text-xs">
-                    <span class="text-base-content/50 font-mono">Sync Modes:</span>
+                    <span class="text-base-content/50 font-mono">Legend:</span>
+                    <span class="badge badge-sm badge-accent badge-soft font-mono">📤 Push DB (From Local)</span>
                     <span class="badge badge-sm badge-warning badge-soft font-mono">⚡ 9h Out</span>
                     <span class="badge badge-sm badge-primary badge-soft font-mono">🔄 Both (DB Plan)</span>
                 </div>
@@ -305,7 +329,7 @@
                             <th class="py-3 px-3 font-bold">1st Entry (Check-In)</th>
                             <th class="py-3 px-3 font-bold">Last Entry (Check-Out)</th>
                             <th class="py-3 px-3 font-bold font-mono">Total Work Time</th>
-                            <th class="py-3 px-3 font-bold text-center">Status Badge</th>
+                            <th class="py-3 px-3 font-bold text-center">Status / Local DB</th>
                             <th class="py-3 px-4 font-bold text-right">Actions</th>
                         </tr>
                     </thead>
@@ -344,12 +368,8 @@
                         <span>Shortfall: Duration &lt; 9 Hours</span>
                     </span>
                     <span class="flex items-center gap-1.5 font-medium">
-                        <span class="w-2.5 h-2.5 rounded-full bg-error"></span>
-                        <span>Single Punch: Missing Check-Out</span>
-                    </span>
-                    <span class="flex items-center gap-1.5 font-medium">
-                        <span class="w-2.5 h-2.5 rounded-full bg-primary"></span>
-                        <span>DB Plan Synced: Both In &amp; Out Adjusted</span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-accent"></span>
+                        <span>Saved Locally in MySQL DB</span>
                     </span>
                 </div>
                 <div class="font-mono text-[11px] text-base-content/50">
@@ -370,7 +390,7 @@
                     </div>
                     <div>
                         <h3 class="font-bold text-base text-base-content">Manual Punch Adjustment</h3>
-                        <p class="text-xs text-base-content/60">Modify biometric check-out time manually</p>
+                        <p class="text-xs text-base-content/60">Modify biometric punches and save locally or push to API</p>
                     </div>
                 </div>
                 <form method="dialog">
@@ -393,9 +413,27 @@
                         <span class="font-mono font-bold text-primary" id="modalDisplayEmpCode">-</span>
                     </div>
                     <div class="flex justify-between items-center border-t border-base-300/50 pt-2">
-                        <span class="text-base-content/60 font-medium">1st Punch (Check-In):</span>
+                        <span class="text-base-content/60 font-medium">Current Check-In (API):</span>
                         <span class="font-mono font-bold text-info" id="modalDisplayFirstPunch">-</span>
                     </div>
+                    <div class="flex justify-between items-center" id="modalLocalDbRow">
+                        <span class="text-base-content/60 font-medium">Saved in Local DB:</span>
+                        <span class="font-mono font-bold text-accent" id="modalDisplayLocalDb">None</span>
+                    </div>
+                </div>
+
+                <!-- Check-In Input (editable) -->
+                <div class="mb-3">
+                    <label for="modalFirstPunchInput" class="label label-text text-xs font-semibold text-base-content/80 pb-1">
+                        Check-In Punch Time
+                    </label>
+                    <input 
+                        type="datetime-local" 
+                        step="1" 
+                        id="modalFirstPunchInput" 
+                        class="input input-bordered w-full bg-base-100 text-base-content font-mono font-semibold"
+                        required
+                    />
                 </div>
 
                 <!-- Check-Out Input -->
@@ -430,14 +468,60 @@
                 </div>
 
                 <!-- Modal Actions -->
-                <div class="modal-action mt-2 gap-2">
-                    <button type="button" class="btn btn-ghost btn-sm sm:btn-md" onclick="document.getElementById('manualAdjustModal').close()">Cancel</button>
-                    <button type="submit" id="modalSaveBtn" class="btn btn-primary btn-sm sm:btn-md gap-2">
-                        <i data-lucide="save" class="w-4 h-4"></i>
-                        <span>Save Changes</span>
+                <div class="modal-action mt-2 flex flex-wrap justify-end gap-2">
+                    <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('manualAdjustModal').close()">Cancel</button>
+                    <button type="button" id="modalSaveLocalOnlyBtn" class="btn btn-outline btn-accent btn-sm gap-1" onclick="submitSaveLocalOnly()">
+                        <i data-lucide="database" class="w-3.5 h-3.5"></i>
+                        <span>Save to Local DB</span>
+                    </button>
+                    <button type="submit" id="modalSaveBtn" class="btn btn-primary btn-sm gap-1">
+                        <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
+                        <span>Save &amp; Push to API DB</span>
                     </button>
                 </div>
             </form>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+
+    <!-- Confirmation Modal: Push Local DB Values to Remote API -->
+    <dialog id="pushLocalDbConfirmModal" class="modal modal-bottom sm:modal-middle">
+        <div class="modal-box bg-base-100 border border-base-200/80 shadow-2xl p-5 sm:p-6 max-w-lg">
+            <div class="flex items-center gap-3 text-accent border-b border-base-200 pb-3 mb-4">
+                <div class="p-2.5 rounded-xl bg-accent/10">
+                    <i data-lucide="database-zap" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg text-base-content">Update API DB with Locally Saved Values</h3>
+                    <p class="text-xs text-base-content/60">Pushes exact values from local MySQL database directly to the remote API database</p>
+                </div>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-accent/10 border border-accent/20 mb-3 text-xs">
+                <div class="font-bold text-base-content mb-1">Direct Database Push</div>
+                <p class="text-base-content/80">
+                    This operation will read the <strong class="text-accent font-bold">locally saved check-in and check-out values</strong> for employee <strong class="font-mono text-base-content" id="confirmLocalPushEmpCode">-</strong> and update the remote API biometric database without computing new random numbers.
+                </p>
+            </div>
+
+            <p class="text-xs text-base-content/80 mb-2 font-semibold">
+                Records found in local database (<span class="text-accent font-mono" id="confirmLocalPushCount">0</span> days):
+            </p>
+
+            <!-- Scrollable List of Affected Dates -->
+            <div class="border border-base-200 rounded-xl max-h-48 overflow-y-auto p-2 bg-base-200/40 divide-y divide-base-200 text-xs font-mono mb-4" id="confirmLocalPushDatesList">
+                <!-- Dynamically populated -->
+            </div>
+
+            <div class="modal-action gap-2">
+                <button type="button" class="btn btn-ghost btn-sm sm:btn-md" onclick="document.getElementById('pushLocalDbConfirmModal').close()">Cancel</button>
+                <button type="button" class="btn btn-accent btn-sm sm:btn-md gap-2 font-bold" onclick="executePushLocalDb()">
+                    <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+                    <span>Confirm &amp; Push to API DB</span>
+                </button>
+            </div>
         </div>
         <form method="dialog" class="modal-backdrop">
             <button>close</button>
@@ -461,7 +545,6 @@
                 This action will compute realistic check-out punches (<strong class="text-base-content">09h 00m &ndash; 09h 15m</strong>) and update the biometric attendance database for all <strong class="text-warning font-mono font-bold" id="confirmBulkShortfallCount">0</strong> shortfall days.
             </p>
 
-            <!-- Scrollable List of Affected Dates -->
             <div class="border border-base-200 rounded-xl max-h-48 overflow-y-auto p-2 bg-base-200/40 divide-y divide-base-200 text-xs font-mono mb-4" id="confirmBulkDatesList">
                 <!-- Dynamically populated -->
             </div>
@@ -510,7 +593,6 @@
                 Will process <strong class="text-primary font-mono font-bold" id="confirmDbRuleShortfallCount">0</strong> days for employee <strong class="font-mono text-base-content" id="confirmDbRuleEmpCode">-</strong>.
             </p>
 
-            <!-- Scrollable List of Affected Dates -->
             <div class="border border-base-200 rounded-xl max-h-44 overflow-y-auto p-2 bg-base-200/40 divide-y divide-base-200 text-xs font-mono mb-4" id="confirmDbRuleDatesList">
                 <!-- Dynamically populated -->
             </div>
@@ -549,7 +631,9 @@
                 sync: '{{ route('admin.attendance-sync.sync') }}',
                 bulkSync: '{{ route('admin.attendance-sync.bulk-sync') }}',
                 syncDbRule: '{{ route('admin.attendance-sync.sync-db-rule') }}',
-                bulkSyncDbRule: '{{ route('admin.attendance-sync.bulk-sync-db-rule') }}'
+                bulkSyncDbRule: '{{ route('admin.attendance-sync.bulk-sync-db-rule') }}',
+                pushLocalToApi: '{{ route('admin.attendance-sync.push-local-to-api') }}',
+                saveLocalAttendance: '{{ route('admin.attendance-sync.save-local-attendance') }}'
             }
         };
 
@@ -740,23 +824,27 @@
             const totalDays = state.days.length;
             const completedDays = state.days.filter(d => d.is_nine_hours).length;
             const shortfallDays = totalDays - completedDays;
+            const localDbDays = state.days.filter(d => d.local_db && d.local_db.exists).length;
 
             // Update KPI Cards
             document.getElementById('kpiContainer').classList.remove('hidden');
             document.getElementById('kpiTotalDays').textContent = totalDays;
             
             const totalPunchesCount = state.days.reduce((acc, d) => acc + (d.punch_count || 0), 0);
-            document.getElementById('kpiTotalPunches').textContent = `${totalPunchesCount} punches recorded`;
+            document.getElementById('kpiTotalPunches').textContent = `${totalPunchesCount} punches`;
 
             document.getElementById('kpiCompletedDays').textContent = completedDays;
             const compPct = totalDays > 0 ? Math.round((completedDays / totalDays) * 100) : 0;
             document.getElementById('kpiCompletedPct').textContent = `${compPct}%`;
 
             document.getElementById('kpiShortfallDays').textContent = shortfallDays;
+            document.getElementById('kpiLocalDbCount').textContent = localDbDays;
 
-            // Bulk Sync Banner visibility & badge
             const bulkBadgeCount = document.getElementById('bulkShortfallBadgeCount');
-            bulkBadgeCount.textContent = `${shortfallDays} Shortfall Days`;
+            if (bulkBadgeCount) bulkBadgeCount.textContent = `${shortfallDays} Shortfall Days`;
+
+            const localDbBadgeCount = document.getElementById('localDbBadgeCount');
+            if (localDbBadgeCount) localDbBadgeCount.textContent = `${localDbDays} Ready in DB`;
 
             // Update Table
             const tbody = document.getElementById('attendanceTableBody');
@@ -781,10 +869,13 @@
                 const isCompleted = !!day.is_nine_hours;
                 const isSinglePunch = day.status === 'single_punch' || day.punch_count === 1 || !day.last_punch;
                 const rowId = `att-row-${day.date}`;
+                const hasLocal = !!(day.local_db && day.local_db.exists);
 
                 // Status Badge
                 let statusBadgeHtml = '';
-                if (day.is_db_synced) {
+                if (day.is_pushed_from_local) {
+                    statusBadgeHtml = `<span class="badge badge-accent badge-soft font-mono gap-1 text-xs"><i data-lucide="check-check" class="w-3 h-3"></i> Pushed from DB</span>`;
+                } else if (day.is_db_synced) {
                     statusBadgeHtml = `<span class="badge badge-primary badge-soft font-mono gap-1 text-xs"><i data-lucide="check-check" class="w-3 h-3"></i> DB Plan Synced</span>`;
                 } else if (isCompleted) {
                     statusBadgeHtml = `<span class="badge badge-success badge-soft font-mono gap-1 text-xs"><i data-lucide="check" class="w-3 h-3"></i> &ge; 9 Hours</span>`;
@@ -806,6 +897,19 @@
 
                 const durationFormatted = day.duration?.formatted || (isSinglePunch ? '00h 00m (In Only)' : '00h 00m 00s');
 
+                // Local DB info subtext
+                let localDbSubtext = '';
+                if (hasLocal) {
+                    const lIn = day.local_db.check_in || '--';
+                    const lOut = day.local_db.check_out || '--';
+                    localDbSubtext = `
+                        <div class="mt-1 text-[11px] font-mono text-accent flex items-center gap-1 font-semibold">
+                            <i data-lucide="database" class="w-3 h-3"></i>
+                            <span>Local DB: ${lIn} &rarr; ${lOut}</span>
+                        </div>
+                    `;
+                }
+
                 return `
                     <tr id="${rowId}" class="hover:bg-base-200/40 transition-colors ${!isCompleted ? 'bg-warning/5' : ''}">
                         <!-- Date & Day -->
@@ -825,7 +929,8 @@
                                 <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
                                 <span class="first-punch-time">${firstTime}</span>
                             </div>
-                            <div class="text-[10px] text-base-content/40 font-mono">Check-In Punch</div>
+                            <div class="text-[10px] text-base-content/40 font-mono">API Check-In</div>
+                            ${hasLocal ? `<div class="text-[10px] text-accent font-mono font-semibold">Local: ${day.local_db.check_in || 'None'}</div>` : ''}
                         </td>
 
                         <!-- Last Entry (Check-Out) -->
@@ -834,7 +939,8 @@
                                 <i data-lucide="log-out" class="w-3.5 h-3.5 opacity-60"></i>
                                 <span class="last-punch-time">${lastTime !== '--:--:--' ? lastTime : 'None (Missing)'}</span>
                             </div>
-                            <div class="text-[10px] text-base-content/40 font-mono">Check-Out Punch</div>
+                            <div class="text-[10px] text-base-content/40 font-mono">API Check-Out</div>
+                            ${hasLocal ? `<div class="text-[10px] text-accent font-mono font-semibold">Local: ${day.local_db.check_out || 'None'}</div>` : ''}
                         </td>
 
                         <!-- Total Duration -->
@@ -847,15 +953,28 @@
                             </div>
                         </td>
 
-                        <!-- Status Badge -->
+                        <!-- Status Badge & Local DB Pill -->
                         <td class="py-3 px-3 text-center status-badge-cell">
                             ${statusBadgeHtml}
+                            ${localDbSubtext}
                         </td>
 
                         <!-- Actions -->
                         <td class="py-3 px-4 text-right">
                             <div class="flex items-center justify-end gap-1.5 action-buttons-group">
-                                <!-- Option 1: Standard 9h Out Sync -->
+                                <!-- PRIMARY REQUESTED ACTION: Push Locally Saved DB Values to API DB -->
+                                <button 
+                                    type="button" 
+                                    class="btn btn-xs ${hasLocal ? 'btn-accent' : 'btn-outline btn-ghost text-base-content/40'} gap-1 font-mono push-local-btn" 
+                                    title="${hasLocal ? 'Push locally saved DB values to API DB' : 'No local DB record yet for this date'}"
+                                    onclick="triggerSingleLocalPush('${day.date}')"
+                                    ${!hasLocal ? 'disabled' : ''}
+                                >
+                                    <i data-lucide="upload-cloud" class="w-3 h-3"></i>
+                                    <span>Push DB</span>
+                                </button>
+
+                                <!-- Option 2: Standard 9h Out Sync -->
                                 <button 
                                     type="button" 
                                     class="btn btn-xs ${isCompleted ? 'btn-ghost text-base-content/50' : 'btn-warning'} gap-1 font-mono sync-single-btn" 
@@ -863,25 +982,14 @@
                                     onclick="triggerSingleSync('${day.date}', '${firstFull}')"
                                 >
                                     <i data-lucide="clock" class="w-3 h-3"></i>
-                                    <span>${isCompleted ? '9h Out' : '9h Out'}</span>
-                                </button>
-
-                                <!-- Option 2: Sync BOTH In & Out with DB Rule Plan -->
-                                <button 
-                                    type="button" 
-                                    class="btn btn-xs btn-primary gap-1 font-mono sync-db-btn" 
-                                    title="Sync Both First & Last punch with DB Override Plan (In: 09:20-09:35, Out: ≥9h)"
-                                    onclick="triggerSingleDbRuleSync('${day.date}', '${firstFull}')"
-                                >
-                                    <i data-lucide="zap" class="w-3 h-3"></i>
-                                    <span>Both (DB)</span>
+                                    <span>9h Out</span>
                                 </button>
 
                                 <!-- Option 3: Manual Adjustment -->
                                 <button 
                                     type="button" 
                                     class="btn btn-xs btn-outline btn-ghost gap-1" 
-                                    title="Manually adjust punches"
+                                    title="Manually adjust punches and save locally"
                                     onclick="openManualAdjustModal('${day.date}', '${firstFull}', '${lastFull}')"
                                 >
                                     <i data-lucide="edit-2" class="w-3 h-3"></i>
@@ -893,6 +1001,175 @@
             }).join('');
 
             if (window.renderLucideIcons) window.renderLucideIcons();
+        }
+
+        // --- PRIMARY FEATURE: Push Single Day Local DB Values to Remote API DB ---
+        async function triggerSingleLocalPush(dateStr) {
+            const dayObj = state.days.find(d => d.date === dateStr);
+            if (!dayObj || !dayObj.local_db || !dayObj.local_db.exists) {
+                showToast(`No local DB attendance record found for ${dateStr}. Save locally first.`, 'warning');
+                return;
+            }
+
+            const row = document.getElementById(`att-row-${dateStr}`);
+            const pushBtn = row ? row.querySelector('.push-local-btn') : null;
+
+            if (pushBtn) {
+                pushBtn.disabled = true;
+                pushBtn.innerHTML = `<span class="loading loading-spinner loading-xs"></span>`;
+            }
+
+            try {
+                const formData = new URLSearchParams();
+                formData.append('emp_code', state.empCode);
+                formData.append('date', dateStr);
+
+                const res = await fetch(state.endpoints.pushLocalToApi, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRF-TOKEN': state.csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: formData.toString()
+                });
+
+                const json = await res.json();
+
+                if (json.status === 1) {
+                    const lIn = dayObj.local_db.check_in_full || `${dateStr} ${dayObj.local_db.check_in}`;
+                    const lOut = dayObj.local_db.check_out_full || `${dateStr} ${dayObj.local_db.check_out}`;
+                    const dur = dayObj.local_db.total_time || 'Synced from DB';
+
+                    updateRowInDomBoth(dateStr, lIn, lOut, dur);
+                    dayObj.is_pushed_from_local = true;
+
+                    // Update badge to Pushed from DB
+                    const badgeCell = row.querySelector('.status-badge-cell');
+                    if (badgeCell) {
+                        badgeCell.innerHTML = `
+                            <span class="badge badge-accent badge-soft font-mono gap-1 text-xs">
+                                <i data-lucide="check-check" class="w-3 h-3"></i> 
+                                Pushed from DB
+                            </span>
+                            <div class="mt-1 text-[11px] font-mono text-accent flex items-center gap-1 font-semibold">
+                                <i data-lucide="database" class="w-3 h-3"></i>
+                                <span>Local DB: ${dayObj.local_db.check_in} &rarr; ${dayObj.local_db.check_out}</span>
+                            </div>
+                        `;
+                    }
+
+                    showToast(`API DB updated with locally saved values for ${dateStr}!`, 'success');
+                } else {
+                    showToast(`Error pushing to API DB: ${json.message || 'API rejected update'}`, 'error');
+                }
+            } catch (err) {
+                console.error('Push local to API error:', err);
+                showToast(`Network error pushing ${dateStr} to API`, 'error');
+            } finally {
+                if (pushBtn) {
+                    pushBtn.disabled = false;
+                    pushBtn.className = 'btn btn-xs btn-accent gap-1 font-mono push-local-btn';
+                    pushBtn.innerHTML = `<i data-lucide="check" class="w-3 h-3"></i><span>Pushed</span>`;
+                    if (window.renderLucideIcons) window.renderLucideIcons();
+                }
+            }
+        }
+
+        // --- PRIMARY FEATURE: Confirmation Dialog for Bulk Push Local DB -> API DB ---
+        function promptPushLocalDbConfirmation() {
+            const localDays = state.days.filter(d => d.local_db && d.local_db.exists);
+            if (localDays.length === 0) {
+                showToast('No locally saved attendance records found for this employee in the date range.', 'warning');
+                return;
+            }
+
+            document.getElementById('confirmLocalPushCount').textContent = localDays.length;
+            document.getElementById('confirmLocalPushEmpCode').textContent = state.empCode;
+
+            const listEl = document.getElementById('confirmLocalPushDatesList');
+            listEl.innerHTML = localDays.map(d => `
+                <div class="py-1.5 px-2 flex justify-between items-center text-xs">
+                    <div>
+                        <span class="font-bold text-base-content">${d.date} (${d.day_of_week || ''})</span>
+                    </div>
+                    <div class="font-mono text-accent font-semibold">
+                        In: ${d.local_db.check_in || '--'} | Out: ${d.local_db.check_out || '--'}
+                    </div>
+                    <span class="badge badge-accent badge-xs font-mono">From MySQL DB</span>
+                </div>
+            `).join('');
+
+            document.getElementById('pushLocalDbConfirmModal').showModal();
+            if (window.renderLucideIcons) window.renderLucideIcons();
+        }
+
+        async function executePushLocalDb() {
+            document.getElementById('pushLocalDbConfirmModal').close();
+
+            const startDate = document.getElementById('startDateInput').value;
+            const endDate = document.getElementById('endDateInput').value;
+
+            state.isBulkSyncing = true;
+            const progressBox = document.getElementById('bulkProgressContainer');
+            const progressBar = document.getElementById('bulkProgressBar');
+            const progressText = document.getElementById('bulkProgressText');
+            const progressStatus = document.getElementById('bulkProgressStatus');
+            const pushBtn = document.getElementById('pushLocalDbBtn');
+
+            progressBox.classList.remove('hidden');
+            pushBtn.disabled = true;
+            progressBar.className = 'progress progress-accent w-full h-3';
+
+            progressStatus.textContent = 'Updating API DB with locally saved values...';
+            progressBar.value = 50;
+
+            try {
+                const formData = new URLSearchParams();
+                formData.append('emp_code', state.empCode);
+                formData.append('start_date', startDate);
+                formData.append('end_date', endDate);
+
+                const res = await fetch(state.endpoints.pushLocalToApi, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRF-TOKEN': state.csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: formData.toString()
+                });
+
+                const json = await res.json();
+                progressBar.value = 100;
+                progressText.textContent = `100%`;
+
+                if (json.status === 1) {
+                    const results = json.data?.results || [];
+                    results.forEach(r => {
+                        if (r.status === 'success') {
+                            updateRowInDomBoth(r.date, r.first_time, r.last_time, r.duration || 'Pushed from DB');
+                            const dayObj = state.days.find(d => d.date === r.date);
+                            if (dayObj) dayObj.is_pushed_from_local = true;
+                        }
+                    });
+
+                    progressStatus.textContent = `Completed! ${json.data.success_count} dates pushed to API database.`;
+                    showToast(json.message, 'success');
+                } else {
+                    progressStatus.textContent = `Failed: ${json.message}`;
+                    showToast(json.message || 'Push failed', 'error');
+                }
+            } catch (err) {
+                console.error('Bulk push local to API error:', err);
+                showToast('Network error while pushing local DB to API', 'error');
+            } finally {
+                state.isBulkSyncing = false;
+                pushBtn.disabled = false;
+                setTimeout(() => {
+                    progressBox.classList.add('hidden');
+                }, 4000);
+            }
         }
 
         // --- Single Day: 9h Check-Out Sync ---
@@ -951,62 +1228,6 @@
             }
         }
 
-        // --- Single Day: Sync BOTH First & Last with DB Rule Plan ---
-        async function triggerSingleDbRuleSync(dateStr, firstPunchFull) {
-            const dayObj = state.days.find(d => d.date === dateStr);
-            if (!dayObj) return;
-
-            const row = document.getElementById(`att-row-${dateStr}`);
-            const dbBtn = row ? row.querySelector('.sync-db-btn') : null;
-
-            if (dbBtn) {
-                dbBtn.disabled = true;
-                dbBtn.innerHTML = `<span class="loading loading-spinner loading-xs"></span>`;
-            }
-
-            try {
-                const formData = new URLSearchParams();
-                formData.append('emp_code', state.empCode);
-                formData.append('date', dateStr);
-                if (firstPunchFull) {
-                    formData.append('first_time', firstPunchFull);
-                }
-
-                const res = await fetch(state.endpoints.syncDbRule, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'X-CSRF-TOKEN': state.csrfToken,
-                        'Accept': 'application/json'
-                    },
-                    body: formData.toString()
-                });
-
-                const json = await res.json();
-
-                if (json.status === 1 && json.data) {
-                    const newIn = json.data.first_punch?.punch_time || '';
-                    const newOut = json.data.last_punch?.punch_time || '';
-                    const dur = json.data.duration_formatted || '09h 10m 00s';
-
-                    updateRowInDomBoth(dateStr, newIn, newOut, dur);
-                    showToast(`Date ${dateStr} aligned via DB Rule (In: ${newIn.split(' ')[1] || newIn}, Out: ${newOut.split(' ')[1] || newOut})`, 'success');
-                } else {
-                    showToast(`Failed DB Rule sync for ${dateStr}: ${json.message || 'Error'}`, 'error');
-                }
-            } catch (err) {
-                console.error('DB Rule sync error:', err);
-                showToast(`Network error syncing ${dateStr}`, 'error');
-            } finally {
-                if (dbBtn) {
-                    dbBtn.disabled = false;
-                    dbBtn.className = 'btn btn-xs btn-primary gap-1 font-mono sync-db-btn';
-                    dbBtn.innerHTML = `<i data-lucide="check-check" class="w-3 h-3"></i><span>DB Synced</span>`;
-                    if (window.renderLucideIcons) window.renderLucideIcons();
-                }
-            }
-        }
-
         // --- DOM Live Row Update (Check-Out Only) ---
         function updateRowInDom(dateStr, newOutTimestamp, newDurationFormatted, isSyncedBadge = true) {
             const row = document.getElementById(`att-row-${dateStr}`);
@@ -1056,7 +1277,7 @@
             if (window.renderLucideIcons) window.renderLucideIcons();
         }
 
-        // --- DOM Live Row Update (BOTH Check-In & Check-Out via DB Rule) ---
+        // --- DOM Live Row Update (BOTH Check-In & Check-Out) ---
         function updateRowInDomBoth(dateStr, newInTimestamp, newOutTimestamp, newDurationFormatted) {
             const row = document.getElementById(`att-row-${dateStr}`);
             if (!row) return;
@@ -1064,45 +1285,29 @@
             const inTimeOnly = newInTimestamp.includes(' ') ? newInTimestamp.split(' ')[1] : newInTimestamp;
             const outTimeOnly = newOutTimestamp.includes(' ') ? newOutTimestamp.split(' ')[1] : newOutTimestamp;
 
-            // 1. Update Check-In Column
             const firstPunchSpan = row.querySelector('.first-punch-time');
             if (firstPunchSpan) {
                 firstPunchSpan.textContent = inTimeOnly;
                 firstPunchSpan.parentElement.className = 'flex items-center gap-1.5 font-mono font-semibold text-primary text-sm';
             }
 
-            // 2. Update Check-Out Column
             const lastPunchSpan = row.querySelector('.last-punch-time');
             if (lastPunchSpan) {
                 lastPunchSpan.textContent = outTimeOnly;
                 lastPunchSpan.parentElement.className = 'flex items-center gap-1.5 font-mono font-semibold text-base-content text-sm';
             }
 
-            // 3. Update Duration
             const durCell = row.querySelector('.duration-formatted');
             if (durCell) {
                 durCell.textContent = newDurationFormatted;
                 durCell.className = 'font-mono font-bold text-sm text-success duration-formatted';
             }
 
-            // 4. Update Status Badge
-            const badgeCell = row.querySelector('.status-badge-cell');
-            if (badgeCell) {
-                badgeCell.innerHTML = `
-                    <span class="badge badge-primary badge-soft font-mono gap-1 text-xs">
-                        <i data-lucide="check-check" class="w-3 h-3"></i> 
-                        DB Plan Synced
-                    </span>
-                `;
-            }
-
             row.classList.remove('bg-warning/5');
 
-            // 5. Update Local State
             const dayObj = state.days.find(d => d.date === dateStr);
             if (dayObj) {
                 dayObj.is_nine_hours = true;
-                dayObj.is_db_synced = true;
                 dayObj.status = 'completed';
                 if (!dayObj.first_punch) {
                     dayObj.first_punch = { datetime: newInTimestamp, time: inTimeOnly, punch_state: 0 };
@@ -1136,9 +1341,7 @@
             document.getElementById('kpiShortfallDays').textContent = shortfall;
 
             const bulkBadgeCount = document.getElementById('bulkShortfallBadgeCount');
-            if (bulkBadgeCount) {
-                bulkBadgeCount.textContent = `${shortfall} Shortfall Days`;
-            }
+            if (bulkBadgeCount) bulkBadgeCount.textContent = `${shortfall} Shortfall Days`;
         }
 
         // --- Manual Adjustment Modal Handling ---
@@ -1155,24 +1358,44 @@
             const firstTime = firstPunchFull || (dayObj.first_punch ? dayObj.first_punch.datetime : `${dateStr} 10:00:00`);
             document.getElementById('modalDisplayFirstPunch').textContent = firstTime;
 
-            const input = document.getElementById('modalLastPunchInput');
+            // Set In input
+            const inInput = document.getElementById('modalFirstPunchInput');
+            let initialIn = firstPunchFull || (dayObj.first_punch ? dayObj.first_punch.datetime : `${dateStr} 10:00:00`);
+            if (dayObj.local_db && dayObj.local_db.exists && dayObj.local_db.check_in_full) {
+                initialIn = dayObj.local_db.check_in_full;
+            }
+            inInput.value = initialIn.replace(' ', 'T');
+
+            // Set Out input
+            const outInput = document.getElementById('modalLastPunchInput');
             let initialOut = lastPunchFull || (dayObj.last_punch ? dayObj.last_punch.datetime : '');
-            if (!initialOut || dayObj.status === 'single_punch') {
+            if (dayObj.local_db && dayObj.local_db.exists && dayObj.local_db.check_out_full) {
+                initialOut = dayObj.local_db.check_out_full;
+            } else if (!initialOut || dayObj.status === 'single_punch') {
                 initialOut = calculateRandomOutTime(firstTime, dateStr);
             }
+            outInput.value = initialOut.replace(' ', 'T');
 
-            input.value = initialOut.replace(' ', 'T');
+            // Local DB display
+            const localDbDisplay = document.getElementById('modalDisplayLocalDb');
+            if (dayObj.local_db && dayObj.local_db.exists) {
+                localDbDisplay.textContent = `${dayObj.local_db.check_in} -> ${dayObj.local_db.check_out}`;
+            } else {
+                localDbDisplay.textContent = 'None saved in MySQL yet';
+            }
+
             updateModalEstimatedDuration();
+            inInput.oninput = updateModalEstimatedDuration;
+            outInput.oninput = updateModalEstimatedDuration;
 
-            input.oninput = updateModalEstimatedDuration;
             modal.showModal();
             if (window.renderLucideIcons) window.renderLucideIcons();
         }
 
         function fillSuggestedInModal() {
             const dateStr = document.getElementById('modalTargetDate').value;
-            const firstTime = document.getElementById('modalDisplayFirstPunch').textContent;
-            const suggested = calculateRandomOutTime(firstTime, dateStr);
+            const inVal = document.getElementById('modalFirstPunchInput').value.replace('T', ' ');
+            const suggested = calculateRandomOutTime(inVal, dateStr);
             
             document.getElementById('modalLastPunchInput').value = suggested.replace(' ', 'T');
             updateModalEstimatedDuration();
@@ -1180,20 +1403,20 @@
         }
 
         function updateModalEstimatedDuration() {
-            const firstStr = document.getElementById('modalDisplayFirstPunch').textContent;
+            const inVal = document.getElementById('modalFirstPunchInput').value;
             const lastVal = document.getElementById('modalLastPunchInput').value;
             const previewEl = document.getElementById('modalEstimatedDuration');
 
-            if (!firstStr || !lastVal) {
+            if (!inVal || !lastVal) {
                 previewEl.textContent = '--';
                 return;
             }
 
-            const tFirst = new Date(firstStr.replace(' ', 'T')).getTime();
+            const tFirst = new Date(inVal).getTime();
             const tLast = new Date(lastVal).getTime();
 
             if (isNaN(tFirst) || isNaN(tLast) || tLast <= tFirst) {
-                previewEl.textContent = 'Invalid / Before In-Time';
+                previewEl.textContent = 'Invalid / Out before In';
                 previewEl.className = 'font-mono font-bold text-error text-sm';
                 return;
             }
@@ -1208,11 +1431,65 @@
             previewEl.className = `font-mono font-bold ${diffSec >= 32400 ? 'text-success' : 'text-warning'} text-sm`;
         }
 
+        // Save to Local DB Only (without calling remote API)
+        async function submitSaveLocalOnly() {
+            const dateStr = document.getElementById('modalTargetDate').value;
+            const empCode = document.getElementById('modalTargetEmpCode').value;
+            const inVal = document.getElementById('modalFirstPunchInput').value.replace('T', ' ');
+            const outVal = document.getElementById('modalLastPunchInput').value.replace('T', ' ');
+
+            const saveBtn = document.getElementById('modalSaveLocalOnlyBtn');
+            saveBtn.disabled = true;
+
+            try {
+                const formData = new URLSearchParams();
+                formData.append('emp_code', empCode);
+                formData.append('date', dateStr);
+                formData.append('check_in_datetime', inVal);
+                formData.append('check_out_datetime', outVal);
+
+                const res = await fetch(state.endpoints.saveLocalAttendance, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRF-TOKEN': state.csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: formData.toString()
+                });
+
+                const json = await res.json();
+                if (json.status === 1) {
+                    const dayObj = state.days.find(d => d.date === dateStr);
+                    if (dayObj) {
+                        dayObj.local_db = {
+                            exists: true,
+                            check_in: inVal.split(' ')[1],
+                            check_in_full: inVal,
+                            check_out: outVal.split(' ')[1],
+                            check_out_full: outVal,
+                            total_time: json.data?.total_time
+                        };
+                    }
+                    renderDashboardData();
+                    document.getElementById('manualAdjustModal').close();
+                    showToast(`Saved locally in MySQL DB for ${dateStr}!`, 'success');
+                } else {
+                    showToast(json.message || 'Error saving locally', 'error');
+                }
+            } catch (err) {
+                showToast('Network error saving locally', 'error');
+            } finally {
+                saveBtn.disabled = false;
+            }
+        }
+
+        // Save locally and push to Remote API DB
         async function submitManualAdjust() {
             const dateStr = document.getElementById('modalTargetDate').value;
             const empCode = document.getElementById('modalTargetEmpCode').value;
-            const firstTime = document.getElementById('modalDisplayFirstPunch').textContent;
-            const lastTimeInput = document.getElementById('modalLastPunchInput').value.replace('T', ' ');
+            const firstTime = document.getElementById('modalFirstPunchInput').value.replace('T', ' ');
+            const lastTime = document.getElementById('modalLastPunchInput').value.replace('T', ' ');
 
             const saveBtn = document.getElementById('modalSaveBtn');
             saveBtn.disabled = true;
@@ -1223,7 +1500,7 @@
                 formData.append('emp_code', empCode);
                 formData.append('date', dateStr);
                 formData.append('first_time', firstTime);
-                formData.append('last_time', lastTimeInput);
+                formData.append('last_time', lastTime);
                 formData.append('terminal_alias', 'MANUAL_ADJUST');
 
                 const res = await fetch(state.endpoints.sync, {
@@ -1240,9 +1517,9 @@
 
                 if (json.status === 1) {
                     const dur = json.data?.duration_formatted || document.getElementById('modalEstimatedDuration').textContent;
-                    updateRowInDom(dateStr, lastTimeInput, dur, true);
+                    updateRowInDomBoth(dateStr, firstTime, lastTime, dur);
                     document.getElementById('manualAdjustModal').close();
-                    showToast(`Punch updated for ${dateStr} (${dur})`, 'success');
+                    showToast(`Updated both in API DB & Local DB for ${dateStr} (${dur})`, 'success');
                 } else {
                     showToast(`Failed to update punch: ${json.message || 'API error'}`, 'error');
                 }
@@ -1251,7 +1528,7 @@
                 showToast('Network error while saving punch', 'error');
             } finally {
                 saveBtn.disabled = false;
-                saveBtn.innerHTML = `<i data-lucide="save" class="w-4 h-4"></i><span>Save Changes</span>`;
+                saveBtn.innerHTML = `<i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i><span>Save &amp; Push to API DB</span>`;
                 if (window.renderLucideIcons) window.renderLucideIcons();
             }
         }
@@ -1290,11 +1567,10 @@
             const progressText = document.getElementById('bulkProgressText');
             const progressStatus = document.getElementById('bulkProgressStatus');
             const bulkBtn = document.getElementById('bulkSyncBtn');
-            const bulkDbBtn = document.getElementById('bulkDbRuleSyncBtn');
 
             progressBox.classList.remove('hidden');
             bulkBtn.disabled = true;
-            bulkDbBtn.disabled = true;
+            progressBar.className = 'progress progress-warning w-full h-3';
 
             const total = shortfallDays.length;
             let current = 0;
@@ -1346,7 +1622,6 @@
 
             state.isBulkSyncing = false;
             bulkBtn.disabled = false;
-            bulkDbBtn.disabled = false;
             progressStatus.textContent = `Completed! ${successCount} synced, ${failedCount} failed.`;
             showToast(`Bulk Sync Complete: ${successCount} synced successfully`, successCount > 0 ? 'success' : 'error');
 
@@ -1355,7 +1630,7 @@
             }, 4000);
         }
 
-        // --- Bulk Sync Mode 2: Sync BOTH First & Last with DB Rule Plan ---
+        // --- Bulk Sync Mode 2: Sync via DB Rule Plan ---
         function promptBulkDbRuleSyncConfirmation() {
             const shortfallDays = state.days.filter(d => !d.is_nine_hours);
             if (shortfallDays.length === 0) {
@@ -1404,12 +1679,11 @@
             const progressBar = document.getElementById('bulkProgressBar');
             const progressText = document.getElementById('bulkProgressText');
             const progressStatus = document.getElementById('bulkProgressStatus');
-            const bulkBtn = document.getElementById('bulkSyncBtn');
             const bulkDbBtn = document.getElementById('bulkDbRuleSyncBtn');
 
             progressBox.classList.remove('hidden');
-            bulkBtn.disabled = true;
             bulkDbBtn.disabled = true;
+            progressBar.className = 'progress progress-primary w-full h-3';
 
             const total = shortfallDays.length;
             let current = 0;
@@ -1461,7 +1735,6 @@
             }
 
             state.isBulkSyncing = false;
-            bulkBtn.disabled = false;
             bulkDbBtn.disabled = false;
             progressStatus.textContent = `Completed DB Plan Sync! ${successCount} synced, ${failedCount} failed.`;
             showToast(`DB Plan Bulk Sync Complete: ${successCount} synced successfully`, successCount > 0 ? 'success' : 'error');

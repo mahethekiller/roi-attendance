@@ -61,7 +61,7 @@ class AttendanceSyncController extends Controller
 
     /**
      * Proxy endpoint: Fetch punches for an employee from the remote Biometric API.
-     * Prevents browser CORS and mixed-content issues.
+     * Also enriches response with locally saved MySQL database records.
      */
     public function fetchPunches(Request $request): JsonResponse
     {
@@ -83,11 +83,59 @@ class AttendanceSyncController extends Controller
             'view'       => $validated['view'] ?? 'both',
         ]);
 
+        $empCode = $validated['emp_code'];
+
+        // Query local DB attendance records for this employee
+        $localQuery = Attendance::where(function ($q) use ($empCode) {
+            $q->where('card_no', $empCode)->orWhere('badgenumber', $empCode);
+        });
+
+        if (!empty($validated['start_date'])) {
+            $localQuery->whereDate('punch_date', '>=', $validated['start_date']);
+        }
+        if (!empty($validated['end_date'])) {
+            $localQuery->whereDate('punch_date', '<=', $validated['end_date']);
+        }
+        if (!empty($validated['date'])) {
+            $localQuery->whereDate('punch_date', $validated['date']);
+        }
+
+        $localRecords = $localQuery->get()->keyBy(fn($a) => $a->punch_date->format('Y-m-d'));
+
         try {
             $response = Http::timeout(15)->get($apiUrl, $queryParams);
 
             if ($response->successful()) {
-                return response()->json($response->json(), $response->status());
+                $responseData = $response->json();
+
+                // Enrich each day with local DB saved punch information
+                if (isset($responseData['data']['days']) && is_array($responseData['data']['days'])) {
+                    foreach ($responseData['data']['days'] as &$day) {
+                        $dateStr = $day['date'] ?? null;
+                        $localAtt = $dateStr ? $localRecords->get($dateStr) : null;
+
+                        if ($localAtt) {
+                            $localIn = $localAtt->check_in_datetime?->format('H:i:s') ?? $localAtt->check_in_time;
+                            $localOut = $localAtt->check_out_datetime?->format('H:i:s') ?? $localAtt->check_out_time;
+
+                            $day['local_db'] = [
+                                'exists'         => true,
+                                'id'             => $localAtt->id,
+                                'check_in'       => $localIn,
+                                'check_in_full'  => $localAtt->check_in_datetime?->format('Y-m-d H:i:s') ?? ($dateStr . ' ' . $localIn),
+                                'check_out'      => $localOut,
+                                'check_out_full' => $localAtt->check_out_datetime?->format('Y-m-d H:i:s') ?? ($dateStr . ' ' . $localOut),
+                                'total_time'     => $localAtt->total_time,
+                                'status'         => $localAtt->show_status,
+                            ];
+                        } else {
+                            $day['local_db'] = ['exists' => false];
+                        }
+                    }
+                }
+
+                $responseData['data']['local_records_count'] = $localRecords->count();
+                return response()->json($responseData, $response->status());
             }
 
             Log::warning('Remote biometric punches API returned error response', [
@@ -117,8 +165,188 @@ class AttendanceSyncController extends Controller
     }
 
     /**
+     * Push locally saved attendance values from local MySQL DB to the remote API database.
+     * Takes the exact check_in_datetime / check_in_time and check_out_datetime / check_out_time
+     * saved in our local DB, and updates the remote Biometric database via update_day_punches_api.php.
+     */
+    public function pushLocalDbToApi(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'emp_code'   => 'required|string|max:50',
+            'date'       => 'nullable|date_format:Y-m-d',
+            'start_date' => 'nullable|date_format:Y-m-d',
+            'end_date'   => 'nullable|date_format:Y-m-d',
+        ]);
+
+        $empCode = $validated['emp_code'];
+        $date = $validated['date'] ?? null;
+        $startDate = $validated['start_date'] ?? null;
+        $endDate = $validated['end_date'] ?? null;
+
+        $query = Attendance::where(function ($q) use ($empCode) {
+            $q->where('card_no', $empCode)->orWhere('badgenumber', $empCode);
+        });
+
+        if (!empty($date)) {
+            $query->whereDate('punch_date', $date);
+        } else {
+            if (!empty($startDate)) {
+                $query->whereDate('punch_date', '>=', $startDate);
+            }
+            if (!empty($endDate)) {
+                $query->whereDate('punch_date', '<=', $endDate);
+            }
+        }
+
+        $localRecords = $query->orderBy('punch_date')->get();
+
+        if ($localRecords->isEmpty()) {
+            return response()->json([
+                'status'  => 0,
+                'message' => 'No locally saved attendance records found for employee ' . $empCode . ' in the specified period.',
+            ], 404);
+        }
+
+        $apiUrl = config('services.biometric.update_punches_url', 'http://103.25.129.247/prac1111/attt/update_day_punches_api.php');
+        $successCount = 0;
+        $failedCount = 0;
+        $results = [];
+
+        foreach ($localRecords as $record) {
+            $dateStr = $record->punch_date->format('Y-m-d');
+
+            $firstTime = null;
+            if ($record->check_in_datetime) {
+                $firstTime = $record->check_in_datetime->format('Y-m-d H:i:s');
+            } elseif (!empty($record->check_in_time)) {
+                $firstTime = $dateStr . ' ' . $record->check_in_time;
+            }
+
+            $lastTime = null;
+            if ($record->check_out_datetime) {
+                $lastTime = $record->check_out_datetime->format('Y-m-d H:i:s');
+            } elseif (!empty($record->check_out_time)) {
+                $lastTime = $dateStr . ' ' . $record->check_out_time;
+            }
+
+            if (empty($firstTime) && empty($lastTime)) {
+                $failedCount++;
+                $results[] = [
+                    'date'    => $dateStr,
+                    'status'  => 'skipped',
+                    'message' => 'No valid check-in or check-out timestamps found in local record.',
+                ];
+                continue;
+            }
+
+            try {
+                $postData = [
+                    'emp_code'       => $empCode,
+                    'date'           => $dateStr,
+                    'first_time'     => $firstTime,
+                    'last_time'      => $lastTime,
+                    'terminal_alias' => 'LOCAL_DB_PUSH',
+                ];
+
+                $response = Http::asForm()->timeout(15)->post($apiUrl, $postData);
+                $resData = $response->json();
+
+                if ($response->successful() && isset($resData['status']) && $resData['status'] == 1) {
+                    $successCount++;
+                    $results[] = [
+                        'date'       => $dateStr,
+                        'status'     => 'success',
+                        'first_time' => $firstTime,
+                        'last_time'  => $lastTime,
+                        'duration'   => $resData['data']['duration_formatted'] ?? $record->total_time,
+                    ];
+                } else {
+                    $failedCount++;
+                    $results[] = [
+                        'date'    => $dateStr,
+                        'status'  => 'failed',
+                        'message' => $resData['message'] ?? 'API error',
+                    ];
+                }
+            } catch (\Exception $e) {
+                $failedCount++;
+                $results[] = [
+                    'date'    => $dateStr,
+                    'status'  => 'failed',
+                    'message' => $e->getMessage(),
+                ];
+            }
+        }
+
+        // Audit Trail in SyncLog
+        SyncLog::create([
+            'trigger_type'   => 'push_local_db_to_api',
+            'start_date'     => $localRecords->first()->punch_date->format('Y-m-d'),
+            'end_date'       => $localRecords->last()->punch_date->format('Y-m-d'),
+            'status'         => $failedCount === 0 ? 'success' : ($successCount > 0 ? 'partial' : 'failed'),
+            'imported_count' => 0,
+            'updated_count'  => $successCount,
+            'message'        => "Pushed local DB values to remote API for emp {$empCode}: {$successCount} updated, {$failedCount} failed by " . (Auth::user()?->name ?? 'Admin'),
+            'payload_summary' => [
+                'user_id'       => Auth::id(),
+                'ip_address'    => $request->ip(),
+                'emp_code'      => $empCode,
+                'total_records' => $localRecords->count(),
+                'success_count' => $successCount,
+                'failed_count'  => $failedCount,
+                'details'       => $results,
+            ],
+        ]);
+
+        return response()->json([
+            'status'  => $successCount > 0 ? 1 : 0,
+            'message' => "Successfully updated remote API with locally saved values for {$successCount} days." . ($failedCount > 0 ? " ({$failedCount} failed)" : ""),
+            'data'    => [
+                'total'         => $localRecords->count(),
+                'success_count' => $successCount,
+                'failed_count'  => $failedCount,
+                'results'       => $results,
+            ],
+        ]);
+    }
+
+    /**
+     * Save or update an attendance record locally in the database.
+     */
+    public function saveLocalAttendance(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'emp_code'           => 'required|string|max:50',
+            'date'               => 'required|date_format:Y-m-d',
+            'check_in_datetime'  => 'nullable|string|max:30',
+            'check_out_datetime' => 'nullable|string|max:30',
+        ]);
+
+        $empCode = $validated['emp_code'];
+        $date = $validated['date'];
+        $inTime = $validated['check_in_datetime'] ?? null;
+        $outTime = $validated['check_out_datetime'] ?? null;
+
+        $this->syncLocalAttendance($empCode, $date, $inTime, $outTime);
+
+        $record = Attendance::where(function ($q) use ($empCode) {
+            $q->where('card_no', $empCode)->orWhere('badgenumber', $empCode);
+        })->whereDate('punch_date', $date)->first();
+
+        return response()->json([
+            'status'  => 1,
+            'message' => "Attendance saved locally in database for {$date}.",
+            'data'    => [
+                'date'       => $date,
+                'check_in'   => $record?->check_in_datetime?->format('H:i:s') ?? $record?->check_in_time,
+                'check_out'  => $record?->check_out_datetime?->format('H:i:s') ?? $record?->check_out_time,
+                'total_time' => $record?->total_time,
+            ],
+        ]);
+    }
+
+    /**
      * Proxy endpoint: Update or auto-sync 1st and last punch for a given date.
-     * Calculates randomized 9h00m - 9h15m duration if last_time is not provided.
      */
     public function syncPunch(Request $request): JsonResponse
     {
@@ -199,23 +427,6 @@ class AttendanceSyncController extends Controller
                 'postData' => $postData,
             ]);
 
-            SyncLog::create([
-                'trigger_type'   => 'auto_sync_9h',
-                'start_date'     => $date,
-                'end_date'       => $date,
-                'status'         => 'failed',
-                'imported_count' => 0,
-                'updated_count'  => 0,
-                'message'        => "9h Auto-Sync punch on {$date} for emp {$empCode} failed: " . $e->getMessage(),
-                'payload_summary' => [
-                    'user_id'    => Auth::id(),
-                    'ip_address' => $request->ip(),
-                    'emp_code'   => $empCode,
-                    'date'       => $date,
-                    'error'      => $e->getMessage(),
-                ],
-            ]);
-
             return response()->json([
                 'status'  => 0,
                 'message' => 'Unable to connect to Biometric Update API. Check network/VPN.',
@@ -226,7 +437,6 @@ class AttendanceSyncController extends Controller
 
     /**
      * Synchronize BOTH First Punch and Last Punch using database override rule for the employee.
-     * Calculates adjusted In (e.g. 09:20 - 09:35) and adjusted Out (>= 9h) and pushes both to API 2 & local DB.
      */
     public function syncWithDbRule(Request $request): JsonResponse
     {
@@ -583,7 +793,6 @@ class AttendanceSyncController extends Controller
                 $att->show_status = 'present';
                 $att->save();
             } else {
-                // If not in database yet, create record in attendances table
                 $emp = Employee::where('card_no', $empCode)->orWhere('employee_id', $empCode)->first();
                 $firstCarbon = !empty($firstTime) ? Carbon::parse(str_replace('T', ' ', $firstTime)) : null;
                 $lastCarbon = !empty($lastTime) ? Carbon::parse(str_replace('T', ' ', $lastTime)) : null;
@@ -600,7 +809,7 @@ class AttendanceSyncController extends Controller
                 ]);
             }
         } catch (\Exception $e) {
-            Log::info('Non-fatal: Unable to update/create local attendance record for sync: ' . $e->getMessage());
+            Log::info('Non-fatal: Unable to update/create local attendance record: ' . $e->getMessage());
         }
     }
 }
