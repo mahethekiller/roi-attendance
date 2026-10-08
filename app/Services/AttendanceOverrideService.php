@@ -181,9 +181,9 @@ class AttendanceOverrideService
             $targetMinutes = (int) round($durationHours * 60);
 
             if ($totalMinutes < $targetMinutes) {
-                // Introduce realistic random variation between target (e.g. 9 hrs) and target + 30 mins (9h - 9h 30m)
-                $extraMinutes = rand(1, 30);
-                $extraSeconds = rand(0, 59);
+                // Adjusted Plan formula: target duration (e.g. 9 hours) + rand(0, 14) minutes + rand(5, 55) seconds (09h 00m 05s - 09h 14m 55s)
+                $extraMinutes = rand(0, 14);
+                $extraSeconds = rand(5, 55);
 
                 $newOutDt = clone $inDt;
                 $newOutDt->modify("+{$targetMinutes} minutes +{$extraMinutes} minutes +{$extraSeconds} seconds");
@@ -194,6 +194,27 @@ class AttendanceOverrideService
         }
 
         return $checkOutDatetime;
+    }
+
+    /**
+     * Compute Check-Out timestamp directly using the adjusted plan formula.
+     * Formula: checkIn + (min_duration_hours * 3600) + rand(0, 14)*60 + rand(5, 55) seconds.
+     *
+     * @param string $checkInDatetime format: Y-m-d H:i:s
+     * @param AttendanceOverride|null $rule
+     * @return string adjusted check_out_datetime (09h 00m - 09h 15m duration)
+     */
+    public function calculateAdjustedPlanCheckOut(string $checkInDatetime, ?AttendanceOverride $rule = null): string
+    {
+        $inDt = new DateTime($checkInDatetime);
+        $durationHours = $rule?->min_duration_hours ?? 9.00;
+        $targetMinutes = (int) round($durationHours * 60);
+        $extraMinutes = rand(0, 14);
+        $extraSeconds = rand(5, 55);
+
+        $newOutDt = clone $inDt;
+        $newOutDt->modify("+{$targetMinutes} minutes +{$extraMinutes} minutes +{$extraSeconds} seconds");
+        return $newOutDt->format('Y-m-d H:i:s');
     }
 
     /**
@@ -229,10 +250,24 @@ class AttendanceOverrideService
                     }
 
                     $checkOut = is_object($row) ? ($row->check_out_datetime ?? null) : ($row['check_out_datetime'] ?? null);
+                    $effectiveIn = is_object($row) ? $row->check_in_datetime : $row['check_in_datetime'];
                     if (!empty($checkOut) && $checkIn !== $checkOut) {
-                        $effectiveIn = is_object($row) ? $row->check_in_datetime : $row['check_in_datetime'];
                         $adjustedOut = $this->adjustCheckOut((string) $effectiveIn, (string) $checkOut, $rule);
                         if ($adjustedOut !== $checkOut) {
+                            if (is_object($row)) {
+                                $row->check_out_datetime = $adjustedOut;
+                                $row->check_out_time = date('H:i:s', strtotime($adjustedOut));
+                            } else {
+                                $row['check_out_datetime'] = $adjustedOut;
+                                $row['check_out_time'] = date('H:i:s', strtotime($adjustedOut));
+                            }
+                        }
+                    } elseif (empty($checkOut) || $checkIn === $checkOut) {
+                        // For past dates where only one punch was recorded, apply the adjusted plan check-out
+                        $rowDate = is_object($row) ? ($row->punch_date ?? null) : ($row['punch_date'] ?? null);
+                        $dateStr = $rowDate ? date('Y-m-d', strtotime((string)$rowDate)) : date('Y-m-d', strtotime((string)$effectiveIn));
+                        if ($dateStr < date('Y-m-d')) {
+                            $adjustedOut = $this->calculateAdjustedPlanCheckOut((string) $effectiveIn, $rule);
                             if (is_object($row)) {
                                 $row->check_out_datetime = $adjustedOut;
                                 $row->check_out_time = date('H:i:s', strtotime($adjustedOut));

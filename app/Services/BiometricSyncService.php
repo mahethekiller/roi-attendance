@@ -154,9 +154,16 @@ class BiometricSyncService
 
                     if (!empty($maxCheckTime)) {
                         if ($rawMinCheckTime === $rawMaxCheckTime) {
-                            // Only one punch recorded so far: employee has not checked out yet
-                            $maxCheckTime = null;
-                            $maxTime = null;
+                            if ($punchDate < Carbon::today('Asia/Kolkata')->format('Y-m-d')) {
+                                // For past dates where only one punch was recorded, apply the adjusted plan check-out
+                                $adjustedOut = $this->overrideService->calculateAdjustedPlanCheckOut($minCheckTime, $overrideRule);
+                                $maxCheckTime = $adjustedOut;
+                                $maxTime = date('H:i:s', strtotime($adjustedOut));
+                            } else {
+                                // Only one punch recorded today so far: employee has not checked out yet
+                                $maxCheckTime = null;
+                                $maxTime = null;
+                            }
                         } else {
                             // If the existing record already has an adjusted check-out that satisfies the minimum shift requirement (e.g. >= 9 hours),
                             // preserve it so repeated sync cycles do not re-randomize checkout between 9 - 9:30 hrs!
