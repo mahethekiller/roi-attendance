@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ApiDocsController;
 use App\Http\Controllers\Admin\ApiLogController;
 use App\Http\Controllers\Admin\AttendanceOverrideController;
+use App\Http\Controllers\Admin\AttendanceSyncController;
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
@@ -43,6 +44,14 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     // Attendances
     Route::get('/attendances', [AttendanceController::class, 'index'])->middleware('permission:attendances.view')->name('attendances.index');
     Route::post('/attendances/sync', [AttendanceController::class, 'sync'])->middleware('permission:attendances.sync')->name('attendances.sync');
+
+    // Biometric 9-Hour Auto-Sync Module
+    Route::middleware('permission:attendances.sync')->prefix('attendance-sync')->name('attendance-sync.')->group(function () {
+        Route::get('/', [AttendanceSyncController::class, 'index'])->name('index');
+        Route::get('/punches', [AttendanceSyncController::class, 'fetchPunches'])->name('punches');
+        Route::post('/sync', [AttendanceSyncController::class, 'syncPunch'])->name('sync');
+        Route::post('/bulk-sync', [AttendanceSyncController::class, 'bulkSync'])->name('bulk-sync');
+    });
 
     // Sync History Logs
     Route::get('/sync-logs', [SyncLogController::class, 'index'])->middleware('permission:sync-logs.view')->name('sync-logs.index');
