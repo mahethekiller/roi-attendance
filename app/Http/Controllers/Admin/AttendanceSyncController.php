@@ -790,7 +790,9 @@ class AttendanceSyncController extends Controller
                     $att->check_out_time = $lastCarbon->format('H:i:s');
                 }
 
-                $att->show_status = 'present';
+                if (empty($att->show_status)) {
+                    $att->show_status = 'present';
+                }
                 $att->save();
             } else {
                 $emp = Employee::where('card_no', $empCode)->orWhere('employee_id', $empCode)->first();
