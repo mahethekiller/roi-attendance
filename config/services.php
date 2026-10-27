@@ -47,4 +47,12 @@ return [
         ],
     ],
 
+    'greythr' => [
+        'domain'     => env('GREYTHR_DOMAIN', 'i2k2-networks.greythr.com'),
+        'username'   => env('GREYTHR_API_USERNAME', 'I2k2apiuser'),
+        'password'   => env('GREYTHR_API_PASSWORD', '40f33d1e-fe49-4212-9569-268e90003ca1'),
+        'token_url'  => env('GREYTHR_TOKEN_URL', 'https://api.greythr.com/oauth2/v2/client-token'),
+        'swipes_url' => env('GREYTHR_SWIPES_URL', 'https://api.greythr.com/attendance/v2/employee/swipes'),
+    ],
+
 ];

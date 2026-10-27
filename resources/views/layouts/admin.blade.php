@@ -132,6 +132,7 @@
                         <x-admin-nav-item route="admin.employees.index" activePattern="admin.employees.*" icon="contact-2" label="Employee Directory" permission="employees.view" />
                         <x-admin-nav-item route="admin.attendances.index" activePattern="admin.attendances.*" icon="calendar-check" label="Attendance Logs" permission="attendances.view" />
                         <x-admin-nav-item route="admin.other-attendances.index" activePattern="admin.other-attendances.*" icon="building-2" label="Other Companies" permission="other_attendances.view" />
+                        <x-admin-nav-item route="admin.greythr-logs.index" activePattern="admin.greythr-logs.*" icon="cloud-upload" label="greytHR Pushes" permission="greythr_logs.view" />
                         <x-admin-nav-item route="admin.attendance-sync.index" activePattern="admin.attendance-sync.*" icon="clock-4" label="9h Auto-Sync" role="super-admin" badge="9h" badgeColor="warning" />
                         <x-admin-nav-item url="#" icon="bar-chart-3" label="Reports & Analytics" permission="reports.view" />
 
@@ -142,10 +143,11 @@
                             <x-admin-nav-item route="admin.api-logs.index" activePattern="admin.api-logs.*" icon="activity" label="API Traffic Logs" permission="api.logs.view" />
                         </x-authorized>
 
-                        <x-authorized :permission="['sync-logs.view', 'attendance.overrides.manage', 'roles.manage', 'settings.manage']" :role="['super-admin']">
+                        <x-authorized :permission="['sync-logs.view', 'greythr_logs.view', 'attendance.overrides.manage', 'roles.manage', 'settings.manage']" :role="['super-admin']">
                             <li class="menu-title text-[11px] font-bold uppercase tracking-wider text-base-content/50 mt-4 px-3">Administration</li>
                             <x-admin-nav-item route="admin.users.index" activePattern="admin.users.*" icon="users" label="User Accounts" role="super-admin" />
                             <x-admin-nav-item route="admin.sync-logs.index" activePattern="admin.sync-logs.*" icon="history" label="Sync History Logs" permission="sync-logs.view" />
+                            <x-admin-nav-item route="admin.greythr-logs.index" activePattern="admin.greythr-logs.*" icon="cloud-upload" label="greytHR Push Logs" permission="greythr_logs.view" />
                             <x-admin-nav-item route="admin.attendance-overrides.index" activePattern="admin.attendance-overrides.*" icon="sliders" label="Attendance Overrides" permission="attendance.overrides.manage" />
                             <x-admin-nav-item url="#" icon="shield-alert" label="Roles & Spatie RBAC" permission="roles.manage" />
                             <x-admin-nav-item url="#" icon="settings" label="System Settings" permission="settings.manage" />

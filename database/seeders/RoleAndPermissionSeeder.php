@@ -58,6 +58,11 @@ class RoleAndPermissionSeeder extends Seeder
             'sync-logs.view',
             'sync-logs.clear',
 
+            // greytHR Push Logs
+            'greythr_logs.view',
+            'greythr_logs.push',
+            'greythr_logs.clear',
+
             // Reports & Analytics
             'reports.view',
 
@@ -89,6 +94,9 @@ class RoleAndPermissionSeeder extends Seeder
             'other_attendances.view',
             'other_attendances.sync',
             'other_attendances.export',
+            'greythr_logs.view',
+            'greythr_logs.push',
+            'greythr_logs.clear',
             'api.docs.view',
             'sync-logs.view',
         ]);

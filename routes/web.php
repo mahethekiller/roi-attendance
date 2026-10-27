@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\ApiLogController;
 use App\Http\Controllers\Admin\AttendanceOverrideController;
 use App\Http\Controllers\Admin\AttendanceSyncController;
 use App\Http\Controllers\Admin\OtherCompanyAttendanceController;
+use App\Http\Controllers\Admin\GreythrPushLogController;
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
@@ -67,6 +68,13 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     // Sync History Logs
     Route::get('/sync-logs', [SyncLogController::class, 'index'])->middleware('permission:sync-logs.view')->name('sync-logs.index');
     Route::post('/sync-logs/clear', [SyncLogController::class, 'clear'])->middleware('permission:sync-logs.clear')->name('sync-logs.clear');
+
+    // greytHR Push Logs & Manual Trigger
+    Route::middleware('permission:greythr_logs.view')->group(function () {
+        Route::get('/greythr-logs', [GreythrPushLogController::class, 'index'])->name('greythr-logs.index');
+        Route::post('/greythr-logs/push', [GreythrPushLogController::class, 'pushNow'])->middleware('permission:greythr_logs.push')->name('greythr-logs.push');
+        Route::post('/greythr-logs/clear', [GreythrPushLogController::class, 'clear'])->middleware('permission:greythr_logs.clear')->name('greythr-logs.clear');
+    });
 
     // Attendance Overrides Management (Super Admin)
     Route::middleware('permission:attendance.overrides.manage')->group(function () {
