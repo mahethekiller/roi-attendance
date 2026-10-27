@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Attendance;
+use App\Models\OtherCompanyAttendance;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -83,20 +84,20 @@ class BiometricSyncService
             $punchRecords = $result['data'] ?? [];
             $importedCount = 0;
             $updatedCount = 0;
-            $skippedUnregisteredCount = 0;
+            $otherImportedCount = 0;
+            $otherUpdatedCount = 0;
+            $skippedCount = 0;
 
-            // Pre-fetch all registered card numbers and employee IDs for fast O(1) hash lookup
-            $registeredCards = \App\Models\Employee::whereNotNull('card_no')
+            // Pre-fetch all registered employees by card_no and employee_id for fast O(1) lookup
+            $employeesByCard = \App\Models\Employee::whereNotNull('card_no')
                 ->where('card_no', '!=', '')
-                ->pluck('card_no')
-                ->map(fn($v) => trim((string)$v))
-                ->flip();
+                ->get()
+                ->keyBy(fn($v) => trim((string)$v->card_no));
 
-            $registeredBadgeNumbers = \App\Models\Employee::whereNotNull('employee_id')
+            $employeesByBadge = \App\Models\Employee::whereNotNull('employee_id')
                 ->where('employee_id', '!=', '')
-                ->pluck('employee_id')
-                ->map(fn($v) => trim((string)$v))
-                ->flip();
+                ->get()
+                ->keyBy(fn($v) => trim((string)$v->employee_id));
 
             foreach ($punchRecords as $obj) {
                 $cardNo = is_array($obj) ? ($obj['card_no'] ?? null) : ($obj->card_no ?? null);
@@ -108,21 +109,79 @@ class BiometricSyncService
                 $maxTime = is_array($obj) ? ($obj['maxtime'] ?? null) : ($obj->maxtime ?? null);
 
                 if (empty($cardNo) || empty($punchDateRaw)) {
+                    $skippedCount++;
                     continue;
                 }
 
                 $cleanCard = trim((string)$cardNo);
                 $cleanBadge = !empty($badgeNumber) ? trim((string)$badgeNumber) : '';
 
-                // Verify employee exists in local database by card_no or employee_id / badgenumber
-                $isRegistered = $registeredCards->has($cleanCard) || (!empty($cleanBadge) && $registeredBadgeNumbers->has($cleanBadge));
+                $emp = $employeesByCard->get($cleanCard) ?? (!empty($cleanBadge) ? $employeesByBadge->get($cleanBadge) : null);
+                $punchDate = Carbon::parse($punchDateRaw)->format('Y-m-d');
 
-                if (!$isRegistered) {
-                    $skippedUnregisteredCount++;
+                // Determine whether this record belongs to ROI Mantra
+                $isRoiMantra = $emp && (empty($emp->company) || stripos($emp->company, 'ROI Mantra') !== false);
+
+                if (!$isRoiMantra) {
+                    // Record in other_company_attendances table
+                    $otherCompanyName = ($emp && !empty($emp->company))
+                        ? $emp->company
+                        : (is_array($obj) ? ($obj['company'] ?? 'External Company') : ($obj->company ?? 'External Company'));
+
+                    $otherEmpName = $emp
+                        ? $emp->full_name
+                        : (is_array($obj) ? ($obj['name'] ?? null) : ($obj->name ?? null));
+
+                    $existingOther = OtherCompanyAttendance::where('card_no', $cardNo)
+                        ->whereDate('punch_date', $punchDate)
+                        ->first();
+
+                    $rawMin = $minCheckTime;
+                    $rawMax = $maxCheckTime;
+                    $actualMaxCheckTime = ($rawMin === $rawMax) ? null : $rawMax;
+                    $actualMaxTime = ($rawMin === $rawMax) ? null : $maxTime;
+                    $status = 'present';
+
+                    if ($existingOther) {
+                        $hasChanged = ($existingOther->check_out_time != $actualMaxTime 
+                            || $existingOther->check_out_datetime != $actualMaxCheckTime
+                            || $existingOther->check_in_time != $minTime
+                            || $existingOther->check_in_datetime != $minCheckTime
+                            || $existingOther->company_name != $otherCompanyName);
+
+                        if ($hasChanged) {
+                            $existingOther->update([
+                                'badgenumber'        => $badgeNumber ?: $existingOther->badgenumber,
+                                'employee_name'      => $otherEmpName ?? $existingOther->employee_name,
+                                'company_name'       => $otherCompanyName,
+                                'check_in_datetime'  => $minCheckTime,
+                                'check_in_time'      => $minTime,
+                                'check_out_datetime' => $actualMaxCheckTime,
+                                'check_out_time'     => $actualMaxTime,
+                                'show_status'        => $status,
+                                'raw_payload'        => is_array($obj) ? $obj : (array)$obj,
+                            ]);
+                            $otherUpdatedCount++;
+                        }
+                    } else {
+                        OtherCompanyAttendance::create([
+                            'card_no'            => $cardNo,
+                            'badgenumber'        => $badgeNumber,
+                            'employee_name'      => $otherEmpName,
+                            'company_name'       => $otherCompanyName,
+                            'punch_date'         => $punchDate,
+                            'check_in_datetime'  => $minCheckTime,
+                            'check_out_datetime' => $actualMaxCheckTime,
+                            'check_in_time'      => $minTime,
+                            'check_out_time'     => $actualMaxTime,
+                            'show_status'        => $status,
+                            'raw_payload'        => is_array($obj) ? $obj : (array)$obj,
+                        ]);
+                        $otherImportedCount++;
+                    }
+
                     continue;
                 }
-
-                $punchDate = Carbon::parse($punchDateRaw)->format('Y-m-d');
 
                 $existing = Attendance::where('card_no', $cardNo)
                     ->whereDate('punch_date', $punchDate)
@@ -225,7 +284,7 @@ class BiometricSyncService
                 }
             }
 
-            $successMsg = "Sync complete: {$importedCount} new entries inserted, {$updatedCount} updated, {$skippedUnregisteredCount} skipped (unregistered employees).";
+            $successMsg = "Sync complete: {$importedCount} ROI Mantra inserted, {$updatedCount} updated; {$otherImportedCount} Other Company inserted, {$otherUpdatedCount} updated.";
 
             // Save to sync_logs DB table
             \App\Models\SyncLog::create([
@@ -233,23 +292,28 @@ class BiometricSyncService
                 'start_date'     => $startDate,
                 'end_date'       => $endDate,
                 'status'         => 'success',
-                'imported_count' => $importedCount,
-                'updated_count'  => $updatedCount,
+                'imported_count' => $importedCount + $otherImportedCount,
+                'updated_count'  => $updatedCount + $otherUpdatedCount,
                 'message'        => $successMsg,
                 'payload_summary' => [
                     'total_records_received' => count($punchRecords),
-                    'skipped_unregistered'   => $skippedUnregisteredCount,
+                    'roi_mantra_imported'    => $importedCount,
+                    'roi_mantra_updated'     => $updatedCount,
+                    'other_company_imported' => $otherImportedCount,
+                    'other_company_updated'  => $otherUpdatedCount,
+                    'skipped_invalid'        => $skippedCount,
                 ],
             ]);
 
-            Log::info("Biometric Sync Completed: {$importedCount} inserted, {$updatedCount} updated, {$skippedUnregisteredCount} skipped for range {$startDate} to {$endDate}.");
+            Log::info("Biometric Sync Completed: {$importedCount}/{$updatedCount} (ROI) | {$otherImportedCount}/{$otherUpdatedCount} (Other) for range {$startDate} to {$endDate}.");
 
             return [
-                'success'              => true,
-                'message'              => $successMsg,
-                'imported'             => $importedCount,
-                'updated'              => $updatedCount,
-                'skipped_unregistered' => $skippedUnregisteredCount,
+                'success'                => true,
+                'message'                => $successMsg,
+                'imported'               => $importedCount,
+                'updated'                => $updatedCount,
+                'other_company_imported' => $otherImportedCount,
+                'other_company_updated'  => $otherUpdatedCount,
             ];
 
         } catch (\Exception $e) {

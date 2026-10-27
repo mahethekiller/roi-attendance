@@ -187,7 +187,7 @@ class AttendanceOverrideManagementTest extends TestCase
             'first_name' => 'Dynamic',
             'last_name' => 'RuleUser',
             'email' => 'dyn.rule@example.com',
-            'company' => 'Acme Corp',
+            'company' => 'ROI Mantra Private Limited',
         ]);
 
         // Create dynamic rule for this employee with custom window 10:30 - 10:50 and 10 hours min duration

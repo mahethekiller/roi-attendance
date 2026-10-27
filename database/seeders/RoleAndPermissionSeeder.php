@@ -38,6 +38,9 @@ class RoleAndPermissionSeeder extends Seeder
             'attendances.sync',
             'attendances.export',
             'attendance.overrides.manage',
+            'other_attendances.view',
+            'other_attendances.sync',
+            'other_attendances.export',
 
             // Users
             'users.view',
@@ -83,6 +86,9 @@ class RoleAndPermissionSeeder extends Seeder
             'attendances.view',
             'attendances.sync',
             'attendances.export',
+            'other_attendances.view',
+            'other_attendances.sync',
+            'other_attendances.export',
             'api.docs.view',
             'sync-logs.view',
         ]);

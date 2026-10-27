@@ -33,7 +33,7 @@ class BiometricSyncTest extends TestCase
             'first_name' => 'John',
             'last_name' => 'Doe',
             'email' => 'john.doe@example.com',
-            'company' => 'Acme Corp',
+            'company' => 'ROI Mantra Private Limited',
         ]);
 
         $mockData = [
@@ -92,7 +92,7 @@ class BiometricSyncTest extends TestCase
             'first_name' => 'Sarah',
             'last_name' => 'Connor',
             'email' => 'sarah.connor@example.com',
-            'company' => 'Acme Corp',
+            'company' => 'ROI Mantra Private Limited',
         ]);
 
         $mockData = [
@@ -158,7 +158,7 @@ class BiometricSyncTest extends TestCase
             'first_name' => 'Target',
             'last_name' => 'Employee',
             'email' => 'target.emp@example.com',
-            'company' => 'Acme Corp',
+            'company' => 'ROI Mantra Private Limited',
         ]);
 
         $mockData = [
@@ -207,7 +207,7 @@ class BiometricSyncTest extends TestCase
             'first_name' => 'Persistent',
             'last_name' => 'Check',
             'email' => 'persist@example.com',
-            'company' => 'Acme Corp',
+            'company' => 'ROI Mantra Private Limited',
         ]);
 
         $mockData = [
@@ -257,7 +257,7 @@ class BiometricSyncTest extends TestCase
             'first_name'  => 'Morning',
             'last_name'   => 'Puncher',
             'email'       => 'morning@example.com',
-            'company'     => 'Acme Corp',
+            'company'     => 'ROI Mantra Private Limited',
         ]);
 
         // 1. Initial morning punch (only 1 punch: minchecktime == maxchecktime)

@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\ApiDocsController;
 use App\Http\Controllers\Admin\ApiLogController;
 use App\Http\Controllers\Admin\AttendanceOverrideController;
 use App\Http\Controllers\Admin\AttendanceSyncController;
+use App\Http\Controllers\Admin\OtherCompanyAttendanceController;
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
@@ -44,6 +45,12 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     // Attendances
     Route::get('/attendances', [AttendanceController::class, 'index'])->middleware('permission:attendances.view')->name('attendances.index');
     Route::post('/attendances/sync', [AttendanceController::class, 'sync'])->middleware('permission:attendances.sync')->name('attendances.sync');
+
+    // Other Companies Attendance
+    Route::middleware('permission:other_attendances.view')->group(function () {
+        Route::get('/other-attendances', [OtherCompanyAttendanceController::class, 'index'])->name('other-attendances.index');
+        Route::post('/other-attendances/sync', [OtherCompanyAttendanceController::class, 'sync'])->name('other-attendances.sync');
+    });
 
     // Biometric 9-Hour Auto-Sync Module (Super Admin Only)
     Route::middleware('role:super-admin')->prefix('attendance-sync')->name('attendance-sync.')->group(function () {
