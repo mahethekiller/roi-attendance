@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Employee;
 use App\Models\GreythrPushLog;
 use App\Models\OtherCompanyAttendance;
 use Carbon\Carbon;
@@ -76,25 +77,60 @@ class GreythrPushService
      *
      * Format: ["<ISO_TIMESTAMP>,<EMPLOYEE_ID>,<DOOR>,<1_FOR_IN_OR_0_FOR_OUT>"]
      */
-    public function formatSwipes(string $startDate, string $endDate): array
+    public function formatSwipes(string $startDate, string $endDate, ?string $employeeFilter = null): array
     {
-        $attendances = OtherCompanyAttendance::with('employee')
+        $query = OtherCompanyAttendance::with('employee')
             ->whereDate('punch_date', '>=', $startDate)
-            ->whereDate('punch_date', '<=', $endDate)
-            ->orderBy('punch_date')
+            ->whereDate('punch_date', '<=', $endDate);
+
+        if (!empty($employeeFilter)) {
+            $trimmed = trim($employeeFilter);
+            $query->where(function ($q) use ($trimmed) {
+                $q->where('card_no', $trimmed)
+                  ->orWhere('badgenumber', $trimmed)
+                  ->orWhereHas('employee', function ($empQ) use ($trimmed) {
+                      $empQ->where('employee_id', $trimmed)
+                           ->orWhere('card_no', $trimmed);
+                  });
+            });
+        }
+
+        $attendances = $query->orderBy('punch_date')
             ->orderBy('check_in_datetime')
             ->get();
 
         $swipes = [];
 
         foreach ($attendances as $att) {
-            // Resolve employee identifier
-            $empId = !empty($att->badgenumber) ? trim((string)$att->badgenumber) : null;
-            if (empty($empId) && $att->employee && !empty($att->employee->employee_id)) {
+            // Resolve employee identifier:
+            // greytHR strictly requires the organization employee ID (e.g. "i2k2-2265"),
+            // NOT the raw biometric card number (e.g. "12265") or machine badgenumber.
+            $empId = null;
+
+            // Priority 1: Linked Employee model employee_id (e.g. "i2k2-2265")
+            if ($att->employee && !empty($att->employee->employee_id)) {
                 $empId = trim((string)$att->employee->employee_id);
             }
+
+            // Priority 2: In case relationship was not eager-loaded, perform direct lookup
             if (empty($empId)) {
-                $empId = trim((string)$att->card_no);
+                $matchedEmp = Employee::where('card_no', $att->card_no)
+                    ->orWhere('employee_id', $att->badgenumber)
+                    ->orWhere('card_no', $att->badgenumber)
+                    ->first();
+                if ($matchedEmp && !empty($matchedEmp->employee_id)) {
+                    $empId = trim((string)$matchedEmp->employee_id);
+                }
+            }
+
+            // Priority 3: If badgenumber is non-numeric, it might already be an alphanumeric employee ID (e.g. "i2k2-2265")
+            if (empty($empId) && !empty($att->badgenumber) && !is_numeric($att->badgenumber)) {
+                $empId = trim((string)$att->badgenumber);
+            }
+
+            // Priority 4: Fallback to badgenumber or card_no
+            if (empty($empId)) {
+                $empId = !empty($att->badgenumber) ? trim((string)$att->badgenumber) : trim((string)$att->card_no);
             }
 
             if (empty($empId)) {
@@ -142,12 +178,18 @@ class GreythrPushService
     /**
      * Push other companies attendance swipes to greytHR API and audit the result.
      */
-    public function push(?string $startDate = null, ?string $endDate = null, string $triggerType = 'cron', ?int $userId = null): array
+    public function push(
+        ?string $startDate = null,
+        ?string $endDate = null,
+        string $triggerType = 'cron',
+        ?int $userId = null,
+        ?string $employeeFilter = null
+    ): array
     {
         $startDate = $startDate ?: Carbon::now('Asia/Kolkata')->subDay()->format('Y-m-d');
         $endDate = $endDate ?: Carbon::now('Asia/Kolkata')->format('Y-m-d');
 
-        $formatted = $this->formatSwipes($startDate, $endDate);
+        $formatted = $this->formatSwipes($startDate, $endDate, $employeeFilter);
         $swipes = $formatted['swipes'];
         $recordsCount = $formatted['records_count'];
         $swipesCount = count($swipes);

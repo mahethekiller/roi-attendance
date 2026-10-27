@@ -231,6 +231,88 @@ class GreythrPushTest extends TestCase
         $response->assertSessionHas('success');
     }
 
+    public function test_employee_id_is_prioritized_over_card_number(): void
+    {
+        $date = Carbon::parse('2026-10-27')->format('Y-m-d');
+
+        // Employee with specific ID format e.g. i2k2-2265 and card 12265
+        Employee::create([
+            'employee_id' => 'i2k2-2265',
+            'card_no'     => '12265',
+            'first_name'  => 'RamJi',
+            'last_name'   => 'Gupta',
+            'email'       => 'ram@i2k2.com',
+            'company'     => 'I2K2 Networks Private Limited',
+        ]);
+
+        OtherCompanyAttendance::create([
+            'card_no'        => '12265',
+            'badgenumber'    => '12265', // Numeric badgenumber from machine
+            'employee_name'  => 'RamJi Gupta',
+            'company_name'   => 'I2K2 Networks Private Limited',
+            'punch_date'     => $date,
+            'check_in_time'  => '09:45:00',
+            'check_out_time' => '19:15:00',
+            'show_status'    => 'present',
+        ]);
+
+        $service = app(GreythrPushService::class);
+        $formatted = $service->formatSwipes($date, $date);
+
+        $this->assertEquals(1, $formatted['records_count']);
+        $this->assertCount(2, $formatted['swipes']);
+
+        // Must resolve to employee_id (i2k2-2265), NOT raw card_no (12265)
+        $this->assertStringContainsString(',i2k2-2265,door 1,1', $formatted['swipes'][0]);
+        $this->assertStringContainsString(',i2k2-2265,door 2,0', $formatted['swipes'][1]);
+        $this->assertStringNotContainsString(',12265,door', $formatted['swipes'][0]);
+    }
+
+    public function test_employee_filter_in_service_and_cli(): void
+    {
+        $date = Carbon::parse('2026-10-27')->format('Y-m-d');
+
+        Employee::create([
+            'employee_id' => 'i2k2-2265',
+            'card_no'     => '12265',
+            'first_name'  => 'RamJi',
+            'last_name'   => 'Gupta',
+            'email'       => 'ram@i2k2.com',
+            'company'     => 'I2K2 Networks Private Limited',
+        ]);
+
+        Employee::create([
+            'employee_id' => 'i2k2-9999',
+            'card_no'     => '19999',
+            'first_name'  => 'Other',
+            'last_name'   => 'Person',
+            'email'       => 'other@i2k2.com',
+            'company'     => 'I2K2 Networks Private Limited',
+        ]);
+
+        OtherCompanyAttendance::create([
+            'card_no'        => '12265',
+            'badgenumber'    => '12265',
+            'punch_date'     => $date,
+            'check_in_time'  => '09:00:00',
+        ]);
+
+        OtherCompanyAttendance::create([
+            'card_no'        => '19999',
+            'badgenumber'    => '19999',
+            'punch_date'     => $date,
+            'check_in_time'  => '10:00:00',
+        ]);
+
+        $service = app(GreythrPushService::class);
+
+        // Filter by employee_id 'i2k2-2265'
+        $formatted = $service->formatSwipes($date, $date, 'i2k2-2265');
+        $this->assertEquals(1, $formatted['records_count']);
+        $this->assertCount(1, $formatted['swipes']);
+        $this->assertStringContainsString('i2k2-2265', $formatted['swipes'][0]);
+    }
+
     public function test_admin_can_clear_logs(): void
     {
         GreythrPushLog::create([

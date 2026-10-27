@@ -63,14 +63,16 @@ class GreythrPushLogController extends Controller
     public function pushNow(Request $request, GreythrPushService $service): RedirectResponse
     {
         $validated = $request->validate([
-            'start_date' => 'nullable|date_format:Y-m-d',
-            'end_date'   => 'nullable|date_format:Y-m-d|after_or_equal:start_date',
+            'start_date'  => 'nullable|date_format:Y-m-d',
+            'end_date'    => 'nullable|date_format:Y-m-d|after_or_equal:start_date',
+            'employee_id' => 'nullable|string|max:60',
         ]);
 
         $startDate = $validated['start_date'] ?? null;
         $endDate = $validated['end_date'] ?? null;
+        $employeeId = !empty($validated['employee_id']) ? trim($validated['employee_id']) : null;
 
-        $result = $service->push($startDate, $endDate, 'manual_ui', Auth::id());
+        $result = $service->push($startDate, $endDate, 'manual_ui', Auth::id(), $employeeId);
 
         if ($result['success']) {
             return redirect()->route('admin.greythr-logs.index')

@@ -262,18 +262,28 @@
 
             <form method="POST" action="{{ route('admin.greythr-logs.push') }}" class="mt-4 space-y-4">
                 @csrf
-                <div>
-                    <label class="text-xs font-semibold text-base-content/70 block mb-1">Start Date</label>
-                    <input type="date" name="start_date" class="input input-bordered input-sm w-full bg-base-100 text-base-content" value="{{ $defaultStart }}" required>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs font-semibold text-base-content/70 block mb-1">Start Date</label>
+                        <input type="date" name="start_date" class="input input-bordered input-sm w-full bg-base-100 text-base-content" value="{{ $defaultStart }}" required>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-base-content/70 block mb-1">End Date</label>
+                        <input type="date" name="end_date" class="input input-bordered input-sm w-full bg-base-100 text-base-content" value="{{ $defaultEnd }}" required>
+                    </div>
                 </div>
+
                 <div>
-                    <label class="text-xs font-semibold text-base-content/70 block mb-1">End Date</label>
-                    <input type="date" name="end_date" class="input input-bordered input-sm w-full bg-base-100 text-base-content" value="{{ $defaultEnd }}" required>
+                    <label class="text-xs font-semibold text-base-content/70 block mb-1">
+                        Employee ID / Card No <span class="text-base-content/50 font-normal">(Optional)</span>
+                    </label>
+                    <input type="text" name="employee_id" class="input input-bordered input-sm w-full bg-base-100 text-base-content font-mono text-xs" placeholder="e.g. i2k2-2265 or leave empty for all">
+                    <span class="text-[11px] text-base-content/60 mt-1 block">Leave empty to push swipes for all partner company employees.</span>
                 </div>
 
                 <div class="bg-base-200/60 rounded-lg p-3 text-xs text-base-content/70 space-y-1">
-                    <div class="font-semibold text-base-content">Format standard:</div>
-                    <code class="font-mono text-[11px] block bg-base-300 p-1.5 rounded text-primary">["2026-10-27T09:30:00.000+05:30,89170020,door 1,1"]</code>
+                    <div class="font-semibold text-base-content">greytHR Swipe Standard:</div>
+                    <code class="font-mono text-[11px] block bg-base-300 p-1.5 rounded text-primary">["2026-10-27T09:30:00.000+05:30,i2k2-2265,door 1,1"]</code>
                 </div>
 
                 <div class="modal-action">
