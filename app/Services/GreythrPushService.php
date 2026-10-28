@@ -103,8 +103,8 @@ class GreythrPushService
 
         foreach ($attendances as $att) {
             // Resolve employee identifier:
-            // greytHR strictly requires the organization employee ID (e.g. "i2k2-2265"),
-            // NOT the raw biometric card number (e.g. "12265") or machine badgenumber.
+            // greytHR strictly requires the organization employee ID (e.g. "i2k2-2265").
+            // ONLY pass valid employee_id, NEVER the biometric card number or numeric machine badge.
             $empId = null;
 
             // Priority 1: Linked Employee model employee_id (e.g. "i2k2-2265")
@@ -112,7 +112,7 @@ class GreythrPushService
                 $empId = trim((string)$att->employee->employee_id);
             }
 
-            // Priority 2: In case relationship was not eager-loaded, perform direct lookup
+            // Priority 2: In case relationship was not eager-loaded, perform direct lookup in employees table
             if (empty($empId)) {
                 $matchedEmp = Employee::where('card_no', $att->card_no)
                     ->orWhere('employee_id', $att->badgenumber)
@@ -123,16 +123,13 @@ class GreythrPushService
                 }
             }
 
-            // Priority 3: If badgenumber is non-numeric, it might already be an alphanumeric employee ID (e.g. "i2k2-2265")
+            // Priority 3: If badgenumber is already formatted as an alphanumeric employee code (e.g. "i2k2-2265")
             if (empty($empId) && !empty($att->badgenumber) && !is_numeric($att->badgenumber)) {
                 $empId = trim((string)$att->badgenumber);
             }
 
-            // Priority 4: Fallback to badgenumber or card_no
-            if (empty($empId)) {
-                $empId = !empty($att->badgenumber) ? trim((string)$att->badgenumber) : trim((string)$att->card_no);
-            }
-
+            // Under NO circumstance pass raw card_no or numeric badgenumber to greytHR.
+            // If no valid employee_id is found, skip this attendance record.
             if (empty($empId)) {
                 continue;
             }

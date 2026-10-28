@@ -145,6 +145,15 @@ class GreythrPushTest extends TestCase
     {
         $date = Carbon::parse('2026-10-27')->format('Y-m-d');
 
+        Employee::create([
+            'employee_id' => 'i2k2-9001',
+            'card_no'     => 'CRD-9001',
+            'first_name'  => 'Test',
+            'last_name'   => 'User',
+            'email'       => 'test9001@i2k2.com',
+            'company'     => 'i2k2 Networks',
+        ]);
+
         OtherCompanyAttendance::create([
             'card_no'            => 'CRD-9001',
             'badgenumber'        => '9001',
@@ -182,11 +191,21 @@ class GreythrPushTest extends TestCase
         $this->assertEquals(201, $log->http_status);
         $this->assertEquals(2, $log->swipes_count);
         $this->assertCount(2, $log->payload_sample);
+        $this->assertStringContainsString('i2k2-9001', $log->payload_sample[0]);
     }
 
     public function test_console_command_runs_successfully(): void
     {
         $date = Carbon::today()->format('Y-m-d');
+
+        Employee::create([
+            'employee_id' => 'i2k2-1234',
+            'card_no'     => 'CRD-1234',
+            'first_name'  => 'CLI',
+            'last_name'   => 'Tester',
+            'email'       => 'cli@i2k2.com',
+            'company'     => 'i2k2 Networks',
+        ]);
 
         OtherCompanyAttendance::create([
             'card_no'       => 'CRD-1234',
@@ -313,6 +332,29 @@ class GreythrPushTest extends TestCase
         $this->assertEquals(1, $formatted['records_count']);
         $this->assertCount(1, $formatted['swipes']);
         $this->assertStringContainsString('i2k2-2265', $formatted['swipes'][0]);
+    }
+
+    public function test_card_number_is_never_passed_and_unregistered_attendance_is_skipped(): void
+    {
+        $date = Carbon::parse('2026-10-27')->format('Y-m-d');
+
+        // Unregistered external card without employee profile
+        OtherCompanyAttendance::create([
+            'card_no'        => '998877',
+            'badgenumber'    => '998877',
+            'employee_name'  => 'Unknown Visitor',
+            'company_name'   => 'Third Party Vendor',
+            'punch_date'     => $date,
+            'check_in_time'  => '08:30:00',
+            'check_out_time' => '17:30:00',
+        ]);
+
+        $service = app(GreythrPushService::class);
+        $formatted = $service->formatSwipes($date, $date);
+
+        // Attendance record was found in DB, but swipes MUST be 0 because card numbers are never passed
+        $this->assertEquals(1, $formatted['records_count']);
+        $this->assertCount(0, $formatted['swipes']);
     }
 
     public function test_admin_can_clear_logs(): void
