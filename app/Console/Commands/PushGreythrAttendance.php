@@ -9,12 +9,12 @@ use Illuminate\Console\Command;
 class PushGreythrAttendance extends Command
 {
     protected $signature = 'attendance:push-greythr 
-                            {--start-date= : The start date in YYYY-MM-DD format} 
-                            {--end-date= : The end date in YYYY-MM-DD format} 
-                            {--days=1 : Number of past days to include (default 1: yesterday and today)}
+                            {--start-date= : The start date in YYYY-MM-DD format (default: today)} 
+                            {--end-date= : The end date in YYYY-MM-DD format (default: today)} 
+                            {--days=0 : Number of past days to include (default 0: current date only)}
                             {--employee= : Optional specific employee ID (e.g. i2k2-2265) or card number}';
 
-    protected $description = 'Push other companies biometric attendance swipes to greytHR API';
+    protected $description = 'Push other companies biometric attendance swipes to greytHR API for the current date';
 
     public function handle(GreythrPushService $service): int
     {
@@ -22,12 +22,13 @@ class PushGreythrAttendance extends Command
         $endDate = $this->option('end-date');
         $days = (int) $this->option('days');
         $employee = $this->option('employee');
+        $today = Carbon::now('Asia/Kolkata')->format('Y-m-d');
 
         if (!$startDate) {
-            $startDate = Carbon::now('Asia/Kolkata')->subDays($days)->format('Y-m-d');
+            $startDate = $days > 0 ? Carbon::now('Asia/Kolkata')->subDays($days)->format('Y-m-d') : $today;
         }
         if (!$endDate) {
-            $endDate = Carbon::now('Asia/Kolkata')->format('Y-m-d');
+            $endDate = $today;
         }
 
         $filterMsg = $employee ? " for employee [{$employee}]" : '';

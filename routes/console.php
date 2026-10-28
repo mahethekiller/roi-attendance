@@ -14,8 +14,8 @@ Schedule::command('attendance:sync-biometric --days=3')
     ->withoutOverlapping()
     ->runInBackground();
 
-// Automatically push other companies attendance swipes to greytHR every hour
-Schedule::command('attendance:push-greythr --days=1')
+// Automatically push other companies attendance swipes (current date) to greytHR every hour
+Schedule::command('attendance:push-greythr')
     ->hourly()
     ->withoutOverlapping()
     ->runInBackground();

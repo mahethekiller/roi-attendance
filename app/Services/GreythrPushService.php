@@ -183,8 +183,9 @@ class GreythrPushService
         ?string $employeeFilter = null
     ): array
     {
-        $startDate = $startDate ?: Carbon::now('Asia/Kolkata')->subDay()->format('Y-m-d');
-        $endDate = $endDate ?: Carbon::now('Asia/Kolkata')->format('Y-m-d');
+        $today = Carbon::now('Asia/Kolkata')->format('Y-m-d');
+        $startDate = $startDate ?: $today;
+        $endDate = $endDate ?: $today;
 
         $formatted = $this->formatSwipes($startDate, $endDate, $employeeFilter);
         $swipes = $formatted['swipes'];

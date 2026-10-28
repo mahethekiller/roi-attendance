@@ -225,7 +225,7 @@ class GreythrPushTest extends TestCase
             ], 201),
         ]);
 
-        $this->artisan('attendance:push-greythr --days=0')
+        $this->artisan('attendance:push-greythr')
             ->assertSuccessful();
     }
 

@@ -42,8 +42,9 @@ class GreythrPushLogController extends Controller
         $failedRuns = GreythrPushLog::where('status', 'failed')->count();
         $totalSwipesPushed = GreythrPushLog::where('status', 'success')->sum('swipes_count');
 
-        $defaultStart = Carbon::now('Asia/Kolkata')->subDay()->format('Y-m-d');
-        $defaultEnd = Carbon::now('Asia/Kolkata')->format('Y-m-d');
+        $today = Carbon::now('Asia/Kolkata')->format('Y-m-d');
+        $defaultStart = $today;
+        $defaultEnd = $today;
 
         return view('admin.greythr-logs.index', compact(
             'logs',

@@ -9,6 +9,10 @@
             <p class="text-sm text-base-content/70 mt-0.5">Automated hourly pushes and telemetry audit trail for other companies attendance pushed to <span class="font-mono text-xs font-semibold">i2k2-networks.greythr.com</span>.</p>
         </div>
         <div class="flex items-center gap-2">
+            <button type="button" class="btn btn-outline btn-sm sm:btn-md gap-2 shadow-xs" onclick="document.getElementById('cronSetupModal').showModal()">
+                <i data-lucide="clock" class="w-4 h-4 text-primary"></i>
+                <span>Cron Setup</span>
+            </button>
             <x-authorized permission="greythr_logs.clear">
                 <button type="button" class="btn btn-outline btn-error btn-sm sm:btn-md gap-2 shadow-xs" onclick="document.getElementById('clearGreythrLogsModal').showModal()">
                     <i data-lucide="trash-2" class="w-4 h-4"></i>
@@ -297,6 +301,113 @@
         @endif
     </div>
 
+    <!-- Cron Setup Guide Modal -->
+    <dialog id="cronSetupModal" class="modal">
+        <div class="modal-box bg-base-100 border border-base-200 shadow-xl max-w-2xl p-6">
+            <div class="flex items-center justify-between pb-3 border-b border-base-200">
+                <div class="flex items-center gap-2">
+                    <div class="p-2 rounded-lg bg-primary/10 text-primary">
+                        <i data-lucide="clock" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg text-base-content">greytHR Cron Setup Guide</h3>
+                        <p class="text-xs text-base-content/60">Automated background synchronization for partner companies attendance</p>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-ghost btn-sm btn-circle" onclick="document.getElementById('cronSetupModal').close()">✕</button>
+            </div>
+
+            <div class="mt-4 space-y-4 text-xs text-base-content/80">
+                <!-- Info banner -->
+                <div class="bg-primary/5 border border-primary/20 rounded-lg p-3 text-base-content flex items-start gap-2.5">
+                    <i data-lucide="info" class="w-4 h-4 text-primary shrink-0 mt-0.5"></i>
+                    <div class="space-y-1">
+                        <div class="font-semibold text-xs text-primary">Default Behavior</div>
+                        <p class="text-[11px] leading-relaxed">
+                            By default, the cron command executes for the <strong>current date (today)</strong>. It automatically resolves registered employee IDs (e.g. <code class="font-mono bg-base-200 px-1 py-0.5 rounded text-primary">i2k2-2265</code>) and pushes punches directly to greytHR v2 API.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Setup Option 1: Master Laravel Scheduler (Recommended) -->
+                <div class="bg-base-200/50 rounded-lg p-3 border border-base-300/60 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-sm text-base-content flex items-center gap-1.5">
+                            <span class="badge badge-primary badge-xs">Option 1</span>
+                            Master Laravel Scheduler (Recommended)
+                        </span>
+                        <span class="badge badge-outline badge-xs text-[10px]">Runs All Schedules</span>
+                    </div>
+                    <p class="text-[11px] text-base-content/70">
+                        Add this single line to your server crontab (<code class="bg-base-300 px-1 rounded">crontab -e</code>). It triggers the hourly greytHR push and minutely biometric machine sync automatically.
+                    </p>
+                    <div class="relative bg-base-300 p-2.5 rounded font-mono text-[11px] text-base-content flex items-center justify-between">
+                        <code class="overflow-x-auto select-all" id="cronCmd1">* * * * * cd {{ base_path() }} && php artisan schedule:run >> /dev/null 2>&1</code>
+                        <button type="button" class="btn btn-ghost btn-xs shrink-0 ml-2" onclick="copyText('cronCmd1', 'copyBtn1')" id="copyBtn1">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Setup Option 2: Direct Command Cron -->
+                <div class="bg-base-200/50 rounded-lg p-3 border border-base-300/60 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-sm text-base-content flex items-center gap-1.5">
+                            <span class="badge badge-neutral badge-xs">Option 2</span>
+                            Direct Hourly greytHR Cron
+                        </span>
+                        <span class="badge badge-outline badge-xs text-[10px]">Hourly at Minute 0</span>
+                    </div>
+                    <p class="text-[11px] text-base-content/70">
+                        If you want to trigger greytHR push independently on an hourly basis:
+                    </p>
+                    <div class="relative bg-base-300 p-2.5 rounded font-mono text-[11px] text-base-content flex items-center justify-between">
+                        <code class="overflow-x-auto select-all" id="cronCmd2">0 * * * * cd {{ base_path() }} && php artisan attendance:push-greythr >> /dev/null 2>&1</code>
+                        <button type="button" class="btn btn-ghost btn-xs shrink-0 ml-2" onclick="copyText('cronCmd2', 'copyBtn2')" id="copyBtn2">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Setup Option 3: Windows Task Scheduler (Local XAMPP / Windows Server) -->
+                <div class="bg-base-200/50 rounded-lg p-3 border border-base-300/60 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-sm text-base-content flex items-center gap-1.5">
+                            <span class="badge badge-neutral badge-xs">Option 3</span>
+                            Windows Task Scheduler (XAMPP / Windows)
+                        </span>
+                        <span class="badge badge-outline badge-xs text-[10px]">Windows OS</span>
+                    </div>
+                    <p class="text-[11px] text-base-content/70">
+                        Create a scheduled task set to repeat hourly with the following command:
+                    </p>
+                    <div class="relative bg-base-300 p-2.5 rounded font-mono text-[11px] text-base-content flex items-center justify-between">
+                        <code class="overflow-x-auto select-all" id="cronCmd3">php {{ base_path('artisan') }} attendance:push-greythr</code>
+                        <button type="button" class="btn btn-ghost btn-xs shrink-0 ml-2" onclick="copyText('cronCmd3', 'copyBtn3')" id="copyBtn3">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Manual Test Run Command -->
+                <div class="border-t border-base-200 pt-3 flex items-center justify-between">
+                    <div>
+                        <div class="font-semibold text-xs text-base-content">Manual Test from Terminal</div>
+                        <div class="text-[11px] text-base-content/60">Run this command anytime to test current date push immediately:</div>
+                    </div>
+                    <code class="font-mono text-xs bg-base-200 px-2.5 py-1.5 rounded font-semibold text-primary select-all">php artisan attendance:push-greythr</code>
+                </div>
+            </div>
+
+            <div class="modal-action border-t border-base-200 pt-3">
+                <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('cronSetupModal').close()">Close</button>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+
     <!-- Manual Push Modal -->
     <dialog id="pushNowModal" class="modal">
         <div class="modal-box bg-base-100 border border-base-200 shadow-xl max-w-md">
@@ -558,6 +669,22 @@
                 const btn = document.getElementById(btnId);
                 const originalHtml = btn.innerHTML;
                 btn.innerHTML = '<i data-lucide="check" class="w-3.5 h-3.5 text-success"></i><span class="text-success">Copied!</span>';
+                if (window.lucide) window.lucide.createIcons();
+                setTimeout(() => {
+                    btn.innerHTML = originalHtml;
+                    if (window.lucide) window.lucide.createIcons();
+                }, 2000);
+            });
+        }
+
+        function copyText(elementId, btnId) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+
+            navigator.clipboard.writeText(el.textContent.trim()).then(() => {
+                const btn = document.getElementById(btnId);
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = '<i data-lucide="check" class="w-3.5 h-3.5 text-success"></i>';
                 if (window.lucide) window.lucide.createIcons();
                 setTimeout(() => {
                     btn.innerHTML = originalHtml;
