@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\GreythrPushLog;
 use App\Services\GreythrPushService;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class GreythrPushLogController extends Controller
@@ -117,5 +119,39 @@ class GreythrPushLogController extends Controller
         }
 
         return redirect()->route('admin.greythr-logs.index')->with('success', $msg);
+    }
+
+    /**
+     * External Cron Webhook Endpoint for greytHR Swipes Push.
+     */
+    public function cronWebhook(Request $request, GreythrPushService $service): JsonResponse
+    {
+        $token = $request->input('token')
+            ?? $request->header('X-Cron-Token')
+            ?? $request->bearerToken();
+
+        $expectedToken = (string) config('services.greythr.cron_token');
+
+        if (empty($expectedToken) || empty($token) || !hash_equals($expectedToken, (string) $token)) {
+            Log::warning('Unauthorized greytHR cron webhook invocation attempt', [
+                'ip'         => $request->ip(),
+                'user_agent' => substr($request->userAgent() ?? '', 0, 255),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized cron token.',
+            ], 401);
+        }
+
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+        $employeeId = $request->input('employee_id');
+
+        $result = $service->push($startDate, $endDate, 'webhook', null, $employeeId);
+
+        $httpStatus = $result['success'] ? 200 : ($result['http_status'] ?? 500);
+
+        return response()->json($result, $httpStatus);
     }
 }

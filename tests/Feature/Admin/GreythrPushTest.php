@@ -376,4 +376,85 @@ class GreythrPushTest extends TestCase
         $response->assertRedirect(route('admin.greythr-logs.index'));
         $this->assertEquals(0, GreythrPushLog::count());
     }
+
+    public function test_cron_webhook_rejects_missing_or_invalid_token(): void
+    {
+        // 1. Missing token
+        $response1 = $this->get(route('cron.push-greythr'));
+        $response1->assertStatus(401);
+        $response1->assertJson(['success' => false, 'message' => 'Unauthorized cron token.']);
+
+        // 2. Invalid token
+        $response2 = $this->get(route('cron.push-greythr', ['token' => 'invalid_random_token']));
+        $response2->assertStatus(401);
+    }
+
+    public function test_cron_webhook_executes_successfully_via_get_with_valid_token(): void
+    {
+        $today = Carbon::today()->format('Y-m-d');
+
+        Employee::create([
+            'employee_id' => 'i2k2-5555',
+            'card_no'     => 'CRD-5555',
+            'first_name'  => 'Webhook',
+            'last_name'   => 'Tester',
+            'email'       => 'webhook@i2k2.com',
+            'company'     => 'i2k2 Networks',
+        ]);
+
+        OtherCompanyAttendance::create([
+            'card_no'       => 'CRD-5555',
+            'badgenumber'   => '5555',
+            'punch_date'    => $today,
+            'check_in_time' => '09:15:00',
+        ]);
+
+        Http::fake([
+            'https://api.greythr.com/oauth2/v2/client-token' => Http::response([
+                'access_token' => 'token_webhook',
+                'expires_in'   => 3600,
+            ], 200),
+            'https://api.greythr.com/attendance/v2/employee/swipes' => Http::response([
+                'message' => 'Employee swipes are saved successfully.',
+            ], 201),
+        ]);
+
+        $token = config('services.greythr.cron_token');
+        $response = $this->get(route('cron.push-greythr', ['token' => $token]));
+
+        $response->assertOk();
+        $response->assertJson([
+            'success'      => true,
+            'swipes_count' => 1,
+        ]);
+
+        // Verify audit log has trigger_type = webhook
+        $log = GreythrPushLog::latest()->first();
+        $this->assertNotNull($log);
+        $this->assertEquals('webhook', $log->trigger_type);
+        $this->assertEquals('success', $log->status);
+    }
+
+    public function test_cron_webhook_executes_via_post_with_header_token(): void
+    {
+        $today = Carbon::today()->format('Y-m-d');
+
+        Http::fake([
+            'https://api.greythr.com/oauth2/v2/client-token' => Http::response([
+                'access_token' => 'token_post_webhook',
+                'expires_in'   => 3600,
+            ], 200),
+            'https://api.greythr.com/attendance/v2/employee/swipes' => Http::response([
+                'message' => 'Saved',
+            ], 201),
+        ]);
+
+        $token = config('services.greythr.cron_token');
+        $response = $this->post(route('cron.push-greythr'), [], [
+            'X-Cron-Token' => $token,
+        ]);
+
+        $response->assertOk();
+        $response->assertJson(['success' => true]);
+    }
 }

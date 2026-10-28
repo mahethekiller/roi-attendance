@@ -181,6 +181,10 @@
                                     <span class="badge badge-neutral badge-soft gap-1 text-xs font-mono font-medium">
                                         <i data-lucide="terminal" class="w-3 h-3"></i> CLI Command
                                     </span>
+                                @elseif($log->trigger_type === 'webhook')
+                                    <span class="badge badge-secondary badge-soft gap-1 text-xs font-mono font-medium">
+                                        <i data-lucide="globe" class="w-3 h-3"></i> Webhook URL
+                                    </span>
                                 @else
                                     <span class="badge badge-ghost text-xs font-mono font-medium">{{ $log->trigger_type }}</span>
                                 @endif
@@ -386,6 +390,35 @@
                         <button type="button" class="btn btn-ghost btn-xs shrink-0 ml-2" onclick="copyText('cronCmd3', 'copyBtn3')" id="copyBtn3">
                             <i data-lucide="copy" class="w-3.5 h-3.5"></i>
                         </button>
+                    </div>
+                </div>
+
+                <!-- Setup Option 4: External Cron Webhook URL (cron-job.org, EasyCron, Cloud) -->
+                <div class="bg-base-200/50 rounded-lg p-3 border border-base-300/60 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-sm text-base-content flex items-center gap-1.5">
+                            <span class="badge badge-secondary badge-xs">Option 4</span>
+                            External Cron Webhook URL (HTTP / Cloud)
+                        </span>
+                        <span class="badge badge-outline badge-xs text-[10px]">GET or POST</span>
+                    </div>
+                    <p class="text-[11px] text-base-content/70">
+                        Use this authenticated HTTP URL with third-party cron services (e.g. <strong>cron-job.org</strong>, <strong>EasyCron</strong>, <strong>cPanel URL Cron</strong>):
+                    </p>
+                    <div class="relative bg-base-300 p-2.5 rounded font-mono text-[11px] text-base-content flex items-center justify-between">
+                        <code class="overflow-x-auto select-all text-primary font-semibold" id="cronCmd4">{{ route('cron.push-greythr', ['token' => config('services.greythr.cron_token')]) }}</code>
+                        <button type="button" class="btn btn-ghost btn-xs shrink-0 ml-2" onclick="copyText('cronCmd4', 'copyBtn4')" id="copyBtn4">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                    <div class="space-y-1 pt-1">
+                        <div class="text-[10px] text-base-content/60 font-semibold uppercase">cURL Command for Server:</div>
+                        <div class="relative bg-base-300/70 p-2 rounded font-mono text-[10px] text-base-content flex items-center justify-between">
+                            <code class="overflow-x-auto select-all" id="cronCmdCurl">curl -s "{{ route('cron.push-greythr', ['token' => config('services.greythr.cron_token')]) }}"</code>
+                            <button type="button" class="btn btn-ghost btn-xs shrink-0 ml-2" onclick="copyText('cronCmdCurl', 'copyBtnCurl')" id="copyBtnCurl">
+                                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
 

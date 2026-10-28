@@ -53,6 +53,7 @@ return [
         'password'   => env('GREYTHR_API_PASSWORD', '40f33d1e-fe49-4212-9569-268e90003ca1'),
         'token_url'  => env('GREYTHR_TOKEN_URL', 'https://api.greythr.com/oauth2/v2/client-token'),
         'swipes_url' => env('GREYTHR_SWIPES_URL', 'https://api.greythr.com/attendance/v2/employee/swipes'),
+        'cron_token' => env('GREYTHR_CRON_TOKEN', 'greythr_secure_push_sync_2026'),
     ],
 
 ];

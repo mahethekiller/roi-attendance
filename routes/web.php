@@ -121,6 +121,11 @@ Route::match(['GET', 'POST'], '/cron/sync-attendance', [AttendanceController::cl
     ->middleware('throttle:10,1')
     ->name('cron.sync-attendance');
 
+// External greytHR Push Cron Webhook Endpoint (Rate-limited to 30 req/min)
+Route::match(['GET', 'POST'], '/cron/push-greythr', [GreythrPushLogController::class, 'cronWebhook'])
+    ->middleware('throttle:30,1')
+    ->name('cron.push-greythr');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
