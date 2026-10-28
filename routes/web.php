@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\AttendanceOverrideController;
 use App\Http\Controllers\Admin\AttendanceSyncController;
 use App\Http\Controllers\Admin\OtherCompanyAttendanceController;
 use App\Http\Controllers\Admin\GreythrPushLogController;
+use App\Http\Controllers\Admin\CompanyController;
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
@@ -28,6 +29,14 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->middleware('permission:dashboard.view')
         ->name('dashboard');
+
+    // Companies
+    Route::get('/companies', [CompanyController::class, 'index'])->middleware('permission:companies.view')->name('companies.index');
+    Route::get('/companies/create', [CompanyController::class, 'create'])->middleware('permission:companies.create')->name('companies.create');
+    Route::post('/companies', [CompanyController::class, 'store'])->middleware('permission:companies.create')->name('companies.store');
+    Route::get('/companies/{company}/edit', [CompanyController::class, 'edit'])->middleware('permission:companies.edit')->name('companies.edit');
+    Route::match(['put', 'patch'], '/companies/{company}', [CompanyController::class, 'update'])->middleware('permission:companies.edit')->name('companies.update');
+    Route::delete('/companies/{company}', [CompanyController::class, 'destroy'])->middleware('permission:companies.delete')->name('companies.destroy');
 
     // Employees
     Route::middleware('permission:employees.import')->group(function () {

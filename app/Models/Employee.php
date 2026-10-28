@@ -20,11 +20,17 @@ class Employee extends Model
         'last_name',
         'email',
         'company',
+        'company_id',
     ];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function companyRelation(): BelongsTo
+    {
+        return $this->belongsTo(Company::class, 'company_id');
     }
 
     public function attendances(): \Illuminate\Database\Eloquent\Relations\HasMany

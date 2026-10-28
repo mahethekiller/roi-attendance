@@ -20,6 +20,7 @@ class StoreEmployeeRequest extends FormRequest
             'card_no' => ['nullable', 'string', 'max:50', 'unique:employees,card_no'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email', 'unique:employees,email'],
             'company' => ['nullable', 'string', 'max:255'],
+            'company_id' => ['nullable', 'integer', 'exists:companies,id'],
             'password' => ['nullable', 'string', 'min:8'],
         ];
     }

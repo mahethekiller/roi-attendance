@@ -26,6 +26,12 @@ class RoleAndPermissionSeeder extends Seeder
             // Dashboard
             'dashboard.view',
 
+            // Companies
+            'companies.view',
+            'companies.create',
+            'companies.edit',
+            'companies.delete',
+
             // Employees
             'employees.view',
             'employees.create',
@@ -84,6 +90,9 @@ class RoleAndPermissionSeeder extends Seeder
             'view dashboard',
             'view reports',
             'dashboard.view',
+            'companies.view',
+            'companies.create',
+            'companies.edit',
             'employees.view',
             'employees.create',
             'employees.edit',

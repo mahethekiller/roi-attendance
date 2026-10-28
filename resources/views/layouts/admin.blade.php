@@ -130,6 +130,7 @@
                         <li class="menu-title text-[11px] font-bold uppercase tracking-wider text-base-content/50 px-3">Main Menu</li>
                         <x-admin-nav-item route="admin.dashboard" icon="layout-dashboard" label="Dashboard" permission="dashboard.view" />
                         <x-admin-nav-item route="admin.employees.index" activePattern="admin.employees.*" icon="contact-2" label="Employee Directory" permission="employees.view" />
+                        <x-admin-nav-item route="admin.companies.index" activePattern="admin.companies.*" icon="building" label="Companies" permission="companies.view" />
                         <x-admin-nav-item route="admin.attendances.index" activePattern="admin.attendances.*" icon="calendar-check" label="Attendance Logs" permission="attendances.view" />
                         <x-admin-nav-item route="admin.other-attendances.index" activePattern="admin.other-attendances.*" icon="building-2" label="Other Companies" permission="other_attendances.view" />
                         <x-admin-nav-item route="admin.greythr-logs.index" activePattern="admin.greythr-logs.*" icon="cloud-upload" label="greytHR Pushes" permission="greythr_logs.view" />

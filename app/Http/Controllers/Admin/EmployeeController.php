@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
+use App\Models\Company;
 use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -21,7 +22,7 @@ class EmployeeController extends Controller
     {
         $search = $request->input('search');
 
-        $employees = Employee::with('user')
+        $employees = Employee::with(['user', 'companyRelation'])
             ->search($search)
             ->latest()
             ->paginate(10)
@@ -35,14 +36,25 @@ class EmployeeController extends Controller
 
     public function create(): View
     {
-        return view('admin.employees.create');
+        $companies = Company::active()->orderBy('name')->get();
+
+        return view('admin.employees.create', compact('companies'));
     }
 
     public function store(StoreEmployeeRequest $request): RedirectResponse
     {
         $validated = $request->validated();
 
-        DB::transaction(function () use ($validated) {
+        $companyId = $validated['company_id'] ?? null;
+        $companyName = $validated['company'] ?? null;
+        if (!empty($companyId)) {
+            $company = Company::find($companyId);
+            if ($company) {
+                $companyName = $company->name;
+            }
+        }
+
+        DB::transaction(function () use ($validated, $companyId, $companyName) {
             $fullName = trim("{$validated['first_name']} {$validated['last_name']}");
             $password = !empty($validated['password']) ? $validated['password'] : 'password123';
 
@@ -62,7 +74,8 @@ class EmployeeController extends Controller
                 'first_name' => $validated['first_name'],
                 'last_name' => $validated['last_name'],
                 'email' => $validated['email'],
-                'company' => $validated['company'] ?? null,
+                'company' => $companyName,
+                'company_id' => $companyId,
             ]);
         });
 
@@ -72,14 +85,27 @@ class EmployeeController extends Controller
 
     public function edit(Employee $employee): View
     {
-        return view('admin.employees.edit', compact('employee'));
+        $companies = Company::orderBy('name')->get();
+
+        return view('admin.employees.edit', compact('employee', 'companies'));
     }
 
     public function update(UpdateEmployeeRequest $request, Employee $employee): RedirectResponse
     {
         $validated = $request->validated();
 
-        DB::transaction(function () use ($employee, $validated) {
+        $companyId = $validated['company_id'] ?? null;
+        $companyName = $validated['company'] ?? null;
+        if (!empty($companyId)) {
+            $company = Company::find($companyId);
+            if ($company) {
+                $companyName = $company->name;
+            }
+        } elseif (array_key_exists('company_id', $validated) && is_null($companyId)) {
+            $companyName = null;
+        }
+
+        DB::transaction(function () use ($employee, $validated, $companyId, $companyName) {
             $fullName = trim("{$validated['first_name']} {$validated['last_name']}");
 
             $employee->update([
@@ -88,7 +114,8 @@ class EmployeeController extends Controller
                 'first_name' => $validated['first_name'],
                 'last_name' => $validated['last_name'],
                 'email' => $validated['email'],
-                'company' => $validated['company'] ?? null,
+                'company' => $companyName,
+                'company_id' => $companyId,
             ]);
 
             if ($employee->user) {

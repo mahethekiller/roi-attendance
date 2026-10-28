@@ -87,12 +87,23 @@
 
                             <!-- Company -->
                             <fieldset class="fieldset">
-                                <legend class="fieldset-legend text-xs font-bold uppercase tracking-wider text-base-content/70">Company Name</legend>
-                                <label class="input input-bordered flex items-center gap-2 w-full @error('company') input-error @enderror">
-                                    <i data-lucide="building-2" class="w-4 h-4 text-base-content/50 shrink-0"></i>
-                                    <input type="text" name="company" id="company" class="grow bg-transparent" value="{{ old('company', $employee->company) }}" placeholder="e.g. ROI Technologies">
-                                </label>
-                                @error('company')
+                                <div class="flex items-center justify-between mb-1">
+                                    <legend class="fieldset-legend text-xs font-bold uppercase tracking-wider text-base-content/70">Company</legend>
+                                    @can('companies.create')
+                                        <a href="{{ route('admin.companies.create') }}" target="_blank" class="text-xs text-primary hover:underline flex items-center gap-1">
+                                            <i data-lucide="plus" class="w-3 h-3"></i> Add Company
+                                        </a>
+                                    @endcan
+                                </div>
+                                <select name="company_id" id="company_id" class="select select-bordered w-full @error('company_id') select-error @enderror">
+                                    <option value="">-- Select Company (Optional) --</option>
+                                    @foreach($companies as $company)
+                                        <option value="{{ $company->id }}" {{ old('company_id', $employee->company_id) == $company->id ? 'selected' : '' }}>
+                                            {{ $company->name }} {{ $company->code ? "({$company->code})" : '' }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('company_id')
                                     <p class="fieldset-label text-error">{{ $message }}</p>
                                 @enderror
                             </fieldset>

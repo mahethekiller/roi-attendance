@@ -42,6 +42,7 @@ class UpdateEmployeeRequest extends FormRequest
                 Rule::unique('users', 'email')->ignore($userId),
             ],
             'company' => ['nullable', 'string', 'max:255'],
+            'company_id' => ['nullable', 'integer', 'exists:companies,id'],
         ];
     }
 }
