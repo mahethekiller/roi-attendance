@@ -151,21 +151,20 @@
                         <th>Timestamp</th>
                         <th>Trigger Source</th>
                         <th>Date Range</th>
-                        <th>Records / Swipes</th>
                         <th>Status</th>
-                        <th>HTTP</th>
+                        <th>Data Sent to API (Swipes Payload)</th>
                         <th>Message</th>
-                        <th class="text-right">Payload</th>
+                        <th class="text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($logs as $log)
                         <tr class="hover:bg-base-200/40 transition-colors">
-                            <td class="text-sm font-mono text-base-content/80 whitespace-nowrap">
+                            <td class="text-sm font-mono text-base-content/80 whitespace-nowrap align-top py-3">
                                 <div>{{ $log->created_at->format('M d, Y') }}</div>
                                 <div class="text-xs text-base-content/50">{{ $log->created_at->format('h:i:s A') }}</div>
                             </td>
-                            <td>
+                            <td class="align-top py-3">
                                 @if($log->trigger_type === 'cron')
                                     <span class="badge badge-info badge-soft gap-1 text-xs font-mono font-medium">
                                         <i data-lucide="clock" class="w-3 h-3"></i> Hourly Cron
@@ -185,53 +184,102 @@
                                     <div class="text-[10px] text-base-content/50 mt-0.5">by {{ $log->user->name }}</div>
                                 @endif
                             </td>
-                            <td class="text-xs font-mono text-base-content/70 whitespace-nowrap">
+                            <td class="text-xs font-mono text-base-content/70 whitespace-nowrap align-top py-3">
                                 <div>{{ $log->start_date ? $log->start_date->format('Y-m-d') : '-' }}</div>
                                 <div class="text-[10px] text-base-content/40">to {{ $log->end_date ? $log->end_date->format('Y-m-d') : '-' }}</div>
                             </td>
-                            <td>
-                                <div class="text-xs font-mono font-semibold text-base-content">
-                                    {{ $log->swipes_count }} swipes
-                                </div>
-                                <div class="text-[10px] text-base-content/50">
-                                    from {{ $log->records_count }} records
+                            <td class="align-top py-3">
+                                <div class="flex flex-col gap-1">
+                                    @if($log->status === 'success')
+                                        <span class="badge badge-success badge-soft font-semibold text-xs px-2.5 py-1">
+                                            Success
+                                        </span>
+                                    @elseif($log->status === 'empty')
+                                        <span class="badge badge-neutral badge-soft font-medium text-xs px-2.5 py-1">
+                                            No Data
+                                        </span>
+                                    @else
+                                        <span class="badge badge-error badge-soft font-semibold text-xs px-2.5 py-1">
+                                            Failed
+                                        </span>
+                                    @endif
+
+                                    @if($log->http_status)
+                                        <span class="badge badge-ghost font-mono text-[10px] w-fit">HTTP {{ $log->http_status }}</span>
+                                    @endif
                                 </div>
                             </td>
-                            <td>
-                                @if($log->status === 'success')
-                                    <span class="badge badge-success badge-soft font-semibold text-xs px-2.5 py-1">
-                                        Success
-                                    </span>
-                                @elseif($log->status === 'empty')
-                                    <span class="badge badge-neutral badge-soft font-medium text-xs px-2.5 py-1">
-                                        No Data
-                                    </span>
+                            <td class="align-top py-3">
+                                @php
+                                    $swipesList = $log->payload_sample ?? [];
+                                    $swipesCount = count($swipesList);
+                                    $empIds = [];
+                                    foreach ($swipesList as $sw) {
+                                        $parts = explode(',', $sw);
+                                        if (isset($parts[1])) {
+                                            $cleanId = trim($parts[1]);
+                                            if (!in_array($cleanId, $empIds)) {
+                                                $empIds[] = $cleanId;
+                                            }
+                                        }
+                                    }
+                                @endphp
+
+                                @if($swipesCount > 0)
+                                    <div class="space-y-1.5 max-w-md">
+                                        <div class="flex items-center gap-1.5 flex-wrap">
+                                            <span class="badge badge-primary badge-soft font-mono font-semibold text-xs px-2 py-0.5">
+                                                {{ $swipesCount }} {{ Str::plural('Swipe', $swipesCount) }}
+                                            </span>
+                                            @if(count($empIds) > 0)
+                                                <div class="flex items-center gap-1 flex-wrap text-[11px] text-base-content/70">
+                                                    <span>Employees:</span>
+                                                    @foreach(array_slice($empIds, 0, 3) as $eid)
+                                                        <span class="badge badge-neutral badge-xs font-mono font-semibold">{{ $eid }}</span>
+                                                    @endforeach
+                                                    @if(count($empIds) > 3)
+                                                        <span class="text-[10px] text-base-content/50">+{{ count($empIds) - 3 }} more</span>
+                                                    @endif
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        <!-- Direct Preview of Data Sent to API -->
+                                        <div class="bg-base-200/80 border border-base-300 rounded p-2 font-mono text-[11px] text-base-content/90 max-h-24 overflow-y-auto space-y-0.5 select-all leading-tight">
+                                            @foreach(array_slice($swipesList, 0, 4) as $swipeLine)
+                                                <div class="truncate text-[10.5px]" title="{{ $swipeLine }}">
+                                                    {{ $swipeLine }}
+                                                </div>
+                                            @endforeach
+                                            @if($swipesCount > 4)
+                                                <div class="text-[10px] text-primary/80 font-sans font-medium pt-0.5">
+                                                    +{{ $swipesCount - 4 }} more swipes sent
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
                                 @else
-                                    <span class="badge badge-error badge-soft font-semibold text-xs px-2.5 py-1">
-                                        Failed
-                                    </span>
+                                    <div class="text-xs text-base-content/40 italic flex items-center gap-1">
+                                        <i data-lucide="minus-circle" class="w-3.5 h-3.5"></i>
+                                        <span>No payload sent (0 swipes)</span>
+                                    </div>
                                 @endif
                             </td>
-                            <td>
-                                @if($log->http_status)
-                                    <span class="badge badge-ghost font-mono text-xs">{{ $log->http_status }}</span>
-                                @else
-                                    <span class="text-base-content/40 text-xs">-</span>
-                                @endif
+                            <td class="text-xs text-base-content/80 max-w-xs align-top py-3" title="{{ $log->message }}">
+                                <div class="line-clamp-2">
+                                    {{ $log->message }}
+                                </div>
                             </td>
-                            <td class="text-xs text-base-content/80 max-w-xs truncate" title="{{ $log->message }}">
-                                {{ $log->message }}
-                            </td>
-                            <td class="text-right">
-                                <button type="button" class="btn btn-ghost btn-xs gap-1" onclick="openPayloadModal({{ $log->id }}, {{ json_encode($log->payload_sample ?? []) }}, {{ json_encode($log->response_payload ?? []) }}, '{{ $log->status }}')">
-                                    <i data-lucide="eye" class="w-3.5 h-3.5"></i>
-                                    <span>Inspect</span>
+                            <td class="text-right align-top py-3">
+                                <button type="button" class="btn btn-primary btn-outline btn-xs gap-1" onclick="openPayloadModal({{ $log->id }}, {{ json_encode($log->payload_sample ?? []) }}, {{ json_encode($log->response_payload ?? []) }}, '{{ $log->status }}', '{{ $log->http_status }}', '{{ $log->start_date ? $log->start_date->format('Y-m-d') : '' }}', '{{ $log->end_date ? $log->end_date->format('Y-m-d') : '' }}')">
+                                    <i data-lucide="file-code" class="w-3.5 h-3.5"></i>
+                                    <span>View Payload</span>
                                 </button>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="text-center py-12 text-base-content/60">
+                            <td colspan="7" class="text-center py-12 text-base-content/60">
                                 <i data-lucide="inbox" class="w-9 h-9 mx-auto mb-2 text-base-content/30"></i>
                                 <span class="font-medium text-sm block">No greytHR push logs recorded yet</span>
                                 <span class="text-xs text-base-content/50">Scheduled hourly runs and manual pushes will automatically populate here.</span>
@@ -351,25 +399,81 @@
 
     <!-- Payload Inspect Modal -->
     <dialog id="payloadModal" class="modal">
-        <div class="modal-box bg-base-100 border border-base-200 shadow-xl max-w-2xl">
-            <h3 class="font-bold text-lg text-base-content flex items-center justify-between">
-                <span>Push Telemetry & Payload Details</span>
-                <span id="modalStatusBadge" class="badge badge-sm font-mono"></span>
-            </h3>
-
-            <div class="mt-4 space-y-4">
+        <div class="modal-box bg-base-100 border border-base-200 shadow-xl max-w-4xl p-6">
+            <div class="flex items-center justify-between pb-3 border-b border-base-200">
                 <div>
-                    <label class="text-xs font-semibold text-base-content/70 uppercase tracking-wider block mb-1">Swipes Payload Sample (Sent to greytHR)</label>
-                    <pre id="modalPayloadSample" class="bg-base-200 p-3 rounded-lg text-xs font-mono overflow-x-auto max-h-48 text-base-content"></pre>
+                    <h3 class="font-bold text-lg text-base-content flex items-center gap-2">
+                        <i data-lucide="code-2" class="w-5 h-5 text-primary"></i>
+                        <span>Data Sent to greytHR API & Response Details</span>
+                    </h3>
+                    <p class="text-xs text-base-content/60 mt-0.5">
+                        Endpoint: <code class="text-primary font-mono font-semibold">POST https://api.greythr.com/attendance/v2/employee/swipes</code>
+                    </p>
                 </div>
-
-                <div>
-                    <label class="text-xs font-semibold text-base-content/70 uppercase tracking-wider block mb-1">greytHR Response Body</label>
-                    <pre id="modalResponsePayload" class="bg-base-200 p-3 rounded-lg text-xs font-mono overflow-x-auto max-h-48 text-base-content"></pre>
+                <div class="flex items-center gap-2">
+                    <span id="modalHttpBadge" class="badge badge-ghost font-mono text-xs"></span>
+                    <span id="modalStatusBadge" class="badge badge-sm font-mono font-semibold"></span>
                 </div>
             </div>
 
-            <div class="modal-action">
+            <div class="mt-4 space-y-5">
+                <!-- Section 1: Data Sent (Swipes Payload) -->
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="font-semibold text-sm text-base-content">1. Sent Swipes Payload (Request Body)</span>
+                            <span id="modalSwipesCountBadge" class="badge badge-primary badge-sm font-mono">0 swipes</span>
+                        </div>
+                        <button type="button" class="btn btn-ghost btn-xs gap-1" onclick="copyModalContent('modalPayloadSample', 'copyPayloadBtn')" id="copyPayloadBtn">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                            <span>Copy Payload</span>
+                        </button>
+                    </div>
+
+                    <!-- Parsed Swipes Table -->
+                    <div class="overflow-x-auto max-h-56 border border-base-300/70 rounded-lg mb-2">
+                        <table class="table table-xs table-pin-rows w-full font-mono">
+                            <thead>
+                                <tr class="bg-base-200 text-base-content/70">
+                                    <th>#</th>
+                                    <th>Timestamp (IST)</th>
+                                    <th>Employee ID</th>
+                                    <th>Door Name</th>
+                                    <th>Direction</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modalSwipesTableBody">
+                                <!-- Populated dynamically by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Raw JSON Payload Code block -->
+                    <details class="group bg-base-200/50 rounded-lg border border-base-300/50">
+                        <summary class="cursor-pointer text-xs font-semibold p-2.5 text-base-content/70 flex items-center justify-between">
+                            <span>View Raw JSON Array</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 transition-transform group-open:rotate-180"></i>
+                        </summary>
+                        <div class="p-2.5 pt-0">
+                            <pre id="modalPayloadSample" class="bg-base-300/60 p-3 rounded text-[11px] font-mono overflow-x-auto max-h-40 text-base-content select-all"></pre>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Section 2: greytHR Response Body -->
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-semibold text-sm text-base-content">2. greytHR API Response</span>
+                        <button type="button" class="btn btn-ghost btn-xs gap-1" onclick="copyModalContent('modalResponsePayload', 'copyResponseBtn')" id="copyResponseBtn">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                            <span>Copy Response</span>
+                        </button>
+                    </div>
+                    <pre id="modalResponsePayload" class="bg-base-200/80 border border-base-300/60 p-3 rounded-lg text-xs font-mono overflow-x-auto max-h-44 text-base-content select-all"></pre>
+                </div>
+            </div>
+
+            <div class="modal-action border-t border-base-200 pt-3">
                 <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('payloadModal').close()">Close</button>
             </div>
         </div>
@@ -379,19 +483,87 @@
     </dialog>
 
     <script>
-        function openPayloadModal(id, payload, response, status) {
+        function openPayloadModal(id, payload, response, status, httpStatus, startDate, endDate) {
             const payloadEl = document.getElementById('modalPayloadSample');
             const responseEl = document.getElementById('modalResponsePayload');
             const badgeEl = document.getElementById('modalStatusBadge');
+            const httpBadgeEl = document.getElementById('modalHttpBadge');
+            const swipesCountBadge = document.getElementById('modalSwipesCountBadge');
+            const tableBody = document.getElementById('modalSwipesTableBody');
 
+            // Set raw content
             payloadEl.textContent = JSON.stringify(payload, null, 2);
             responseEl.textContent = JSON.stringify(response, null, 2);
 
-            badgeEl.textContent = status.toUpperCase();
+            // Set Badges
+            badgeEl.textContent = status ? status.toUpperCase() : 'UNKNOWN';
             badgeEl.className = 'badge badge-sm font-mono ' + 
                 (status === 'success' ? 'badge-success' : (status === 'empty' ? 'badge-neutral' : 'badge-error'));
 
+            if (httpStatus && httpStatus !== 'null') {
+                httpBadgeEl.textContent = 'HTTP ' + httpStatus;
+                httpBadgeEl.classList.remove('hidden');
+            } else {
+                httpBadgeEl.classList.add('hidden');
+            }
+
+            const swipes = Array.isArray(payload) ? payload : [];
+            swipesCountBadge.textContent = swipes.length + (swipes.length === 1 ? ' swipe' : ' swipes');
+
+            // Populate parsed table rows
+            tableBody.innerHTML = '';
+            if (swipes.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-base-content/50 italic">No swipes were generated or sent for this run.</td></tr>';
+            } else {
+                swipes.forEach((swipeStr, index) => {
+                    const parts = (typeof swipeStr === 'string' ? swipeStr.split(',') : []);
+                    const timestamp = parts[0] || '-';
+                    const empId = parts[1] || '-';
+                    const door = parts[2] || '-';
+                    const isCheckIn = parts[3] === '1';
+                    const directionText = isCheckIn ? 'IN (Check-in)' : (parts[3] === '0' ? 'OUT (Check-out)' : parts[3]);
+                    const badgeClass = isCheckIn ? 'badge-success badge-soft text-success' : 'badge-warning badge-soft text-warning';
+
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-base-200/50';
+                    tr.innerHTML = `
+                        <td class="text-base-content/50">${index + 1}</td>
+                        <td class="text-base-content/90">${escapeHtml(timestamp)}</td>
+                        <td><span class="badge badge-neutral badge-xs font-mono font-bold">${escapeHtml(empId)}</span></td>
+                        <td class="text-base-content/70">${escapeHtml(door)}</td>
+                        <td><span class="badge ${badgeClass} badge-xs font-semibold">${escapeHtml(directionText)}</span></td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            }
+
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+
             document.getElementById('payloadModal').showModal();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function copyModalContent(elementId, btnId) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+
+            navigator.clipboard.writeText(el.textContent).then(() => {
+                const btn = document.getElementById(btnId);
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = '<i data-lucide="check" class="w-3.5 h-3.5 text-success"></i><span class="text-success">Copied!</span>';
+                if (window.lucide) window.lucide.createIcons();
+                setTimeout(() => {
+                    btn.innerHTML = originalHtml;
+                    if (window.lucide) window.lucide.createIcons();
+                }, 2000);
+            });
         }
     </script>
 </x-admin-layout>

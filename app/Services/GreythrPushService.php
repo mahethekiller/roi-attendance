@@ -234,7 +234,7 @@ class GreythrPushService
                 'status'           => 'failed',
                 'http_status'      => 401,
                 'message'          => $errorMsg,
-                'payload_sample'   => array_slice($swipes, 0, 5),
+                'payload_sample'   => array_slice($swipes, 0, 500),
                 'response_payload' => null,
                 'triggered_by'     => $userId,
             ]);
@@ -271,7 +271,7 @@ class GreythrPushService
                 'status'           => $isSuccess ? 'success' : 'failed',
                 'http_status'      => $httpStatus,
                 'message'          => $message,
-                'payload_sample'   => array_slice($swipes, 0, 10),
+                'payload_sample'   => array_slice($swipes, 0, 500),
                 'response_payload' => $responseData,
                 'triggered_by'     => $userId,
             ]);

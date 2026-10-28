@@ -72,6 +72,8 @@ class GreythrPushTest extends TestCase
         $response->assertSee('i2k2-networks.greythr.com');
         $response->assertSee('10'); // Swipes
         $response->assertSee('Employee swipes are saved successfully.');
+        $response->assertSee('89170020'); // Employee ID in sent payload
+        $response->assertSee('door 1,1'); // Swipe direction in sent payload
     }
 
     public function test_service_obtains_and_caches_oauth_token(): void
